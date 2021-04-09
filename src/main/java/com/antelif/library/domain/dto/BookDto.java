@@ -4,7 +4,9 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-/** BookEntity DTO. */
+/**
+ * BookEntity DTO.
+ */
 @Getter
 @Setter
 public class BookDto {
