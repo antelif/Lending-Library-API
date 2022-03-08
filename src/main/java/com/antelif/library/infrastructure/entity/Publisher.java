@@ -1,17 +1,14 @@
 package com.antelif.library.infrastructure.entity;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class Customer {
+public class Publisher {
 
-  String name;
-  String phoneNo;
-  String email;
-  int id;
-  double fee;
-
+  private String name;
+  private List<Book> books;
 
 }

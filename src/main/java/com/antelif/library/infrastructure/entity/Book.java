@@ -1,30 +1,18 @@
 package com.antelif.library.infrastructure.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Setter
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-
-@Entity
+@ToString
 public class Book {
 
-  @Id
   private String isbn;
   private String title;
-  private String author;
-  private String publisher;
-
-  @Override
-  public String toString() {
-    return title + ", by " + author + "\nISBN: " + isbn;
-  }
+  private Author author;
+  private Publisher publisher;
 
 
 }

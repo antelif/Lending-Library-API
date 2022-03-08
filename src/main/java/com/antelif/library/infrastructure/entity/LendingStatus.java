@@ -5,13 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Customer {
+public class LendingStatus {
 
-  String name;
-  String phoneNo;
-  String email;
-  int id;
-  double fee;
-
+  private Transaction latestTransaction;
+  private Status status;
 
 }
