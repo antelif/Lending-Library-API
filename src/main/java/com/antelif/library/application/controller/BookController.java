@@ -24,8 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class BookController {
 
-  @Autowired
-  private BookService bookService;
+  private final BookService bookService;
 
   /**
    * Gets a book by Isbn.
@@ -35,27 +34,24 @@ public class BookController {
    */
   @GetMapping("/books/{isbn}")
   public Book getBookByIsbn(@PathVariable("isbn") String isbn) {
-    Book book;
 
     log.info("Request to get Book with isbn: {}", isbn);
 
-    book = bookService.getBookByIsbn(isbn);
-
-    return book;
+    return bookService.getBookByIsbn(isbn);
   }
 
   @GetMapping(value = "/books", params = "author")
   public List<Book> getBookByAuthor(@RequestParam("author") String author) {
-    List<Book> books = bookService.getBookByAuthor(author);
     log.info("Request to get all Books by athor: {}", author);
-    return books;
+    return bookService.getBookByAuthor(author);
   }
 
   @GetMapping(value = "/books", params = "title")
   public List<Book> getBooksByTitle(@RequestParam("title") String title) {
-    List<Book> books = bookService.getBooksByTitle(title);
+
     log.info("Request to get all Books with keyword: {}", title);
-    return books;
+
+    return bookService.getBooksByTitle(title);
   }
 
   @GetMapping(value = "/books", params = "publisher")

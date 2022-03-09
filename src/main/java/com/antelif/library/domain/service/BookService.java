@@ -1,36 +1,31 @@
 package com.antelif.library.domain.service;
 
 import com.antelif.library.infrastructure.entity.Book;
-import com.antelif.library.infrastructure.BookRepository;
+import com.antelif.library.infrastructure.repository.BookRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class BookService {
 
-  @Autowired
-  private BookRepository bookRepository;
+  private final BookRepository bookRepository;
 
   public Book getBookByIsbn(String isbn) {
     return bookRepository.getBookByIsbn(isbn);
   }
 
   public List<Book> getBookByAuthor(String author) {
-    List<Book> books = bookRepository.getBooksByAuthor(author);
-    return books;
+    return bookRepository.getBooksByAuthor(author);
   }
 
   public List<Book> getBooksByTitle(String title) {
-    List<Book> books = bookRepository.getBooksByTitleContaining(title);
-    return books;
+    return bookRepository.getBooksByTitleContaining(title);
   }
 
-  public List<Book> getBooksByPublisher(String publisher){
-    List<Book> books = bookRepository.getBooksByPublisher(publisher);
-    return  books;
+  public List<Book> getBooksByPublisher(String publisher) {
+    return bookRepository.getBooksByPublisher(publisher);
   }
 
   public void addBook(Book book) {
