@@ -5,25 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="33a6e6e0-268d-479d-b12e-6ffa8c576697" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/google-java-format.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/google-java-format.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gitignore.txt" beforeDir="false" afterPath="$PROJECT_DIR$/gitignore.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gitignore.txt" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lending_library.iml" beforeDir="false" afterPath="$PROJECT_DIR$/lending_library.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/antelif/library/application/controller/BookController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/antelif/library/application/controller/BookController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/antelif/library/domain/service/BookService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/antelif/library/domain/service/BookService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/antelif/library/infrastructure/entity/Book.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/antelif/library/infrastructure/entity/Book.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/antelif/library/infrastructure/entity/Customer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/antelif/library/infrastructure/entity/Customer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/AddBooks.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/antelif/lendinglibrary/LendingLibraryApplication.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/antelif/lendinglibrary/controller/BookController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/antelif/lendinglibrary/entity/Book.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/antelif/lendinglibrary/entity/Customer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/antelif/lendinglibrary/entity/Personnel.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/antelif/lendinglibrary/repository/BookRepository.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/antelif/lendinglibrary/service/BookService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/antelif/lendinglibrary/LendingLibraryApplicationTests.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/antelif/library/infrastructure/entity/Publisher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/antelif/library/infrastructure/entity/Publisher.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +35,9 @@
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
   </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectId" id="1pLqpNdD6u0JBJvjP3KjbLck6PV" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="1" id="Add" />
@@ -66,7 +55,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/lending-library" />
+    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/project1" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -75,9 +64,9 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Project" />
-    <property name="project.structure.proportion" value="0.0" />
-    <property name="project.structure.side.proportion" value="0.0" />
-    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="google-java-format.settings" />
   </component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
@@ -85,19 +74,6 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="CLASS" />
-      <properties />
-      <listeners />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="LendingLibraryApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <module name="lending_library" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.antelif.library.LendingLibraryApplication" />
@@ -119,6 +95,12 @@
       <workItem from="1615125134441" duration="5663000" />
       <workItem from="1615130876841" duration="1650000" />
       <workItem from="1617993509513" duration="366000" />
+      <workItem from="1646775245244" duration="35000" />
+      <workItem from="1646775306416" duration="306000" />
+      <workItem from="1646775637117" duration="235000" />
+      <workItem from="1646776222043" duration="221000" />
+      <workItem from="1647465700412" duration="704000" />
+      <workItem from="1647466607371" duration="484000" />
     </task>
     <servers />
   </component>
