@@ -16,17 +16,17 @@ public class BookService {
     return bookRepository.getBookByIsbn(isbn);
   }
 
-  public List<Book> getBookByAuthor(String author) {
-    return bookRepository.getBooksByAuthor(author);
-  }
+//  public List<Book> getBookByAuthor(String author) {
+//    return bookRepository.getBooksByAuthor(author);
+//  }
 
   public List<Book> getBooksByTitle(String title) {
     return bookRepository.getBooksByTitleContaining(title);
   }
 
-  public List<Book> getBooksByPublisher(String publisher) {
-    return bookRepository.getBooksByPublisher(publisher);
-  }
+//  public List<Book> getBooksByPublisher(String publisher) {
+//    return bookRepository.getBooksByPublisher(publisher);
+//  }
 
   public void addBook(Book book) {
     bookRepository.save(book);
