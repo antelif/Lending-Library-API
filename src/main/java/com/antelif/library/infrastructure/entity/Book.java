@@ -8,11 +8,8 @@ import lombok.ToString;
 @Getter
 @ToString
 public class Book {
-
   private String isbn;
   private String title;
   private Author author;
   private Publisher publisher;
-
-
 }
