@@ -12,5 +12,5 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: none
-#  liquibase:
-#    change-log: classspath:/changelog/db.changelog-master.xml
+  liquibase:
+    change-log: changelog/changelog-master.xml

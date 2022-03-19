@@ -24,10 +24,6 @@ public class Transaction {
 
   @ManyToOne
   @JoinColumn(referencedColumnName = "id")
-  private CopyTransaction copyTransaction;
-
-  @ManyToOne
-  @JoinColumn(referencedColumnName = "id")
   private Customer customer;
 
   @ManyToOne

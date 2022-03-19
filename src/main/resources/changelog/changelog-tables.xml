@@ -1,0 +1,212 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+  <preConditions>
+    <dbms type="postgresql"/>
+  </preConditions>
+
+  <!--  Table Creation. -->
+  <changeSet id="table-creation-book" author="antelif">
+    <preConditions>
+      <not>
+        <tableExists tableName="book"/>
+      </not>
+    </preConditions>
+
+    <createTable tableName="book">
+      <column name="id" type="serial" autoIncrement="true">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="isbn" type="varchar(17)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="title" type="varchar(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="author_id" type="int">
+        <constraints nullable="false"/>
+      </column>
+      <column name="publisher_id" type="int">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="table-creation-book_copy" author="antelif">
+    <preConditions>
+      <not>
+        <tableExists tableName="book_copy"/>
+      </not>
+    </preConditions>
+    <createTable tableName="book_copy">
+      <column name="id" type="serial" autoIncrement="true">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="status" type="varchar(10)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="state" type="varchar(10)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="table-creation-publisher" author="antelif">
+    <preConditions>
+      <not>
+        <tableExists tableName="publisher"/>
+      </not>
+    </preConditions>
+    <createTable tableName="publisher">
+      <column name="id" type="serial" autoIncrement="true">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="name" type="varchar(50)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="table-creation-author" author="antelif">
+    <preConditions>
+      <not>
+        <tableExists tableName="author"/>
+      </not>
+    </preConditions>
+    <createTable tableName="author">
+      <column name="id" type="serial" autoIncrement="true">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="name" type="varchar(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="surname" type="varchar(50)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="table-creation-copy_transaction" author="antelif">
+    <preConditions>
+      <not>
+        <tableExists tableName="copy_transaction"/>
+      </not>
+    </preConditions>
+    <createTable tableName="copy_transaction">
+      <column name="book_copy_id" type="int">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="transaction_id" type="int">
+        <constraints primaryKey="true"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="table-creation-transaction" author="antelif">
+    <preConditions>
+      <not>
+        <tableExists tableName="transaction"/>
+      </not>
+    </preConditions>
+    <createTable tableName="transaction">
+      <column name="id" type="serial" autoIncrement="true">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="customer_id" type="int">
+        <constraints nullable="false"/>
+      </column>
+      <column name="personnel_id" type="int">
+        <constraints nullable="false"/>
+      </column>
+      <column name="creation_date" type="timestamp with time zone">
+        <constraints nullable="false"/>
+      </column>
+      <column name="return_date" type="timestamp with time zone">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="table-creation-customer" author="antelif">
+    <preConditions>
+      <not>
+        <tableExists tableName="customer"/>
+      </not>
+    </preConditions>
+    <createTable tableName="customer">
+      <column name="id" type="serial" autoIncrement="true">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="name" type="varchar(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="surname" type="varchar(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="phone_no" type="varchar(20)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="fee" type="double" startWith="0">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="table-creation-personnel" author="antelif">
+    <preConditions>
+      <not>
+        <tableExists tableName="personnel"/>
+      </not>
+    </preConditions>
+    <createTable tableName="personnel">
+      <column name="id" type="serial" autoIncrement="true">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="username" type="varchar(20)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="password" type="varchar(50)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+
+  <!--  Ad Foreign Keys. -->
+  <changeSet id="fk-constraint-book-1" author="antelif">
+    <addForeignKeyConstraint baseTableName="book" baseColumnNames="publisher_id"
+      constraintName="book_fk1"
+      referencedTableName="publisher" referencedColumnNames="id"/>
+  </changeSet>
+  <changeSet id="fk-constraint-book-2" author="antelif">
+    <addForeignKeyConstraint baseTableName="book" baseColumnNames="author_id"
+      constraintName="book_fk2"
+      referencedTableName="author" referencedColumnNames="id"/>
+  </changeSet>
+  <changeSet id="fk-constraint-book_copy-1" author="antelif">
+    <addForeignKeyConstraint baseTableName="book_copy" baseColumnNames="book_id"
+      constraintName="book_copy_fk1"
+      referencedTableName="book" referencedColumnNames="id"/>
+  </changeSet>
+  <changeSet id="fk-constraint-copy_transaction-1" author="antelif">
+    <addForeignKeyConstraint baseTableName="copy_transaction" baseColumnNames="book_copy_id"
+      constraintName="book_copy_fk1"
+      referencedTableName="book_copy" referencedColumnNames="id"/>
+  </changeSet>
+  <changeSet id="fk-constraint-copy_transaction-2" author="antelif">
+    <addForeignKeyConstraint baseTableName="copy_transaction" baseColumnNames="transaction_id"
+      constraintName="book_copy_fk2"
+      referencedTableName="transaction" referencedColumnNames="id"/>
+  </changeSet>
+  <changeSet id="fk-constraint-transaction-1" author="antelif">
+    <addForeignKeyConstraint baseTableName="transaction" baseColumnNames="customer_id"
+      constraintName="transaction_fk1"
+      referencedTableName="customer" referencedColumnNames="id"/>
+  </changeSet>
+  <changeSet id="fk-constraint-transaction-2" author="antelif">
+    <addForeignKeyConstraint baseTableName="transaction" baseColumnNames="personnel_id"
+      constraintName="transaction_fk2"
+      referencedTableName="personnel" referencedColumnNames="id"/>
+  </changeSet>
+</databaseChangeLog>
