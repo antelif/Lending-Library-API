@@ -11,16 +11,15 @@ import lombok.Setter;
 @Setter
 @Entity
 public class Customer {
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
 
-  String name;
+  private String name;
 
-  String phoneNo;
+  private String phoneNo;
 
-  String email;
+  private String email;
 
-  double fee;
+  private double fee;
 }

@@ -1,7 +1,6 @@
 package com.antelif.library.infrastructure.entity;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -25,11 +24,11 @@ public class Book {
 
   private String title;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(referencedColumnName = "id")
   private Author author;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(referencedColumnName = "id")
   private Publisher publisher;
 }

@@ -10,11 +10,11 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
   Book getBookByIsbn(String isbn);
 
-//  List<Book> getBooksByAuthor(String author);
+  List<Book> getBooksByAuthorName(String authorName);
 
   List<Book> getBooksByTitleContaining(String title);
 
   void deleteBookByIsbn(String isbn);
 
-//  List<Book> getBooksByPublisher(String publisher);
+  List<Book> getBooksByPublisherName(String publisherName);
 }
