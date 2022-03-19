@@ -10,13 +10,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-public class Author {
+public class CopyTransaction {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-
-  private String name;
-
-  private String surname;
 }

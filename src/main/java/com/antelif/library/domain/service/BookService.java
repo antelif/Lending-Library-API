@@ -17,7 +17,7 @@ public class BookService {
   }
 
   public List<Book> getBookByAuthor(String author) {
-    return bookRepository.getBooksByAuthor(author);
+    return bookRepository.getBooksByAuthorName(author);
   }
 
   public List<Book> getBooksByTitle(String title) {
@@ -25,7 +25,7 @@ public class BookService {
   }
 
   public List<Book> getBooksByPublisher(String publisher) {
-    return bookRepository.getBooksByPublisher(publisher);
+    return bookRepository.getBooksByPublisherName(publisher);
   }
 
   public void addBook(Book book) {
@@ -39,5 +39,4 @@ public class BookService {
   public void updateBook(Book book) {
     bookRepository.save(book);
   }
-
 }
