@@ -14,4 +14,3 @@ spring:
       ddl-auto: create
   liquibase:
     change-log: classpath:/changelog/changelog-master.xml
-fvdf
