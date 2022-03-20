@@ -24,10 +24,6 @@ public class BookCopy {
   @JoinColumn(referencedColumnName = "id")
   private Book book;
 
-  @ManyToOne
-  @JoinColumn(referencedColumnName = "id")
-  private CopyTransaction copyTransaction;
-
   @Enumerated(value = EnumType.STRING)
   private State state;
 

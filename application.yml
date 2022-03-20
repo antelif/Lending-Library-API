@@ -8,9 +8,10 @@ spring:
     database: POSTGRESQL
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
-    generate-ddl: false
+    generate-ddl: true
     show-sql: true
     hibernate:
-      ddl-auto: none
-#  liquibase:
-#    change-log: classspath:/changelog/db.changelog-master.xml
+      ddl-auto: create
+  liquibase:
+    change-log: classpath:/changelog/changelog-master.xml
+fvdf
