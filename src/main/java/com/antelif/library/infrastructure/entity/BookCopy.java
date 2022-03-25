@@ -11,6 +11,7 @@ import javax.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
+/** BookCopy entity object that gets persisted in database. */
 @Getter
 @Setter
 @Entity

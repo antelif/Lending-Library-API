@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Publisher entity object that gets persisted in database. */
 @Getter
 @Setter
 @Entity

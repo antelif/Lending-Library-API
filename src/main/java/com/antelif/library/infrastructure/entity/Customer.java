@@ -24,4 +24,8 @@ public class Customer {
   private String email;
 
   private double fee;
+
+  public boolean canBorrow() {
+    return this.fee <= 0;
+  }
 }

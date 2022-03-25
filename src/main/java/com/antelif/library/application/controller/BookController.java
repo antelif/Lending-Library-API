@@ -1,5 +1,6 @@
 package com.antelif.library.application.controller;
 
+import com.antelif.library.domain.dto.BookDto;
 import com.antelif.library.domain.service.BookService;
 import com.antelif.library.infrastructure.entity.Book;
 import java.util.List;
@@ -57,9 +58,9 @@ public class BookController {
   }
 
   @PostMapping("/books/{isbn}")
-  public void addBook(@RequestBody Book book) {
-    log.info("Request to add book with id: {}", book.getIsbn());
-    bookService.addBook(book);
+  public void addBook(@RequestBody BookDto dto) {
+    log.info("Request to add book with id: {}", dto.getIsbn());
+    bookService.addBook(dto);
   }
 
   @PutMapping("books/{isbn}")

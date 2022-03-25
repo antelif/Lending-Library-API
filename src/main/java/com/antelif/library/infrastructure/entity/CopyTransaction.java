@@ -9,10 +9,12 @@ import javax.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
+/** CopyTransaction entity object that gets persisted in database. */
 @Getter
 @Setter
 @Entity
 @IdClass(value = CopyTransactionId.class)
+// TODO: revise name.
 public class CopyTransaction {
 
   @Id

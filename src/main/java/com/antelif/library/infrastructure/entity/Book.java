@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+/** Book entity object that gets persisted in database. */
 @Setter
 @Getter
 @ToString
