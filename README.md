@@ -8,6 +8,6 @@ Personnel of library can:
 - Add / Remove books from library system
 - Add / Remove copies of books available for lending
 - Create borrow transactions
-- Create Return transaction
+- Create Return transactions
 - View return transactions that are overdue
 - Create new customer records

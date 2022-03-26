@@ -4,19 +4,20 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
+/** PublisherEntity entity object that gets persisted in database. */
 @Getter
+@Setter
 @Entity
-public class Personnel {
+@Table(name = "publisher")
+public class PublisherEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String username;
-
-  private String password;
+  private String name;
 }

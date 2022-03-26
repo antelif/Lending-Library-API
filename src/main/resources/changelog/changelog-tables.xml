@@ -44,6 +44,9 @@
       <column name="id" type="serial" autoIncrement="true">
         <constraints primaryKey="true"/>
       </column>
+      <column name="book_id" type="integer">
+        <constraints nullable="false"/>
+      </column>
       <column name="status" type="varchar(10)">
         <constraints nullable="false"/>
       </column>
@@ -81,6 +84,9 @@
       </column>
       <column name="name" type="varchar(50)">
         <constraints nullable="false"/>
+      </column>
+      <column name="middle_name" type="varchar(50)">
+        <constraints nullable="true"/>
       </column>
       <column name="surname" type="varchar(50)">
         <constraints nullable="false"/>

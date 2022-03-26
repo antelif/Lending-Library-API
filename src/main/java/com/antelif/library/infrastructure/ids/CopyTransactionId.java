@@ -1,17 +1,18 @@
 package com.antelif.library.infrastructure.ids;
 
-import com.antelif.library.infrastructure.entity.BookCopy;
-import com.antelif.library.infrastructure.entity.Transaction;
+import com.antelif.library.infrastructure.entity.BookCopyEntity;
+import com.antelif.library.infrastructure.entity.TransactionEntity;
 import java.io.Serializable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Contains copy transaction table primary key. */
 @Getter
 @Setter
 @EqualsAndHashCode
 public class CopyTransactionId implements Serializable {
 
-  private BookCopy bookCopy;
-  private Transaction transaction;
+  private BookCopyEntity bookCopy;
+  private TransactionEntity transaction;
 }
