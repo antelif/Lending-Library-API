@@ -27,8 +27,4 @@ public class CustomerEntity {
   private String email;
 
   private double fee;
-
-  public boolean canBorrow() {
-    return this.fee <= 0;
-  }
 }
