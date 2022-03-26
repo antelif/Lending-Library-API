@@ -85,6 +85,9 @@
       <column name="name" type="varchar(50)">
         <constraints nullable="false"/>
       </column>
+      <column name="middle_name" type="varchar(50)">
+        <constraints nullable="true"/>
+      </column>
       <column name="surname" type="varchar(50)">
         <constraints nullable="false"/>
       </column>

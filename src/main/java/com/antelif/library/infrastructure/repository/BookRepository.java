@@ -8,13 +8,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BookRepository extends JpaRepository<BookEntity, Long> {
 
+  /**
+   * Retrieves a book by the isbn provided.
+   *
+   * @param isbn the isbn of the book.
+   * @return a book entity if exists.
+   */
   BookEntity getBookByIsbn(String isbn);
-
-  //  List<BookEntity> getBooksByAuthorName(String authorName);
-  //
-  //  List<BookEntity> getBooksByTitleContaining(String title);
-
-  void deleteBookByIsbn(String isbn);
-
-  //  List<BookEntity> getBooksByPublisherName(String publisherName);
 }

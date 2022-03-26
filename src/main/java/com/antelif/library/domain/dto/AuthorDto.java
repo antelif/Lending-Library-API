@@ -4,13 +4,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/** AuthorEntity DTO. */
+/** Author DTO. */
 @Getter
 @Setter
 @EqualsAndHashCode
 public class AuthorDto {
 
-  private Long id;
   private String name;
   private String surname;
 }

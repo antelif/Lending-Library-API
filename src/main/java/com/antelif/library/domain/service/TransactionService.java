@@ -8,6 +8,7 @@ import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/** Transaction service. */
 @Service
 @RequiredArgsConstructor
 public class TransactionService {
@@ -15,6 +16,12 @@ public class TransactionService {
   private final TransactionRepository transactionRepository;
   private final ConverterFactory converterFactory;
 
+  /**
+   * Add a new transaction in the database.
+   *
+   * @param transactionDto contains information about the new transaction.
+   * @return the transaction id.
+   */
   @Transactional
   public Long createTransaction(TransactionDto transactionDto) {
     return transactionRepository

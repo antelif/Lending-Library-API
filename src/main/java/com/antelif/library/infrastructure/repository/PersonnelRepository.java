@@ -9,5 +9,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PersonnelRepository extends JpaRepository<PersonnelEntity, Long> {
 
+  /**
+   * Get a Personnel entity object from database with the given id.
+   *
+   * @param id the id for the personnel entity.
+   * @return a personnel entity if it exists.
+   */
   Optional<PersonnelEntity> getPersonnelById(Long id);
 }

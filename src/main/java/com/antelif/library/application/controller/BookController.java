@@ -4,10 +4,8 @@ import com.antelif.library.domain.dto.BookCopyDto;
 import com.antelif.library.domain.dto.BookDto;
 import com.antelif.library.domain.service.BookCopyService;
 import com.antelif.library.domain.service.BookService;
-import com.antelif.library.infrastructure.entity.BookEntity;
 import java.util.List;
 import java.util.Map;
-import javax.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** BookEntity Controller. */
+/** Book Controller. */
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -34,15 +32,16 @@ public class BookController {
    * @return a book having the given isbn.
    */
   @GetMapping(value = "/{isbn}")
-  public BookEntity getBookByIsbn(@PathVariable("isbn") String isbn) {
+  public BookDto getBookByIsbn(@PathVariable("isbn") String isbn) {
 
-    log.info("Request to get BookEntity with isbn: {}", isbn);
+    log.info("Request to get book with isbn: {}", isbn);
 
     return bookService.getBookByIsbn(isbn);
   }
 
   /**
    * Add a new book in the database.
+   *
    * @param dto the DTo with information about the new book.
    * @return a map with the book title as value.
    */
@@ -52,40 +51,17 @@ public class BookController {
     return Map.of("created", bookService.addBook(dto));
   }
 
+  /**
+   * Add book copies endpoint.
+   *
+   * @param isbn o the book, to add copies for.
+   * @param copies the BookCopy DTOs with information about each copy.
+   * @return a map.
+   */
   @PostMapping(value = "/copies/{isbn}")
-  public Map<String, String> addMultipleBookCopies(@PathParam(value = "isbn")String isbn, @RequestBody List<BookCopyDto> copies){
-    log.info("Request to add {} book copies for with id: {}", isbn);
+  public Map<String, String> addMultipleBookCopies(
+      @PathVariable(value = "isbn") String isbn, @RequestBody List<BookCopyDto> copies) {
+    log.info("Request to add {} book copies for with id: {}", copies.size(), isbn);
     return Map.of("created", bookCopyService.addBookCopies(copies).toString());
   }
-//
-//  @GetMapping(value = "/books", params = "author")
-//  public List<BookEntity> getBookByAuthor(@RequestParam("author") String author) {
-//    log.info("Request to get all Books by athor: {}", author);
-//    return bookService.getBookByAuthor(author);
-//  }
-//
-//  @GetMapping(value = "/books", params = "title")
-//  public List<BookEntity> getBooksByTitle(@RequestParam("title") String title) {
-//
-//    log.info("Request to get all Books with keyword: {}", title);
-//
-//    return bookService.getBooksByTitle(title);
-//  }
-//
-//  @GetMapping(value = "/books", params = "publisher")
-//  public List<BookEntity> getBooksByPublisher(@PathParam("publisher") String publisher) {
-//    return bookService.getBooksByPublisher(publisher);
-//  }
-//
-//  @PutMapping("books/{isbn}")
-//  public void updateBook(BookEntity book) {
-//    log.info("Request to update boom with isbn: {}", book.getIsbn());
-//    bookService.updateBook(book);
-//  }
-//
-//  @DeleteMapping("books/{isbn}")
-//  public void removeBook(String isbn) {
-//    log.info("Request to delete book with isbn: {}", isbn);
-//    bookService.removeBook(isbn);
-//  }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/** Author query controller. */
 @RestController
 @Slf4j
 @RequestMapping(value = "/authors")
@@ -17,6 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthorQueryController {
   private final AuthorService authorService;
 
+  /**
+   * Get author by name and surname endpoint.
+   *
+   * @param name the name of the author,
+   * @param surname the surname of the author.
+   * @return an author DTO for the provided name and surname.
+   */
   @GetMapping
   public AuthorDto getAuthorByNameAndSurname(
       @RequestParam(value = "name") String name, @RequestParam(value = "surname") String surname) {
@@ -24,6 +32,12 @@ public class AuthorQueryController {
     return authorService.getAuthorByNameAndSurname(name, surname);
   }
 
+  /**
+   * Get autor by id endpoint.
+   *
+   * @param id the id of the author to retrieve.
+   * @return an author DTO for the provided id.
+   */
   @GetMapping
   public AuthorDto getAuthorById(@PathParam(value = "id") Long id) {
     log.info("Received request to fetch author with id {}", id);

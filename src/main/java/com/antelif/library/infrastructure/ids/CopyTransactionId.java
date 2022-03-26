@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Contains copy transaction table primary key. */
 @Getter
 @Setter
 @EqualsAndHashCode

@@ -7,6 +7,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/** Author service. */
 @Service
 @RequiredArgsConstructor
 public class AuthorService {
@@ -14,6 +15,12 @@ public class AuthorService {
   private final AuthorRepository authorRepository;
   private final AuthorConverter converter;
 
+  /**
+   * Adds author to database.
+   *
+   * @param authorDto the DTO to get information about the author to create.
+   * @return n author DTO.
+   */
   public AuthorDto addAuthor(AuthorDto authorDto) {
 
     var persistedEntity =
@@ -27,32 +34,53 @@ public class AuthorService {
         .map(authorRepository::save)
         .map(converter::convertFromEntityToDomain)
         .map(converter::convertFromDomainToDto)
+        // TODO: Add dedicated exception.
         .orElseThrow(RuntimeException::new);
   }
 
+  /**
+   * Retrieve an author from the database by provided id.
+   *
+   * @param id of the author to retrieve.
+   * @return an author DTO.
+   */
   public AuthorDto getAuthorById(Long id) {
     var persistedAuthor = authorRepository.getAuthorById(id);
 
     if (persistedAuthor.isEmpty()) {
+      // TODO: Replace with dedicated exception.
       throw new RuntimeException("Cannot ind author by id " + id);
     }
 
     return persistedAuthor
         .map(converter::convertFromEntityToDomain)
         .map(converter::convertFromDomainToDto)
+        // TODO: Add a dedicated exception.
         .orElseThrow(RuntimeException::new);
   }
 
+  /**
+   * Retrieve an author from the database based on the provided name and surname. If more than one
+   * authors are retrieved return error.
+   *
+   * @param name of the author to retrieve,
+   * @param surname of the author to retrieve.
+   * @return and author DTO.
+   */
   public AuthorDto getAuthorByNameAndSurname(String name, String surname) {
     var persistedAuthors = authorRepository.getAuthorsByNameAndSurname(name, surname);
 
     if (persistedAuthors.size() > 1) {
+      // TODO: Replace with dedicated exception.
       throw new RuntimeException("Cannot find specific author.");
     }
     if (persistedAuthors.stream().findAny().isEmpty()) {
+      // TODO: Replace wih dedicated exception.
       throw new RuntimeException("No author was found");
     }
     return converter.convertFromDomainToDto(
-        converter.convertFromEntityToDomain(persistedAuthors.stream().findAny().get()));
+        converter.convertFromEntityToDomain(
+            // TODO: Replace with dedicated exception.
+            persistedAuthors.stream().findAny().orElseThrow(RuntimeException::new)));
   }
 }

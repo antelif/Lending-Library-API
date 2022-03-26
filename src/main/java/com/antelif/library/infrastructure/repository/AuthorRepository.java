@@ -12,7 +12,20 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AuthorRepository extends JpaRepository<AuthorEntity, Long> {
 
+  /**
+   * Retrieves an author by their id.
+   *
+   * @param id the author id.
+   * @return an author entity if exists.
+   */
   Optional<AuthorEntity> getAuthorById(Long id);
 
-  List<AuthorEntity> getAuthorsByNameAndSurname(String authorName, String surname);
+  /**
+   * Retrieves all authors by their name and surname.
+   *
+   * @param name the name of the author,
+   * @param surname the surname of the author.
+   * @return a list with all authors retrieved.
+   */
+  List<AuthorEntity> getAuthorsByNameAndSurname(String name, String surname);
 }

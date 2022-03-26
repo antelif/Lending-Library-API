@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Transaction domain object. */
 @Getter
 @Setter
 @EqualsAndHashCode

@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Book domain object. */
 @Setter
 @Getter
 @EqualsAndHashCode

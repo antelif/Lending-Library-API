@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Publisher domain object. */
 @Getter
 @Setter
 @EqualsAndHashCode

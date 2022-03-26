@@ -8,6 +8,7 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Customer entity object. */
 @Getter
 @Setter
 @Entity

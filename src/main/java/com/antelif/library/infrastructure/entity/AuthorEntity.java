@@ -21,5 +21,7 @@ public class AuthorEntity {
 
   private String name;
 
+  private String middleName;
+
   private String surname;
 }
