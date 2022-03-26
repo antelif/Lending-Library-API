@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Transaction DTO. */
+/** TransactionEntity DTO. */
 @Getter
 @Setter
 @EqualsAndHashCode

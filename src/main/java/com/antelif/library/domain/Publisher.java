@@ -1,16 +1,12 @@
-package com.antelif.library.domain.dto;
+package com.antelif.library.domain;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/** AuthorEntity DTO. */
 @Getter
 @Setter
 @EqualsAndHashCode
-public class AuthorDto {
-
-  private Long id;
+public class Publisher {
   private String name;
-  private String surname;
 }

@@ -1,15 +1,18 @@
 package com.antelif.library.infrastructure.repository;
 
-import com.antelif.library.infrastructure.entity.Author;
+import com.antelif.library.infrastructure.entity.AuthorEntity;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
-/** Author repository. */
+/** AuthorEntity repository. */
 @Component
 @Repository
-public interface AuthorRepository extends JpaRepository<Author, Long> {
+public interface AuthorRepository extends JpaRepository<AuthorEntity, Long> {
 
-  Optional<Author> getAuthorById(Long id);
+  Optional<AuthorEntity> getAuthorById(Long id);
+
+  List<AuthorEntity> getAuthorsByNameAndSurname(String authorName, String surname);
 }

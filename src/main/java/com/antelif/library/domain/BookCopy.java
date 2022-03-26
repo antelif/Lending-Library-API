@@ -1,4 +1,4 @@
-package com.antelif.library.domain.dto;
+package com.antelif.library.domain;
 
 import com.antelif.library.domain.type.State;
 import com.antelif.library.domain.type.Status;
@@ -6,12 +6,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/** BookCopyEntity DTO. */
 @Getter
 @Setter
 @EqualsAndHashCode
-public class BookCopyDto {
-  private String isbn;
+public class BookCopy {
+
+  private Book book;
   private State state;
   private Status status;
 }

@@ -7,8 +7,8 @@ spring:
   jpa:
     database: POSTGRESQL
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: false
-    generate-ddl: false
+#    open-in-view: false
+#    generate-ddl: false
     show-sql: true
     hibernate:
       ddl-auto: none

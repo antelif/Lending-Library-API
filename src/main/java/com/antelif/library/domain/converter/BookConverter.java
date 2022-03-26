@@ -1,40 +1,37 @@
 package com.antelif.library.domain.converter;
 
+import com.antelif.library.domain.Book;
 import com.antelif.library.domain.dto.BookDto;
-import com.antelif.library.infrastructure.entity.Book;
-import com.antelif.library.infrastructure.repository.AuthorRepository;
-import com.antelif.library.infrastructure.repository.PublisherRepository;
+import com.antelif.library.infrastructure.entity.BookEntity;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-/** Book and BookDto converter. */
+/** BookEntity and BookDto converter. */
 @Component
 @RequiredArgsConstructor
-public class BookConverter implements Converter<Book, BookDto> {
+public class BookConverter implements Converter<Book, BookDto, BookEntity> {
 
-  private final PublisherRepository publisherRepository;
-  private final AuthorRepository authorRepository;
+  private final ModelMapper modelMapper;
 
   @Override
-  public Book convertToDomain(BookDto bookDto) {
-
-    Book book = new Book();
-    book.setIsbn(bookDto.getIsbn());
-    book.setTitle(bookDto.getTitle());
-
-    book.setPublisher(
-        publisherRepository
-            .getPublisherById(bookDto.getAuthorId())
-            .orElseThrow(RuntimeException::new));
-
-    book.setAuthor(
-        authorRepository.getAuthorById(bookDto.getAuthorId()).orElseThrow(RuntimeException::new));
-
-    return book;
+  public Book convertFromDtoToDomain(BookDto bookDto) {
+    return modelMapper.map(bookDto, Book.class);
   }
 
   @Override
-  public BookDto convertToDto(Book book) {
-    return null;
+  public BookEntity convertFromDomainToEntity(Book book) {
+    return modelMapper.map(book, BookEntity.class);
+  }
+
+  @Override
+  public Book convertFromEntityToDomain(BookEntity bookEntity) {
+    return modelMapper.map(bookEntity, Book.class);
+  }
+
+  @Override
+  public BookDto convertFromDomainToDto(Book book) {
+
+    return modelMapper.map(book, BookDto.class);
   }
 }

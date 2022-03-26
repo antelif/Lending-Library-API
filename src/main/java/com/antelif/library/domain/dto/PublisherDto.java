@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Publisher DTO. */
+/** PublisherEntity DTO. */
 @Getter
 @Setter
 @EqualsAndHashCode
