@@ -11,5 +11,6 @@ import lombok.Setter;
 public class AuthorDto {
 
   private String name;
+  private String middleName;
   private String surname;
 }

@@ -10,5 +10,6 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class Author {
   private String name;
+  private String middleName;
   private String surname;
 }
