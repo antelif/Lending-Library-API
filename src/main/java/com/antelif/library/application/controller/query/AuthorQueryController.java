@@ -2,10 +2,10 @@ package com.antelif.library.application.controller.query;
 
 import com.antelif.library.domain.dto.AuthorDto;
 import com.antelif.library.domain.service.AuthorService;
-import javax.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,8 +38,8 @@ public class AuthorQueryController {
    * @param id the id of the author to retrieve.
    * @return an author DTO for the provided id.
    */
-  @GetMapping
-  public AuthorDto getAuthorById(@PathParam(value = "id") Long id) {
+  @GetMapping(value = "/{id}")
+  public AuthorDto getAuthorById(@PathVariable(value = "id") Long id) {
     log.info("Received request to fetch author with id {}", id);
     return authorService.getAuthorById(id);
   }
