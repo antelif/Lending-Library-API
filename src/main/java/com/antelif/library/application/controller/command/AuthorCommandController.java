@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping(value = "/authors")
+@RequestMapping(value = "library/authors")
 public class AuthorCommandController {
 
   private final AuthorService authorService;
