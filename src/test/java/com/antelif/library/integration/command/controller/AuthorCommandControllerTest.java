@@ -1,11 +1,12 @@
 package com.antelif.library.integration.command.controller;
 
+import static com.antelif.library.application.error.GenericError.DUPLICATE_AUTHOR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.antelif.library.application.error.ErrorResponse;
 import com.antelif.library.domain.dto.AuthorDto;
 import com.antelif.library.factory.AuthorDtoFactory;
 import com.antelif.library.integration.BaseIntegrationTest;
@@ -76,11 +77,13 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
     createNewAuthor(author);
 
     // Same author creation should fail
-    Exception exception = assertThrows(Exception.class, () -> createNewAuthor(author));
+    var response = createNewAuthor(author).getResponse().getContentAsString();
+    var errorResponse = objectMapper.readValue(response, ErrorResponse.class);
+    assertEquals(DUPLICATE_AUTHOR.getCode(), errorResponse.getCode());
   }
 
   @Test
-  @DisplayName("Create Author when name, when record exists for this name and surname fails.")
+  @DisplayName("Create Author when record exists for this name and surname fails.")
   @SneakyThrows
   void testDuplicateAuthorIsNotCreatedWhenGivingNameAndSurnameOnly() {
     var author = AuthorDtoFactory.createAuthorDto(4);
@@ -89,7 +92,9 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
 
     var newAuthor = AuthorDtoFactory.createAuthorDtoNoMiddleName(4);
 
-    Exception exception = assertThrows(Exception.class, () -> createNewAuthor(newAuthor));
+    var response = createNewAuthor(newAuthor).getResponse().getContentAsString();
+    var errorResponse = objectMapper.readValue(response, ErrorResponse.class);
+    assertEquals(DUPLICATE_AUTHOR.getCode(), errorResponse.getCode());
   }
 
   @SneakyThrows
