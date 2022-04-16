@@ -34,8 +34,8 @@
     </plugins>
   </build>
 
-
   <dependencies>
+
     <!--  Spring -->
     <dependency>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -107,6 +107,5 @@
       <version>5.8.1</version>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 </project>
