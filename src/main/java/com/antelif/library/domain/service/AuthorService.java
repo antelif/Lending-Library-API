@@ -24,10 +24,14 @@ public class AuthorService {
   public AuthorDto addAuthor(AuthorDto authorDto) {
 
     var persistedEntity =
-        authorRepository.getAuthorsByNameAndSurname(authorDto.getName(), authorDto.getSurname());
+        Optional.ofNullable(authorDto.getMiddleName()).isPresent()
+            ? authorRepository.getAuthorEntitiesByNameAndSurnameAndMiddleName(
+                authorDto.getName(), authorDto.getSurname(), authorDto.getMiddleName())
+            : authorRepository.getAuthorsByNameAndSurname(
+                authorDto.getName(), authorDto.getSurname());
 
-    if (persistedEntity.size() >= 1) {
-      throw new RuntimeException("Cannot find specific author");
+    if (!persistedEntity.isEmpty()) {
+      throw new RuntimeException("Author already exists.");
     }
     return Optional.of(converter.convertFromDtoToDomain(authorDto))
         .map(converter::convertFromDomainToEntity)

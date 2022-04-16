@@ -15,7 +15,7 @@ public interface AuthorRepository extends JpaRepository<AuthorEntity, Long> {
   /**
    * Retrieves an author by their id.
    *
-   * @param id the author id.
+   * @param id the author id
    * @return an author entity if exists.
    */
   Optional<AuthorEntity> getAuthorById(Long id);
@@ -24,8 +24,19 @@ public interface AuthorRepository extends JpaRepository<AuthorEntity, Long> {
    * Retrieves all authors by their name and surname.
    *
    * @param name the name of the author,
-   * @param surname the surname of the author.
-   * @return a list with all authors retrieved.
+   * @param surname the surname of the author,
+   * @return a list with all authors retrieved
    */
   List<AuthorEntity> getAuthorsByNameAndSurname(String name, String surname);
+
+  /**
+   * Retrieves all authos by their name, surname and middle name.
+   *
+   * @param name the name of the author,
+   * @param surname the surname of the author,
+   * @param middleName the middle name of the author
+   * @return a list with all author retrieved.
+   */
+  List<AuthorEntity> getAuthorEntitiesByNameAndSurnameAndMiddleName(
+      String name, String surname, String middleName);
 }
