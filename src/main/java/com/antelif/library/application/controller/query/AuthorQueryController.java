@@ -2,6 +2,7 @@ package com.antelif.library.application.controller.query;
 
 import com.antelif.library.domain.dto.AuthorDto;
 import com.antelif.library.domain.service.AuthorService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,21 +20,21 @@ public class AuthorQueryController {
   private final AuthorService authorService;
 
   /**
-   * Get author by name and surname endpoint.
+   * Get authors by name and surname endpoint.
    *
    * @param name the name of the author,
    * @param surname the surname of the author.
-   * @return an author DTO for the provided name and surname.
+   * @return a list of author DTO for the provided name and surname.
    */
   @GetMapping
-  public AuthorDto getAuthorByNameAndSurname(
+  public List<AuthorDto> getAuthorByNameAndSurname(
       @RequestParam(value = "name") String name, @RequestParam(value = "surname") String surname) {
     log.info("Requested author: {} {}", name, surname);
     return authorService.getAuthorByNameAndSurname(name, surname);
   }
 
   /**
-   * Get autor by id endpoint.
+   * Get author by id endpoint.
    *
    * @param id the id of the author to retrieve.
    * @return an author DTO for the provided id.

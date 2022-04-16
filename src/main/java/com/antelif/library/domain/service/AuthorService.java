@@ -1,9 +1,18 @@
 package com.antelif.library.domain.service;
 
+import static com.antelif.library.application.error.GenericError.AUTHOR_CONVERTER_FAILED;
+import static com.antelif.library.application.error.GenericError.AUTHOR_DOES_NOT_EXIST;
+
+import com.antelif.library.application.error.GenericError;
 import com.antelif.library.domain.converter.AuthorConverter;
 import com.antelif.library.domain.dto.AuthorDto;
+import com.antelif.library.domain.exception.ConverterException;
+import com.antelif.library.domain.exception.DuplicateEntityException;
+import com.antelif.library.domain.exception.EntityDoesNotExistException;
 import com.antelif.library.infrastructure.repository.AuthorRepository;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,15 +40,14 @@ public class AuthorService {
                 authorDto.getName(), authorDto.getSurname());
 
     if (!persistedEntity.isEmpty()) {
-      throw new RuntimeException("Author already exists.");
+      throw new DuplicateEntityException(GenericError.DUPLICATE_AUTHOR);
     }
     return Optional.of(converter.convertFromDtoToDomain(authorDto))
         .map(converter::convertFromDomainToEntity)
         .map(authorRepository::save)
         .map(converter::convertFromEntityToDomain)
         .map(converter::convertFromDomainToDto)
-        // TODO: Add dedicated exception.
-        .orElseThrow(RuntimeException::new);
+        .orElseThrow(() -> new ConverterException(AUTHOR_CONVERTER_FAILED));
   }
 
   /**
@@ -52,15 +60,13 @@ public class AuthorService {
     var persistedAuthor = authorRepository.getAuthorById(id);
 
     if (persistedAuthor.isEmpty()) {
-      // TODO: Replace with dedicated exception.
-      throw new RuntimeException("Cannot ind author by id " + id);
+      throw new EntityDoesNotExistException(AUTHOR_DOES_NOT_EXIST);
     }
 
     return persistedAuthor
         .map(converter::convertFromEntityToDomain)
         .map(converter::convertFromDomainToDto)
-        // TODO: Add a dedicated exception.
-        .orElseThrow(RuntimeException::new);
+        .orElseThrow(() -> new ConverterException(AUTHOR_CONVERTER_FAILED));
   }
 
   /**
@@ -71,20 +77,12 @@ public class AuthorService {
    * @param surname of the author to retrieve.
    * @return and author DTO.
    */
-  public AuthorDto getAuthorByNameAndSurname(String name, String surname) {
+  public List<AuthorDto> getAuthorByNameAndSurname(String name, String surname) {
     var persistedAuthors = authorRepository.getAuthorsByNameAndSurname(name, surname);
 
-    if (persistedAuthors.size() > 1) {
-      // TODO: Replace with dedicated exception.
-      throw new RuntimeException("Cannot find specific author.");
-    }
-    if (persistedAuthors.stream().findAny().isEmpty()) {
-      // TODO: Replace wih dedicated exception.
-      throw new RuntimeException("No author was found");
-    }
-    return converter.convertFromDomainToDto(
-        converter.convertFromEntityToDomain(
-            // TODO: Replace with dedicated exception.
-            persistedAuthors.stream().findAny().orElseThrow(RuntimeException::new)));
+    return persistedAuthors.stream()
+        .map(converter::convertFromEntityToDomain)
+        .map(converter::convertFromDomainToDto)
+        .collect(Collectors.toList());
   }
 }
