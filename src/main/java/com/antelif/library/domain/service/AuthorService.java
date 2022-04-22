@@ -1,6 +1,7 @@
 package com.antelif.library.domain.service;
 
 import static com.antelif.library.application.error.GenericError.AUTHOR_CONVERTER_FAILED;
+import static com.antelif.library.application.error.GenericError.AUTHOR_CREATION_FAILED;
 import static com.antelif.library.application.error.GenericError.AUTHOR_DOES_NOT_EXIST;
 
 import com.antelif.library.application.error.GenericError;
@@ -8,6 +9,7 @@ import com.antelif.library.domain.converter.AuthorConverter;
 import com.antelif.library.domain.dto.AuthorDto;
 import com.antelif.library.domain.exception.ConverterException;
 import com.antelif.library.domain.exception.DuplicateEntityException;
+import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
 import com.antelif.library.infrastructure.repository.AuthorRepository;
 import java.util.List;
@@ -30,13 +32,13 @@ public class AuthorService {
    * @param authorDto the DTO to get information about the author to create.
    * @return n author DTO.
    */
-  public AuthorDto addAuthor(AuthorDto authorDto) {
+  public Long addAuthor(AuthorDto authorDto) {
 
     var persistedEntity =
         Optional.ofNullable(authorDto.getMiddleName()).isPresent()
             ? authorRepository.getAuthorEntitiesByNameAndSurnameAndMiddleName(
                 authorDto.getName(), authorDto.getSurname(), authorDto.getMiddleName())
-            : authorRepository.getAuthorsByNameAndSurname(
+            : authorRepository.getAuthorEntitiesByNameAndSurname(
                 authorDto.getName(), authorDto.getSurname());
 
     if (!persistedEntity.isEmpty()) {
@@ -45,9 +47,8 @@ public class AuthorService {
     return Optional.of(converter.convertFromDtoToDomain(authorDto))
         .map(converter::convertFromDomainToEntity)
         .map(authorRepository::save)
-        .map(converter::convertFromEntityToDomain)
-        .map(converter::convertFromDomainToDto)
-        .orElseThrow(() -> new ConverterException(AUTHOR_CONVERTER_FAILED));
+        .orElseThrow(() -> new EntityCreationException(AUTHOR_CREATION_FAILED))
+        .getId();
   }
 
   /**
@@ -57,7 +58,7 @@ public class AuthorService {
    * @return an author DTO.
    */
   public AuthorDto getAuthorById(Long id) {
-    var persistedAuthor = authorRepository.getAuthorById(id);
+    var persistedAuthor = authorRepository.getAuthorEntityById(id);
 
     if (persistedAuthor.isEmpty()) {
       throw new EntityDoesNotExistException(AUTHOR_DOES_NOT_EXIST);
@@ -70,15 +71,13 @@ public class AuthorService {
   }
 
   /**
-   * Retrieve an author from the database based on the provided name and surname. If more than one
-   * authors are retrieved return error.
+   * Retrieve authors from the database based on the provided name and surname.
    *
-   * @param name of the author to retrieve,
    * @param surname of the author to retrieve.
-   * @return and author DTO.
+   * @return a list of author DTOs.
    */
-  public List<AuthorDto> getAuthorByNameAndSurname(String name, String surname) {
-    var persistedAuthors = authorRepository.getAuthorsByNameAndSurname(name, surname);
+  public List<AuthorDto> getAuthorsBySurname(String surname) {
+    var persistedAuthors = authorRepository.getAuthorEntitiesBySurname(surname);
 
     return persistedAuthors.stream()
         .map(converter::convertFromEntityToDomain)

@@ -14,23 +14,21 @@ import org.springframework.web.bind.annotation.RestController;
 /** Author query controller. */
 @RestController
 @Slf4j
-@RequestMapping(value = "/authors")
+@RequestMapping(value = "/library/authors")
 @RequiredArgsConstructor
 public class AuthorQueryController {
   private final AuthorService authorService;
 
   /**
-   * Get authors by name and surname endpoint.
+   * Get authors by surname endpoint.
    *
-   * @param name the name of the author,
-   * @param surname the surname of the author.
+   * @param surname the surname of the author
    * @return a list of author DTO for the provided name and surname.
    */
   @GetMapping
-  public List<AuthorDto> getAuthorByNameAndSurname(
-      @RequestParam(value = "name") String name, @RequestParam(value = "surname") String surname) {
-    log.info("Requested author: {} {}", name, surname);
-    return authorService.getAuthorByNameAndSurname(name, surname);
+  public List<AuthorDto> getAuthorBySurname(@RequestParam(value = "surname") String surname) {
+    log.info("Requested author: {} ", surname);
+    return authorService.getAuthorsBySurname(surname);
   }
 
   /**

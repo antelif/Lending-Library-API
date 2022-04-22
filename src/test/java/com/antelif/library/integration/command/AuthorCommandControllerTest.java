@@ -1,6 +1,7 @@
-package com.antelif.library.integration.command.controller;
+package com.antelif.library.integration.command;
 
 import static com.antelif.library.application.error.GenericError.DUPLICATE_AUTHOR;
+import static com.antelif.library.domain.common.Constants.CREATED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -11,6 +12,7 @@ import com.antelif.library.domain.dto.AuthorDto;
 import com.antelif.library.factory.AuthorDtoFactory;
 import com.antelif.library.integration.BaseIntegrationTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -62,6 +64,7 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
 
     var response = createNewAuthor(author);
 
+    var expectedResponse = objectMapper.writeValueAsString(Map.of(CREATED, 2));
     assertEquals(
         objectMapper.writeValueAsString(author), response.getResponse().getContentAsString());
   }
@@ -98,7 +101,7 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
   }
 
   @SneakyThrows
-  private MvcResult createNewAuthor(AuthorDto author) {
+  public MvcResult createNewAuthor(AuthorDto author) {
     var content = objectMapper.writeValueAsString(author);
     return this.mockMvc
         .perform(post(ENDPOINT).contentType(CONTENT_TYPE).content(content))
