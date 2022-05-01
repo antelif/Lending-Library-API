@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -40,38 +39,37 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
   @BeforeEach
   @SneakyThrows
   void setUp() {
+    authorCounter++;
     this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
     objectMapper = new ObjectMapper();
   }
 
   @Test
-  @DisplayName("Create Author with all arguments successfully.")
+  @DisplayName("Create successfully author with all arguments.")
   @SneakyThrows
   void testNewAuthorIsCreatedWithNameSurnameAndMiddleName() {
-    var author = AuthorDtoFactory.createAuthorDto(1);
+    var author = AuthorDtoFactory.createAuthorDto(authorCounter);
 
-    var response = createNewAuthor(author);
+    var response = objectMapper.readValue(createNewAuthor(author), Map.class);
 
-    assertEquals(
-        objectMapper.writeValueAsString(author), response.getResponse().getContentAsString());
+    var expectedResponse = Map.of(CREATED, authorCounter);
+    assertEquals(expectedResponse, response);
   }
 
   @Test
-  @DisplayName("Create Author with name and surname arguments successfully.")
+  @DisplayName("Create successfully author with name and surname arguments.")
   @SneakyThrows
   void testNewAuthorIsCreatedWithNameAndSurname() {
-    var author = AuthorDtoFactory.createAuthorDtoNoMiddleName(2);
+    var author = AuthorDtoFactory.createAuthorDtoNoMiddleName(authorCounter);
 
-    var response = createNewAuthor(author);
+    var response = objectMapper.readValue(createNewAuthor(author), Map.class);
 
-    var expectedResponse = objectMapper.writeValueAsString(Map.of(CREATED, 2));
-    assertEquals(
-        objectMapper.writeValueAsString(author), response.getResponse().getContentAsString());
+    var expectedResponse = Map.of(CREATED, authorCounter);
+    assertEquals(expectedResponse, response);
   }
 
   @Test
-  @DisplayName(
-      "Create Author when name, when record exists for this name, surname and middle name fails.")
+  @DisplayName("Create author fails when record exists for this name, surname and middle name.")
   @SneakyThrows
   void testDuplicateAuthorIsNotCreated() {
     var author = AuthorDtoFactory.createAuthorDto(3);
@@ -80,33 +78,36 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
     createNewAuthor(author);
 
     // Same author creation should fail
-    var response = createNewAuthor(author).getResponse().getContentAsString();
+    var response = createNewAuthor(author);
     var errorResponse = objectMapper.readValue(response, ErrorResponse.class);
     assertEquals(DUPLICATE_AUTHOR.getCode(), errorResponse.getCode());
   }
 
   @Test
-  @DisplayName("Create Author when record exists for this name and surname fails.")
+  @DisplayName("Create author fails when record exists for this name and surname.")
   @SneakyThrows
   void testDuplicateAuthorIsNotCreatedWhenGivingNameAndSurnameOnly() {
-    var author = AuthorDtoFactory.createAuthorDto(4);
 
-    createNewAuthor(author);
+    // Create first author
+    createNewAuthor(AuthorDtoFactory.createAuthorDto(authorCounter));
 
-    var newAuthor = AuthorDtoFactory.createAuthorDtoNoMiddleName(4);
+    var newAuthor = AuthorDtoFactory.createAuthorDtoNoMiddleName(authorCounter);
 
-    var response = createNewAuthor(newAuthor).getResponse().getContentAsString();
+    // Same author without middle name should fail
+    var response = createNewAuthor(newAuthor);
     var errorResponse = objectMapper.readValue(response, ErrorResponse.class);
     assertEquals(DUPLICATE_AUTHOR.getCode(), errorResponse.getCode());
   }
 
   @SneakyThrows
-  public MvcResult createNewAuthor(AuthorDto author) {
+  private String createNewAuthor(AuthorDto author) {
     var content = objectMapper.writeValueAsString(author);
     return this.mockMvc
         .perform(post(ENDPOINT).contentType(CONTENT_TYPE).content(content))
         .andDo(print())
         .andExpect(status().isOk())
-        .andReturn();
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
   }
 }

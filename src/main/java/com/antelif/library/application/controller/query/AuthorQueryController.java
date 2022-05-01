@@ -1,5 +1,8 @@
 package com.antelif.library.application.controller.query;
 
+import static com.antelif.library.domain.common.Constants.ID;
+import static com.antelif.library.domain.common.Constants.SURNAME;
+
 import com.antelif.library.domain.dto.AuthorDto;
 import com.antelif.library.domain.service.AuthorService;
 import java.util.List;
@@ -26,8 +29,8 @@ public class AuthorQueryController {
    * @return a list of author DTO for the provided name and surname.
    */
   @GetMapping
-  public List<AuthorDto> getAuthorBySurname(@RequestParam(value = "surname") String surname) {
-    log.info("Requested author: {} ", surname);
+  public List<AuthorDto> getAuthorBySurname(@RequestParam(value = SURNAME) String surname) {
+    log.info("Received request to fetch authors with surname {}", surname);
     return authorService.getAuthorsBySurname(surname);
   }
 
@@ -38,7 +41,7 @@ public class AuthorQueryController {
    * @return an author DTO for the provided id.
    */
   @GetMapping(value = "/{id}")
-  public AuthorDto getAuthorById(@PathVariable(value = "id") Long id) {
+  public AuthorDto getAuthorById(@PathVariable(value = ID) Long id) {
     log.info("Received request to fetch author with id {}", id);
     return authorService.getAuthorById(id);
   }

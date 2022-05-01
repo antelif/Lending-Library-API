@@ -29,7 +29,7 @@ public class AuthorCommandController {
    */
   @PostMapping
   public Map<String, Long> addAuthor(@RequestBody AuthorDto authorDto) {
-    log.info("Received request to add author {}", authorDto.getName());
-    return Map.of(CREATED,authorService.addAuthor(authorDto));
+    log.info("Received request to add author {}", authorDto);
+    return Map.of(CREATED, authorService.addAuthor(authorDto));
   }
 }
