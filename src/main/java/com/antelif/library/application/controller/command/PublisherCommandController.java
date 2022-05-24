@@ -26,13 +26,13 @@ public class PublisherCommandController {
   /**
    * Add a new publisher endpoint.
    *
-   * @param publisherRequest the DTO to get information to create the new author.
-   * @return an author response DTO.
+   * @param publisherRequest the DTO to get information to create the new publisher.
+   * @return an publisher response DTO.
    */
   @PostMapping
   public ResponseEntity<Map<String, PublisherResponse>> addPublisher(
       @RequestBody PublisherRequest publisherRequest) {
-    log.info("Received request to add author {}", publisherRequest);
+    log.info("Received request to add publisher {}", publisherRequest);
     return ResponseEntity.ok(Map.of(CREATED, publisherService.addPublisher(publisherRequest)));
   }
 }
