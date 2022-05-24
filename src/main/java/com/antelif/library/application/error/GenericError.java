@@ -13,7 +13,10 @@ public enum GenericError {
   DUPLICATE_PUBLISHER(5, "Publisher already exists."),
   PUBLISHER_DOES_NOT_EXIST(6, "Publisher does not exist."),
   PUBLISHER_CONVERTER_FAILED(7, "Could not convert publisher object."),
-  PUBLISHER_CREATION_FAILED(8, "Could not create new publisher.");
+  PUBLISHER_CREATION_FAILED(8, "Could not create new publisher."),
+
+  DUPLICATE_BOOK(9, "Book already exists"),
+  BOOK_CREATION_FAILED(10, "Could not create new author.");
 
   private final int code;
   private final String description;
