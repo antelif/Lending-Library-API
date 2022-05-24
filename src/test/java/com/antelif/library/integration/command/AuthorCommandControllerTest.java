@@ -8,15 +8,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.antelif.library.application.error.ErrorResponse;
-import com.antelif.library.domain.dto.AuthorDto;
+import com.antelif.library.domain.dto.request.AuthorRequest;
+import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.factory.AuthorDtoFactory;
 import com.antelif.library.integration.BaseIntegrationTest;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,50 +40,67 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
   @Autowired private MockMvc mockMvc;
 
   private ObjectMapper objectMapper;
+  private ModelMapper modelMapper;
+
+  private AuthorRequest authorRequest;
+  private AuthorResponse authorExpectedResponse;
 
   @BeforeEach
   @SneakyThrows
   void setUp() {
-    authorCounter++;
     this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+
     objectMapper = new ObjectMapper();
+    modelMapper = new ModelMapper();
+
+    authorCounter++;
+
+    authorRequest = AuthorDtoFactory.createAuthorRequest(authorCounter);
+    authorExpectedResponse = modelMapper.map(authorRequest, AuthorResponse.class);
   }
 
   @Test
   @DisplayName("Create successfully author with all arguments.")
   @SneakyThrows
   void testNewAuthorIsCreatedWithNameSurnameAndMiddleName() {
-    var author = AuthorDtoFactory.createAuthorDto(authorCounter);
 
-    var response = objectMapper.readValue(createNewAuthor(author), Map.class);
+    Map<String, AuthorResponse> response =
+        objectMapper.readValue(createNewAuthor(authorRequest), new TypeReference<>() {});
 
-    var expectedResponse = Map.of(CREATED, authorCounter);
-    assertEquals(expectedResponse, response);
+    authorExpectedResponse.setId(response.get(CREATED).getId());
+
+    JSONAssert.assertEquals(
+        objectMapper.writeValueAsString(authorExpectedResponse),
+        objectMapper.writeValueAsString(response.get(CREATED)),
+        JSONCompareMode.STRICT);
   }
 
   @Test
   @DisplayName("Create successfully author with name and surname arguments.")
   @SneakyThrows
   void testNewAuthorIsCreatedWithNameAndSurname() {
-    var author = AuthorDtoFactory.createAuthorDtoNoMiddleName(authorCounter);
 
-    var response = objectMapper.readValue(createNewAuthor(author), Map.class);
+    Map<String, AuthorResponse> response =
+        objectMapper.readValue(createNewAuthor(authorRequest), new TypeReference<>() {});
 
-    var expectedResponse = Map.of(CREATED, authorCounter);
-    assertEquals(expectedResponse, response);
+    authorExpectedResponse.setId(response.get(CREATED).getId());
+
+    JSONAssert.assertEquals(
+        objectMapper.writeValueAsString(authorExpectedResponse),
+        objectMapper.writeValueAsString(response.get(CREATED)),
+        JSONCompareMode.STRICT);
   }
 
   @Test
   @DisplayName("Create author fails when record exists for this name, surname and middle name.")
   @SneakyThrows
   void testDuplicateAuthorIsNotCreated() {
-    var author = AuthorDtoFactory.createAuthorDto(3);
 
     // Create first author
-    createNewAuthor(author);
+    createNewAuthor(authorRequest);
 
     // Same author creation should fail
-    var response = createNewAuthor(author);
+    var response = createNewAuthor(authorRequest);
     var errorResponse = objectMapper.readValue(response, ErrorResponse.class);
     assertEquals(DUPLICATE_AUTHOR.getCode(), errorResponse.getCode());
   }
@@ -89,9 +111,9 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
   void testDuplicateAuthorIsNotCreatedWhenGivingNameAndSurnameOnly() {
 
     // Create first author
-    createNewAuthor(AuthorDtoFactory.createAuthorDto(authorCounter));
+    createNewAuthor(authorRequest);
 
-    var newAuthor = AuthorDtoFactory.createAuthorDtoNoMiddleName(authorCounter);
+    var newAuthor = AuthorDtoFactory.createAuthorRequestNoMiddleName(authorCounter);
 
     // Same author without middle name should fail
     var response = createNewAuthor(newAuthor);
@@ -100,7 +122,7 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
   }
 
   @SneakyThrows
-  private String createNewAuthor(AuthorDto author) {
+  private String createNewAuthor(AuthorRequest author) {
     var content = objectMapper.writeValueAsString(author);
     return this.mockMvc
         .perform(post(ENDPOINT).contentType(CONTENT_TYPE).content(content))

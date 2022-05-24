@@ -10,7 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.antelif.library.application.error.ErrorResponse;
-import com.antelif.library.domain.dto.AuthorDto;
+import com.antelif.library.domain.dto.request.AuthorRequest;
+import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.factory.AuthorDtoFactory;
 import com.antelif.library.integration.BaseIntegrationTest;
 import java.util.List;
@@ -19,11 +20,15 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.type.TypeReference;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,33 +36,50 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 @AutoConfigureMockMvc
 class AuthorQueryControllerTest extends BaseIntegrationTest {
 
-  @Autowired MockMvc mockMvc;
-
-  private ObjectMapper objectMapper;
-
   private final String ENDPOINT = "/library/authors";
   private final String CONTENT_TYPE = "application/json";
 
+  @Autowired private WebApplicationContext webApplicationContext;
+  @Autowired MockMvc mockMvc;
+
+  private ObjectMapper objectMapper;
+  private ModelMapper modelMapper;
+
+  private AuthorRequest authorRequest;
+  private AuthorResponse authorExpectedResponse;
+
   @BeforeEach
   void setUp() {
+    this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+
     this.objectMapper = new ObjectMapper();
+    this.modelMapper = new ModelMapper();
+
     authorCounter++;
+
+    authorRequest = AuthorDtoFactory.createAuthorRequest(authorCounter);
+    authorExpectedResponse = modelMapper.map(authorRequest, AuthorResponse.class);
   }
 
   @Test
   @SneakyThrows
   @DisplayName("Author is retrieved by id successfully.")
   void getAuthorById_isSuccessful() {
-    var author = AuthorDtoFactory.createAuthorDto(authorCounter);
-    var response =
+
+    Map<String, AuthorResponse> response =
         objectMapper.readValue(
-            createNewAuthor(author).getResponse().getContentAsString(), Map.class);
-    var authorId = response.get(CREATED);
+            createNewAuthor(authorRequest), new TypeReference<Map<String, AuthorResponse>>() {});
 
-    var actualResponse =
-        objectMapper.readValue(getAuthorById(String.valueOf(authorId)), AuthorDto.class);
+    var authorId = response.get(CREATED).getId();
 
-    assertEquals(author, actualResponse);
+    authorExpectedResponse.setId(authorId);
+
+    var actualResponse = objectMapper.readValue(getAuthorById(authorId), AuthorResponse.class);
+
+    JSONAssert.assertEquals(
+        objectMapper.writeValueAsString(authorExpectedResponse),
+        objectMapper.writeValueAsString(actualResponse),
+        JSONCompareMode.STRICT);
   }
 
   @Test
@@ -76,29 +98,31 @@ class AuthorQueryControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   @DisplayName("Authors are retrieved by surname successfully.")
   void getAuthorsBySurname_isSuccessful() {
-    var author = AuthorDtoFactory.createAuthorDto(authorCounter);
+    createNewAuthor(authorRequest);
 
-    createNewAuthor(author);
-
-    List<AuthorDto> actualResponse =
+    List<AuthorResponse> actualResponse =
         objectMapper.readValue(
-            getAuthorBySurname(author.getSurname()), new TypeReference<List<AuthorDto>>() {});
+            getAuthorBySurname(authorRequest.getSurname()),
+            new TypeReference<List<AuthorResponse>>() {});
+
+    var authorId = actualResponse.get(0).getId();
+    authorExpectedResponse.setId(authorId);
 
     assertEquals(1, actualResponse.size());
-    assertEquals(author, actualResponse.get(0));
+    JSONAssert.assertEquals(
+        objectMapper.writeValueAsString(authorExpectedResponse),
+        objectMapper.writeValueAsString(actualResponse.get(0)),
+        JSONCompareMode.STRICT);
   }
 
   @Test
   @SneakyThrows
   @DisplayName("No authors are retrieved if there are not any with this surname.")
   void getAuthorsBySurname_returnsEmpty_ifThereNoAuthorsForSurname() {
-    var author = AuthorDtoFactory.createAuthorDto(authorCounter);
+    createNewAuthor(authorRequest);
 
-    createNewAuthor(author);
-
-    List<AuthorDto> actualResponse =
-        objectMapper.readValue(
-            getAuthorBySurname("wrongSurname"), new TypeReference<List<AuthorDto>>() {});
+    List<AuthorRequest> actualResponse =
+        objectMapper.readValue(getAuthorBySurname("wrongSurname"), new TypeReference<>() {});
 
     assertEquals(0, actualResponse.size());
   }
@@ -126,12 +150,14 @@ class AuthorQueryControllerTest extends BaseIntegrationTest {
   }
 
   @SneakyThrows
-  private MvcResult createNewAuthor(AuthorDto author) {
+  private String createNewAuthor(AuthorRequest author) {
     var content = objectMapper.writeValueAsString(author);
     return this.mockMvc
         .perform(post(ENDPOINT).contentType(CONTENT_TYPE).content(content))
         .andDo(print())
         .andExpect(status().isOk())
-        .andReturn();
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
   }
 }

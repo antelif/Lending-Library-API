@@ -1,19 +1,19 @@
 package com.antelif.library.factory;
 
-import com.antelif.library.domain.dto.AuthorDto;
+import com.antelif.library.domain.dto.request.AuthorRequest;
 
 public class AuthorDtoFactory {
 
-  public static AuthorDto createAuthorDto(int index) {
-    var author = new AuthorDto();
+  public static AuthorRequest createAuthorRequest(int index) {
+    var author = new AuthorRequest();
     author.setName("name" + index);
     author.setMiddleName("middleName" + index);
     author.setSurname("surname" + index);
     return author;
   }
 
-  public static AuthorDto createAuthorDtoNoMiddleName(int index) {
-    var author = new AuthorDto();
+  public static AuthorRequest createAuthorRequestNoMiddleName(int index) {
+    var author = new AuthorRequest();
     author.setName("name" + index);
     author.setSurname("surname" + index);
     return author;

@@ -1,16 +1,14 @@
-package com.antelif.library.domain.dto;
+package com.antelif.library.domain.dto.request;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** Author DTO. */
+/** Author Request DTO used as request body in HTTP requests. */
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode
-public class AuthorDto {
+public class AuthorRequest {
 
   private String name;
   private String middleName;

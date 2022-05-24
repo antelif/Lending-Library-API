@@ -1,7 +1,8 @@
 package com.antelif.library.application.controller;
 
-import com.antelif.library.domain.dto.BookCopyDto;
-import com.antelif.library.domain.dto.BookDto;
+import com.antelif.library.domain.dto.request.BookCopyRequest;
+import com.antelif.library.domain.dto.request.BookRequest;
+import com.antelif.library.domain.dto.response.BookResponse;
 import com.antelif.library.domain.service.BookCopyService;
 import com.antelif.library.domain.service.BookService;
 import java.util.List;
@@ -32,7 +33,7 @@ public class BookController {
    * @return a book having the given isbn.
    */
   @GetMapping(value = "/{isbn}")
-  public BookDto getBookByIsbn(@PathVariable("isbn") String isbn) {
+  public BookResponse getBookByIsbn(@PathVariable("isbn") String isbn) {
 
     log.info("Request to get book with isbn: {}", isbn);
 
@@ -46,7 +47,7 @@ public class BookController {
    * @return a map with the book title as value.
    */
   @PostMapping
-  public Map<String, String> addBook(@RequestBody BookDto dto) {
+  public Map<String, String> addBook(@RequestBody BookRequest dto) {
     log.info("Request to add book with id: {}", dto.getIsbn());
     return Map.of("created", bookService.addBook(dto));
   }
@@ -60,7 +61,7 @@ public class BookController {
    */
   @PostMapping(value = "/copies/{isbn}")
   public Map<String, String> addMultipleBookCopies(
-      @PathVariable(value = "isbn") String isbn, @RequestBody List<BookCopyDto> copies) {
+      @PathVariable(value = "isbn") String isbn, @RequestBody List<BookCopyRequest> copies) {
     log.info("Request to add {} book copies for with id: {}", copies.size(), isbn);
     return Map.of("created", bookCopyService.addBookCopies(copies).toString());
   }
