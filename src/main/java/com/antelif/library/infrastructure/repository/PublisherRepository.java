@@ -12,6 +12,7 @@ public interface PublisherRepository extends JpaRepository<PublisherEntity, Long
 
   /**
    * Get a publisher by their id.
+   *
    * @param id the id of the publisher to retrieve from database.
    * @return a publisher entity if exists.
    */
@@ -19,6 +20,7 @@ public interface PublisherRepository extends JpaRepository<PublisherEntity, Long
 
   /**
    * Get a list of publishers for the provided publisher name.
+   *
    * @param publisherName the name of the publisher to retrieve.
    * @return alist with publishers.
    */
