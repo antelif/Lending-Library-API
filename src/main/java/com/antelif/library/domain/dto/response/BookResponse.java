@@ -11,6 +11,6 @@ public class BookResponse {
   private String id;
   private String title;
   private String isbn;
-  private String authorId;
-//  private String publisherId;
+  private AuthorResponse author;
+  private PublisherResponse publisher;
 }

@@ -10,10 +10,11 @@ import com.antelif.library.domain.exception.DuplicateEntityException;
 import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.infrastructure.repository.BookRepository;
 import java.util.Optional;
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/** BookEntity Service. */
+/** Book Service. */
 @RequiredArgsConstructor
 @Service
 public class BookService {
@@ -22,11 +23,12 @@ public class BookService {
   private final BookConverter converter;
 
   /**
-   * Adds a new book entity to database.
+   * Adds a new book to database.
    *
    * @param bookRequest the DTO to get information about the book to create.
    * @return a book response DTO.
    */
+  @Transactional
   public BookResponse addBook(BookRequest bookRequest) {
     var persistedEntity = bookRepository.getBookByIsbn(bookRequest.getIsbn());
 

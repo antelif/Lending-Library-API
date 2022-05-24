@@ -16,6 +16,7 @@ import com.antelif.library.infrastructure.repository.AuthorRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,7 @@ public class AuthorService {
    * @param authorRequest the DTO to get information about the author to create.
    * @return an author response DTO.
    */
+  @Transactional
   public AuthorResponse addAuthor(AuthorRequest authorRequest) {
 
     var persistedEntity =
