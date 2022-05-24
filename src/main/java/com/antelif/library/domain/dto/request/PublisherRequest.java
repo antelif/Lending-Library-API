@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/** PublisherEntity DTO. */
+/** Publisher Request DTO used as request body in HTTP requests. */
 @Getter
 @Setter
 @EqualsAndHashCode

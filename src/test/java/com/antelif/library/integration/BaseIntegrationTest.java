@@ -12,6 +12,7 @@ public class BaseIntegrationTest {
   private static final ConfiguredPostgresqlContainer postgres;
 
   public static int authorCounter = 0;
+  public static int publisherCounter = 0;
 
   static {
     postgres = ConfiguredPostgresqlContainer.getInstance();
