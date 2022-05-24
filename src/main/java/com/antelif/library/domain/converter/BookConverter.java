@@ -1,7 +1,7 @@
 package com.antelif.library.domain.converter;
 
-import com.antelif.library.domain.Book;
-import com.antelif.library.domain.dto.BookDto;
+import com.antelif.library.domain.dto.request.BookRequest;
+import com.antelif.library.domain.dto.response.BookResponse;
 import com.antelif.library.infrastructure.entity.BookEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -10,28 +10,17 @@ import org.springframework.stereotype.Component;
 /** BookEntity and BookDto converter. */
 @Component
 @RequiredArgsConstructor
-public class BookConverter implements Converter<Book, BookDto, BookEntity> {
+public class BookConverter implements Converter<BookRequest, BookEntity, BookResponse> {
 
   private final ModelMapper modelMapper;
 
   @Override
-  public Book convertFromDtoToDomain(BookDto bookDto) {
-    return modelMapper.map(bookDto, Book.class);
+  public BookEntity convertFromRequestToEntity(BookRequest bookRequest) {
+    return modelMapper.map(bookRequest, BookEntity.class);
   }
 
   @Override
-  public BookEntity convertFromDomainToEntity(Book book) {
-    return modelMapper.map(book, BookEntity.class);
-  }
-
-  @Override
-  public Book convertFromEntityToDomain(BookEntity bookEntity) {
-    return modelMapper.map(bookEntity, Book.class);
-  }
-
-  @Override
-  public BookDto convertFromDomainToDto(Book book) {
-
-    return modelMapper.map(book, BookDto.class);
+  public BookResponse convertFromEntityToResponse(BookEntity bookEntity) {
+    return modelMapper.map(bookEntity, BookResponse.class);
   }
 }

@@ -17,7 +17,7 @@ public class ConverterFactory {
    * Gets the converter for the class provided.
    *
    * @param className the name of the class to retrieve converter for.
-   * @return the appopriate converter implementation.
+   * @return the appropriate converter implementation.
    */
   public Optional<Converter> getConverter(String className) {
     return Optional.ofNullable(converterMap.get(className));

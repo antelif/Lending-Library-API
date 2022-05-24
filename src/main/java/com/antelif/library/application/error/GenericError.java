@@ -7,7 +7,8 @@ import lombok.Getter;
 public enum GenericError {
   DUPLICATE_AUTHOR(1, "Author already exists."),
   AUTHOR_DOES_NOT_EXIST(2, "Author does not exist."),
-  AUTHOR_CONVERTER_FAILED(3, "Could not convert author object.");
+  AUTHOR_CONVERTER_FAILED(3, "Could not convert author object."),
+  AUTHOR_CREATION_FAILED(4, "Could not create new author.");
 
   private final int code;
   private final String description;

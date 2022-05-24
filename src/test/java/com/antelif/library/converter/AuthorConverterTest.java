@@ -2,9 +2,9 @@ package com.antelif.library.converter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.antelif.library.domain.Author;
 import com.antelif.library.domain.converter.AuthorConverter;
-import com.antelif.library.domain.dto.AuthorDto;
+import com.antelif.library.domain.dto.request.AuthorRequest;
+import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.infrastructure.entity.AuthorEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,8 +20,8 @@ class AuthorConverterTest {
 
   @Autowired private AuthorConverter authorConverter;
 
-  private final AuthorDto expectedDto = new AuthorDto();
-  private final Author expectedDomain = new Author();
+  private final AuthorRequest expectedRequest = new AuthorRequest();
+  private final AuthorResponse authorResponse = new AuthorResponse();
   private final AuthorEntity expectedEntity = new AuthorEntity();
 
   private final String name = "Sarah";
@@ -30,13 +30,13 @@ class AuthorConverterTest {
 
   @BeforeEach
   public void setUp() {
-    expectedDto.setName(name);
-    expectedDto.setSurname(surname);
-    expectedDto.setMiddleName(middleName);
+    expectedRequest.setName(name);
+    expectedRequest.setSurname(surname);
+    expectedRequest.setMiddleName(middleName);
 
-    expectedDomain.setName(name);
-    expectedDomain.setSurname(surname);
-    expectedDomain.setMiddleName(middleName);
+    authorResponse.setName(name);
+    authorResponse.setSurname(surname);
+    authorResponse.setMiddleName(middleName);
 
     expectedEntity.setName(name);
     expectedEntity.setSurname(surname);
@@ -44,34 +44,18 @@ class AuthorConverterTest {
   }
 
   @Test
-  @DisplayName("Convert Author - Dto to Domain")
+  @DisplayName("Convert Author - Request to Entity")
   void convertFromDtoToDomain_isSuccessful() {
-    var actualDomain = authorConverter.convertFromDtoToDomain(expectedDto);
-
-    assertEquals(expectedDomain, actualDomain);
-  }
-
-  @Test
-  @DisplayName("Convert Author - Domain to Entity")
-  void convertFromDomainToEntity_isSuccessful() {
-    var actualEntity = authorConverter.convertFromDomainToEntity(expectedDomain);
+    var actualEntity = authorConverter.convertFromRequestToEntity(expectedRequest);
 
     assertEquals(expectedEntity, actualEntity);
   }
 
   @Test
-  @DisplayName("Convert Author - Entity to Domain")
-  void convertFromEntityToDomain_isSuccessful() {
-    var actualDomain = authorConverter.convertFromEntityToDomain(expectedEntity);
+  @DisplayName("Convert Author - Entity to Response")
+  void convertFromDomainToEntity_isSuccessful() {
+    var actualOutput = authorConverter.convertFromEntityToResponse(expectedEntity);
 
-    assertEquals(expectedDomain, actualDomain);
-  }
-
-  @Test
-  @DisplayName("Convert Author - Domain to Dto")
-  void convertFromDomainToDto_isSuccessful() {
-    var actualDto = authorConverter.convertFromDomainToDto(expectedDomain);
-
-    assertEquals(expectedDto, actualDto);
+    assertEquals(authorResponse, actualOutput);
   }
 }

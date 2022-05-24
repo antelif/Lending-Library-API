@@ -1,7 +1,7 @@
 package com.antelif.library.domain.converter;
 
-import com.antelif.library.domain.Author;
-import com.antelif.library.domain.dto.AuthorDto;
+import com.antelif.library.domain.dto.request.AuthorRequest;
+import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.infrastructure.entity.AuthorEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -10,27 +10,17 @@ import org.springframework.stereotype.Component;
 /** Converter for author objects. */
 @Component
 @RequiredArgsConstructor
-public class AuthorConverter implements Converter<Author, AuthorDto, AuthorEntity> {
+public class AuthorConverter implements Converter<AuthorRequest, AuthorEntity, AuthorResponse> {
 
   private final ModelMapper modelMapper;
 
   @Override
-  public Author convertFromDtoToDomain(AuthorDto authorDto) {
-    return modelMapper.map(authorDto, Author.class);
+  public AuthorEntity convertFromRequestToEntity(AuthorRequest authorRequest) {
+    return modelMapper.map(authorRequest, AuthorEntity.class);
   }
 
   @Override
-  public AuthorEntity convertFromDomainToEntity(Author author) {
-    return modelMapper.map(author, AuthorEntity.class);
-  }
-
-  @Override
-  public Author convertFromEntityToDomain(AuthorEntity authorEntity) {
-    return modelMapper.map(authorEntity, Author.class);
-  }
-
-  @Override
-  public AuthorDto convertFromDomainToDto(Author author) {
-    return modelMapper.map(author, AuthorDto.class);
+  public AuthorResponse convertFromEntityToResponse(AuthorEntity authorEntity) {
+    return modelMapper.map(authorEntity, AuthorResponse.class);
   }
 }

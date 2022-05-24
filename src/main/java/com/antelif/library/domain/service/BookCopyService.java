@@ -1,6 +1,6 @@
 package com.antelif.library.domain.service;
 
-import com.antelif.library.domain.dto.BookCopyDto;
+import com.antelif.library.domain.dto.request.BookCopyRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class BookCopyService {
    * @param bookCopies the copies to add in the database.
    * @return the number
    */
-  public Integer addBookCopies(List<BookCopyDto> bookCopies) {
+  public Integer addBookCopies(List<BookCopyRequest> bookCopies) {
 
     return 0;
   }

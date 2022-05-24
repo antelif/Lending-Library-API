@@ -3,35 +3,25 @@ package com.antelif.library.domain.converter;
 /**
  * Converter used to convert DTOs to entities and entities to DTOs.
  *
- * @param <D> the entity object type.
- * @param <D> the domain object type.
+ * @param <I> the request DTO object type.
+ * @param <E> the entity object type.
+ * @param <O> the response DTO object type.
  */
-public interface Converter<D, P, E> {
+public interface Converter<I, E, O> {
 
   /**
-   * Converts a DTO to a domain object.
+   * Converts a request DTO to an entity object.
    *
-   * @param p the DTO object.
+   * @param i the request DTO object.
    * @return a domain object.
    */
-  D convertFromDtoToDomain(P p);
+  E convertFromRequestToEntity(I i);
 
   /**
-   * Converts a domain object to an entity object.
+   * Converts an entity object to a response DTO object.
    *
-   * @param d the domain object.
-   * @return an entity object.
+   * @param e the entity object.
+   * @return an response DTO object.
    */
-  E convertFromDomainToEntity(D d);
-
-  /**
-   * Convert
-   * @param d
-   * @return
-   */
-  D convertFromEntityToDomain(E d);
-
-  P convertFromDomainToDto(D d);
-
-
+  O convertFromEntityToResponse(E e);
 }

@@ -1,6 +1,6 @@
 package com.antelif.library.application.controller.command;
 
-import com.antelif.library.domain.dto.TransactionDto;
+import com.antelif.library.domain.dto.request.TransactionRequest;
 import com.antelif.library.domain.service.TransactionService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class TransactionCommandController {
    * @return a map with the transaction id as value.
    */
   @PostMapping
-  public Map<String, Long> createTransaction(@RequestBody TransactionDto transaction) {
+  public Map<String, Long> createTransaction(@RequestBody TransactionRequest transaction) {
 
     return Map.of("created", transactionService.createTransaction(transaction));
   }

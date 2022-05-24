@@ -1,6 +1,6 @@
 package com.antelif.library.domain.service;
 
-import com.antelif.library.domain.dto.TransactionDto;
+import com.antelif.library.domain.dto.request.TransactionRequest;
 import com.antelif.library.domain.factory.ConverterFactory;
 import com.antelif.library.infrastructure.entity.TransactionEntity;
 import com.antelif.library.infrastructure.repository.TransactionRepository;
@@ -19,17 +19,17 @@ public class TransactionService {
   /**
    * Add a new transaction in the database.
    *
-   * @param transactionDto contains information about the new transaction.
+   * @param transactionRequest contains information about the new transaction.
    * @return the transaction id.
    */
   @Transactional
-  public Long createTransaction(TransactionDto transactionDto) {
+  public Long createTransaction(TransactionRequest transactionRequest) {
     return transactionRepository
         .save(
             (TransactionEntity)
-                converterFactory.getConverter(transactionDto.getClass().toString()).stream()
+                converterFactory.getConverter(transactionRequest.getClass().toString()).stream()
                     .findAny()
-                    .map(c -> c.convertFromDtoToDomain(transactionDto))
+                    .map(c -> c.convertFromRequestToEntity(transactionRequest))
                     // TODO: Replace with customized exception.
                     .orElseThrow(RuntimeException::new))
         .getId();
