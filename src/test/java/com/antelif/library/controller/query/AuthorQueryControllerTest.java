@@ -1,4 +1,4 @@
-package com.antelif.library.integration.query;
+package com.antelif.library.controller.query;
 
 import static com.antelif.library.application.error.GenericError.AUTHOR_DOES_NOT_EXIST;
 import static com.antelif.library.domain.common.Constants.CREATED;

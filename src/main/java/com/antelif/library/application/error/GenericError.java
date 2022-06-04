@@ -16,7 +16,12 @@ public enum GenericError {
   PUBLISHER_CREATION_FAILED(8, "Could not create new publisher."),
 
   DUPLICATE_BOOK(9, "Book already exists"),
-  BOOK_CREATION_FAILED(10, "Could not create new author.");
+  BOOK_CREATION_FAILED(10, "Could not create new author."),
+
+  DUPLICATE_PERSONNEL(13, "Personnel already exists."),
+  PERSONNEL_DOES_NOT_EXIST(14, "Personnel does not exist."),
+  PERSONNEL_CONVERTER_FAILED(15, "Could not convert personnel object."),
+  PERSONNEL_CREATION_FAILED(16, "Could not create new personnel.");
 
   private final int code;
   private final String description;

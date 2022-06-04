@@ -8,7 +8,7 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/** PersonnelEntity entity object that gets persisted in database. */
+/** Personnel entity object that gets persisted in database. */
 @Setter
 @Getter
 @Entity

@@ -1,4 +1,4 @@
-package com.antelif.library.integration.command;
+package com.antelif.library.controller.command;
 
 import static com.antelif.library.application.error.GenericError.AUTHOR_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.DUPLICATE_BOOK;

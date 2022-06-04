@@ -1,4 +1,4 @@
-package com.antelif.library.integration.command;
+package com.antelif.library.controller.command;
 
 import static com.antelif.library.application.error.GenericError.DUPLICATE_AUTHOR;
 import static com.antelif.library.domain.common.Constants.CREATED;
