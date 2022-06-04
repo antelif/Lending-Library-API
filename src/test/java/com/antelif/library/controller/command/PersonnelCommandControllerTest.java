@@ -1,6 +1,6 @@
-package com.antelif.library.integration.command;
+package com.antelif.library.controller.command;
 
-import static com.antelif.library.application.error.GenericError.DUPLICATE_PUBLISHER;
+import static com.antelif.library.application.error.GenericError.DUPLICATE_PERSONNEL;
 import static com.antelif.library.domain.common.Constants.CREATED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -8,9 +8,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.antelif.library.application.error.ErrorResponse;
-import com.antelif.library.domain.dto.request.PublisherRequest;
-import com.antelif.library.domain.dto.response.PublisherResponse;
-import com.antelif.library.factory.PublisherFactory;
+import com.antelif.library.domain.dto.request.PersonnelRequest;
+import com.antelif.library.domain.dto.response.PersonnelResponse;
+import com.antelif.library.factory.PersonnelFactory;
 import com.antelif.library.integration.BaseIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,9 +31,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class PublisherCommandControllerTest extends BaseIntegrationTest {
+class PersonnelCommandControllerTest extends BaseIntegrationTest {
 
-  private final String ENDPOINT = "/library/publishers";
+  private final String ENDPOINT = "/library/personnel";
   private final String CONTENT_TYPE = "application/json";
 
   @Autowired private WebApplicationContext webApplicationContext;
@@ -42,8 +42,8 @@ class PublisherCommandControllerTest extends BaseIntegrationTest {
   private ObjectMapper objectMapper;
   private ModelMapper modelMapper;
 
-  private PublisherRequest publisherRequest;
-  private PublisherResponse publisherResponse;
+  private PersonnelRequest personnelRequest;
+  private PersonnelResponse personnelResponse;
 
   @BeforeEach
   @SneakyThrows
@@ -53,45 +53,45 @@ class PublisherCommandControllerTest extends BaseIntegrationTest {
     objectMapper = new ObjectMapper();
     modelMapper = new ModelMapper();
 
-    publisherCounter++;
+    personnelCounter++;
 
-    publisherRequest = PublisherFactory.createPublisherRequest(publisherCounter);
-    publisherResponse = modelMapper.map(publisherRequest, PublisherResponse.class);
+    personnelRequest = PersonnelFactory.createPersonnelRequest(personnelCounter);
+    personnelResponse = modelMapper.map(personnelRequest, PersonnelResponse.class);
   }
 
   @Test
-  @DisplayName("Create successfully publisher.")
+  @DisplayName("Create successfully personnel.")
   @SneakyThrows
-  void testNewPublisherIsCreatedWithNameSurnameAndMiddleName() {
+  void testNewPersonnelIsCreated() {
 
-    Map<String, PublisherResponse> response =
-        objectMapper.readValue(createPublisher(publisherRequest), new TypeReference<>() {});
+    Map<String, PersonnelResponse> response =
+        objectMapper.readValue(createPersonnel(personnelRequest), new TypeReference<>() {});
 
-    publisherResponse.setId(response.get(CREATED).getId());
+    personnelResponse.setId(response.get(CREATED).getId());
 
     JSONAssert.assertEquals(
-        objectMapper.writeValueAsString(publisherResponse),
+        objectMapper.writeValueAsString(personnelResponse),
         objectMapper.writeValueAsString(response.get(CREATED)),
         JSONCompareMode.STRICT);
   }
 
   @Test
-  @DisplayName("Create publisher fails when record exists for this name.")
+  @DisplayName("Create personnel fails when username exists.")
   @SneakyThrows
-  void testDuplicatePublisherIsNotCreated() {
+  void testPersonnelIsNotCreatedWhenDuplicateUsername() {
 
-    // Create first publisher
-    createPublisher(publisherRequest);
+    // Create first personnel
+    createPersonnel(personnelRequest);
 
-    // Same publisher creation should fail
-    var response = createPublisher(publisherRequest);
+    // Same personnel creation should fail
+    var response = createPersonnel(personnelRequest);
     var errorResponse = objectMapper.readValue(response, ErrorResponse.class);
-    assertEquals(DUPLICATE_PUBLISHER.getCode(), errorResponse.getCode());
+    assertEquals(DUPLICATE_PERSONNEL.getCode(), errorResponse.getCode());
   }
 
   @SneakyThrows
-  private String createPublisher(PublisherRequest publisher) {
-    var content = objectMapper.writeValueAsString(publisher);
+  private String createPersonnel(PersonnelRequest personnel) {
+    var content = objectMapper.writeValueAsString(personnel);
     return this.mockMvc
         .perform(post(ENDPOINT).contentType(CONTENT_TYPE).content(content))
         .andDo(print())
