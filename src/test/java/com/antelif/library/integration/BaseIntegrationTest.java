@@ -15,6 +15,7 @@ public class BaseIntegrationTest {
   public static int publisherCounter = 0;
   public static int bookCounter = 0;
   public static int personnelCounter = 0;
+  public static int customerCounter = 0;
 
   static {
     postgres = ConfiguredPostgresqlContainer.getInstance();

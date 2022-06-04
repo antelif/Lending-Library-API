@@ -8,7 +8,7 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Customer entity object. */
+/** Customer entity object that gets persisted in database. */
 @Getter
 @Setter
 @Entity
@@ -26,5 +26,5 @@ public class CustomerEntity {
 
   private String email;
 
-  private double fee;
+  private double fee = 0;
 }

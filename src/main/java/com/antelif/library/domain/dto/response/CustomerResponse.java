@@ -6,8 +6,11 @@ import lombok.Setter;
 /** Personnel response DTO used as response body in HTTP requests. */
 @Getter
 @Setter
-public class PersonnelResponse {
-
+public class CustomerResponse {
   private Long id;
-  private String username;
+  private String name;
+  private String surname;
+  private String phoneNo;
+  private String email;
+  private double fee = 0;
 }

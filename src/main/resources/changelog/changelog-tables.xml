@@ -152,7 +152,7 @@
         <constraints nullable="false"/>
       </column>
       <column name="phone_no" type="varchar(20)">
-        <constraints nullable="false"/>
+        <constraints nullable="false" unique="true"/>
       </column>
       <column name="fee" type="double" startWith="0">
         <constraints nullable="false"/>

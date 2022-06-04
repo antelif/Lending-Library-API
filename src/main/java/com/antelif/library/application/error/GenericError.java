@@ -21,7 +21,12 @@ public enum GenericError {
   DUPLICATE_PERSONNEL(13, "Personnel already exists."),
   PERSONNEL_DOES_NOT_EXIST(14, "Personnel does not exist."),
   PERSONNEL_CONVERTER_FAILED(15, "Could not convert personnel object."),
-  PERSONNEL_CREATION_FAILED(16, "Could not create new personnel.");
+  PERSONNEL_CREATION_FAILED(16, "Could not create new personnel."),
+
+  DUPLICATE_CUSTOMER(17, "Customer already exists."),
+  CUSTOMER_DOES_NOT_EXIST(18, "Customer does not exist."),
+  CUSTOMER_CONVERTER_FAILED(19, "Could not convert customer object."),
+  CUSTOMER_CREATION_FAILED(20, "Could not create new customer.");
 
   private final int code;
   private final String description;
