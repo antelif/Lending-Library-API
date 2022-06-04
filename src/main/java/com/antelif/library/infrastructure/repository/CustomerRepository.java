@@ -10,10 +10,18 @@ import org.springframework.stereotype.Repository;
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> {
 
   /**
-   * Gets a customer entity object by id.
+   * Retrieve a customer by their by id.
    *
-   * @param id the id of the customer to retrieve.
+   * @param id the id of the customer.
    * @return a customer entity object if exists.
    */
   Optional<CustomerEntity> getCustomerById(Long id);
+
+  /**
+   * Retrieve a customer by their by phone number.
+   *
+   * @param phone the phone number of the customer.
+   * @return a customer entity object if exists.
+   */
+  Optional<CustomerEntity> getCustomerByPhoneNo(String phone);
 }
