@@ -1,17 +1,16 @@
 package com.antelif.library.domain.service;
 
 import static com.antelif.library.application.error.GenericError.DUPLICATE_PERSONNEL;
-import static com.antelif.library.application.error.GenericError.PERSONNEL_CONVERTER_FAILED;
 import static com.antelif.library.application.error.GenericError.PERSONNEL_CREATION_FAILED;
 import static com.antelif.library.application.error.GenericError.PERSONNEL_DOES_NOT_EXIST;
 
 import com.antelif.library.domain.converter.PersonnelConverter;
 import com.antelif.library.domain.dto.request.PersonnelRequest;
 import com.antelif.library.domain.dto.response.PersonnelResponse;
-import com.antelif.library.domain.exception.ConverterException;
 import com.antelif.library.domain.exception.DuplicateEntityException;
 import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
+import com.antelif.library.infrastructure.entity.PersonnelEntity;
 import com.antelif.library.infrastructure.repository.PersonnelRepository;
 import java.util.Optional;
 import javax.transaction.Transactional;
@@ -54,15 +53,10 @@ public class PersonnelService {
    * @param id of the personnel to retrieve.
    * @return a personnel response DTO.
    */
-  public PersonnelResponse getPersonnelById(Long id) {
+  public PersonnelEntity getPersonnelById(Long id) {
     var persistedPersonnel = personnelRepository.getPersonnelById(id);
 
-    if (persistedPersonnel.isEmpty()) {
-      throw new EntityDoesNotExistException(PERSONNEL_DOES_NOT_EXIST);
-    }
-
-    return persistedPersonnel
-        .map(converter::convertFromEntityToResponse)
-        .orElseThrow(() -> new ConverterException(PERSONNEL_CONVERTER_FAILED));
+    return persistedPersonnel.orElseThrow(
+        () -> new EntityDoesNotExistException(PERSONNEL_DOES_NOT_EXIST));
   }
 }

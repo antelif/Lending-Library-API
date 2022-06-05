@@ -1,11 +1,15 @@
 package com.antelif.library.application.controller.command;
 
+import static com.antelif.library.domain.common.Constants.CREATED;
 import static com.antelif.library.domain.common.Endpoints.TRANSACTIONS_ENDPOINT;
 
 import com.antelif.library.domain.dto.request.TransactionRequest;
+import com.antelif.library.domain.dto.response.TransactionResponse;
 import com.antelif.library.domain.service.TransactionService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** TransactionEntity Command Controller. */
 @RestController
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping(value = TRANSACTIONS_ENDPOINT)
 public class TransactionCommandController {
@@ -20,14 +25,15 @@ public class TransactionCommandController {
   private final TransactionService transactionService;
 
   /**
-   * Receives POST requests for the creation of a new transaction.
+   * Add a new transaction endpoint.
    *
-   * @param transaction the new object to persist in database.
-   * @return a map with the transaction id as value.
+   * @param transaction the DTO to get information to create the new transaction.
+   * @return a transaction response DTO.
    */
   @PostMapping
-  public Map<String, Long> createTransaction(@RequestBody TransactionRequest transaction) {
-
-    return Map.of("created", transactionService.createTransaction(transaction));
+  public ResponseEntity<Map<String, TransactionResponse>> createTransaction(
+      @RequestBody TransactionRequest transaction) {
+    log.info("Received request to add transaction {}", transaction);
+    return ResponseEntity.ok(Map.of(CREATED, transactionService.createTransaction(transaction)));
   }
 }

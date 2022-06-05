@@ -4,25 +4,26 @@ import static com.antelif.library.factory.AuthorFactory.createAuthorResponse;
 
 import com.antelif.library.domain.dto.request.BookRequest;
 import com.antelif.library.domain.dto.response.BookResponse;
+import lombok.SneakyThrows;
 
 public class BookFactory {
 
-  public static BookRequest createBookRequest(int index, long authorId, long publisherId) {
+  public static BookRequest createBookRequest(int bookIndex, long authorId, long publisherId) {
     var book = new BookRequest();
-    book.setIsbn("isbn" + index);
-    book.setTitle("title" + index);
+    book.setIsbn("isbn" + bookIndex);
+    book.setTitle("title" + bookIndex);
     book.setAuthorId(authorId);
     book.setPublisherId(publisherId);
     return book;
   }
 
-  public static BookResponse createBookResponse(
-      int authorIndex, int publisherIndex, int bookIndex) {
+  @SneakyThrows
+  public static BookResponse createBookResponse(int authorId, int publisherId, int bookIndex) {
     var book = new BookResponse();
     book.setIsbn("isbn" + bookIndex);
     book.setTitle("title" + bookIndex);
-    book.setAuthor(createAuthorResponse(authorIndex));
-    book.setPublisher(PublisherFactory.createPublisherResponse(publisherIndex));
+    book.setAuthor(createAuthorResponse(authorId));
+    book.setPublisher(PublisherFactory.createPublisherResponse(publisherId));
     return book;
   }
 }

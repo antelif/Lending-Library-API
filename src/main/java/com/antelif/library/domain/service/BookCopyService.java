@@ -6,7 +6,10 @@ import com.antelif.library.domain.converter.BookCopyConverter;
 import com.antelif.library.domain.dto.request.BookCopyRequest;
 import com.antelif.library.domain.dto.response.BookCopyResponse;
 import com.antelif.library.domain.exception.EntityCreationException;
+import com.antelif.library.infrastructure.entity.BookCopyEntity;
 import com.antelif.library.infrastructure.repository.BookCopyRepository;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +36,9 @@ public class BookCopyService {
         .map(repository::save)
         .map(converter::convertFromEntityToResponse)
         .orElseThrow(() -> new EntityCreationException(BOOK_CREATION_FAILED));
+  }
+
+  public List<BookCopyEntity> getBookCopiesByBookCopyIds(List<Long> bookCopyIds) {
+    return new ArrayList<>(repository.getByIdIn(bookCopyIds));
   }
 }

@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class PublisherResponse {
 
-  private String id;
+  private Long id;
   private String name;
 
 }

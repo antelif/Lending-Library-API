@@ -1,9 +1,9 @@
 package com.antelif.library.domain.dto.request;
 
-import static com.antelif.library.domain.type.Status.SHELF;
+import static com.antelif.library.domain.type.BookCopyStatus.AVAILABLE;
 
+import com.antelif.library.domain.type.BookCopyStatus;
 import com.antelif.library.domain.type.State;
-import com.antelif.library.domain.type.Status;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,5 +15,5 @@ import lombok.ToString;
 public class BookCopyRequest {
   private String isbn;
   private State state;
-  private Status status = SHELF;
+  private BookCopyStatus status = AVAILABLE;
 }

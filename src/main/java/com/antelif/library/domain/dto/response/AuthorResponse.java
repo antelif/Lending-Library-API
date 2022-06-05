@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class AuthorResponse {
 
-  private String id;
+  private Long id;
   private String name;
   private String surname;
   private String middleName;

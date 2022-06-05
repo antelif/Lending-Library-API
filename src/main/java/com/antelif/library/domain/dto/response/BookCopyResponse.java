@@ -1,7 +1,7 @@
 package com.antelif.library.domain.dto.response;
 
 import com.antelif.library.domain.type.State;
-import com.antelif.library.domain.type.Status;
+import com.antelif.library.domain.type.BookCopyStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,5 +13,5 @@ public class BookCopyResponse {
   private Long id;
   private BookResponse book;
   private State state;
-  private Status status;
+  private BookCopyStatus status;
 }

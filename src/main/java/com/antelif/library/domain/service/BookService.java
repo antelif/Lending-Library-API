@@ -7,6 +7,7 @@ import static com.antelif.library.application.error.GenericError.DUPLICATE_BOOK;
 import com.antelif.library.domain.converter.BookConverter;
 import com.antelif.library.domain.dto.request.BookRequest;
 import com.antelif.library.domain.dto.response.BookResponse;
+import com.antelif.library.domain.exception.ConverterException;
 import com.antelif.library.domain.exception.DuplicateEntityException;
 import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
@@ -35,7 +36,7 @@ public class BookService {
   public BookResponse addBook(BookRequest bookRequest) {
     var persistedEntity = bookRepository.getBookByIsbn(bookRequest.getIsbn());
 
-    if (persistedEntity.isPresent()) {
+    if (!persistedEntity.isEmpty()) {
       throw new DuplicateEntityException(DUPLICATE_BOOK);
     }
     return Optional.of(converter.convertFromRequestToEntity(bookRequest))
@@ -44,15 +45,18 @@ public class BookService {
         .orElseThrow(() -> new EntityCreationException(BOOK_CREATION_FAILED));
   }
 
-  /**
-   * Get a book by provided isbn.
-   *
-   * @param isbn the isbn to retrieve book for.
-   * @return a book entity if the book exists.
-   */
   public BookEntity getBookByIsbn(String isbn) {
-    return bookRepository
-        .getBookByIsbn(isbn)
-        .orElseThrow(() -> new EntityDoesNotExistException(BOOK_DOES_NOT_EXIST));
+    var persistedBook = bookRepository.getBookByIsbn(isbn);
+
+    if (persistedBook.size() > 1) {
+      throw new DuplicateEntityException(DUPLICATE_BOOK);
+    }
+    if (persistedBook.isEmpty()) {
+      throw new EntityDoesNotExistException(BOOK_DOES_NOT_EXIST);
+    }
+
+    return persistedBook.stream()
+        .findFirst()
+        .orElseThrow(() -> new ConverterException(BOOK_DOES_NOT_EXIST));
   }
 }

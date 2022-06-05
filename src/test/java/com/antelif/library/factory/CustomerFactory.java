@@ -15,6 +15,12 @@ public class CustomerFactory {
     return customer;
   }
 
+  public static CustomerRequest createCustomerRequestWithFee(int index) {
+    var customer = createCustomerRequest(index);
+    customer.setFee(5);
+    return customer;
+  }
+
   public static CustomerResponse createCustomerResponse(int index) {
     var customer = new CustomerResponse();
     customer.setName("name" + index);

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
+@DisplayName("Author converter")
 class AuthorConverterTest {
 
   @Autowired private AuthorConverter authorConverter;

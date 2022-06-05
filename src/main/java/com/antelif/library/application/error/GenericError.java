@@ -16,8 +16,9 @@ public enum GenericError {
   PUBLISHER_CREATION_FAILED(8, "Could not create new publisher."),
 
   DUPLICATE_BOOK(9, "Book already exists"),
-  BOOK_DOES_NOT_EXIST(9, "Book does not exist."),
-  BOOK_CREATION_FAILED(10, "Could not create new author."),
+  BOOK_DOES_NOT_EXIST(10, "Book does not exist."),
+  BOOK_CONVERTER_FAILED(11, "Could not convert book object."),
+  BOOK_CREATION_FAILED(12, "Could not create new book."),
 
   DUPLICATE_PERSONNEL(13, "Personnel already exists."),
   PERSONNEL_DOES_NOT_EXIST(14, "Personnel does not exist."),
@@ -27,7 +28,20 @@ public enum GenericError {
   DUPLICATE_CUSTOMER(17, "Customer already exists."),
   CUSTOMER_DOES_NOT_EXIST(18, "Customer does not exist."),
   CUSTOMER_CONVERTER_FAILED(19, "Could not convert customer object."),
-  CUSTOMER_CREATION_FAILED(20, "Could not create new customer.");
+  CUSTOMER_CREATION_FAILED(20, "Could not create new customer."),
+
+  DUPLICATE_BOOK_COPY(21, "Book copy already exists"),
+  BOOK_COPY_DOES_NOT_EXIST(22, "Book copy does not exist."),
+  BOOK_COPY_CONVERTER_FAILED(23, "Could not convert book copy object."),
+  BOOK_COPY_CREATION_FAILED(24, "Could not create new book copy."),
+  BOOK_COPY_UNAVAILABLE(28, "Copy is not eligible for lending due to bad state or unavailability"),
+
+  TRANSACTION_DOES_NOT_EXIST(25, "Transaction does not exist."),
+  TRANSACTION_CONVERTER_FAILED(26, "Could not convert transaction object."),
+  TRANSACTION_CREATION_FAILED(27, "Could not create new transaction."),
+
+  CUSTOMER_HAS_FEE(28, "Customer has pending fee."),
+  CUSTOMER_HAS_THE_BOOK(29, "Customer has already this book.");
 
   private final int code;
   private final String description;

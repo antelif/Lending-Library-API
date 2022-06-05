@@ -2,16 +2,18 @@ package com.antelif.library.controller.command;
 
 import static com.antelif.library.application.error.GenericError.DUPLICATE_PERSONNEL;
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.factory.PersonnelFactory.createPersonnelRequest;
 import static com.antelif.library.factory.PersonnelFactory.createPersonnelResponse;
 import static com.antelif.library.utils.Request.postPersonnel;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.domain.dto.request.PersonnelRequest;
 import com.antelif.library.domain.dto.response.PersonnelResponse;
 import com.antelif.library.integration.BaseIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import java.util.Map;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,13 +28,14 @@ import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DisplayName("Personnel command controller")
 class PersonnelCommandControllerTest extends BaseIntegrationTest {
 
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
-  @Autowired private ObjectMapper objectMapper;
 
   private PersonnelResponse expectedPersonnelResponse;
+  private PersonnelRequest personnelRequest;
 
   @BeforeEach
   @SneakyThrows
@@ -41,6 +44,7 @@ class PersonnelCommandControllerTest extends BaseIntegrationTest {
 
     personnelCounter++;
     expectedPersonnelResponse = createPersonnelResponse(personnelCounter);
+    personnelRequest = createPersonnelRequest(personnelCounter);
   }
 
   @Test
@@ -50,7 +54,7 @@ class PersonnelCommandControllerTest extends BaseIntegrationTest {
 
     var personnelResponseMap =
         objectMapper.readValue(
-            postPersonnel(personnelCounter, this.mockMvc),
+            postPersonnel(objectMapper.writeValueAsString(personnelRequest), this.mockMvc),
             new TypeReference<Map<String, Object>>() {});
 
     var actualPersonnelResponse =
@@ -70,12 +74,15 @@ class PersonnelCommandControllerTest extends BaseIntegrationTest {
   void testPersonnelIsNotCreatedWhenDuplicateUsername() {
 
     // Create first personnel
-    postPersonnel(personnelCounter, this.mockMvc);
+    postPersonnel(objectMapper.writeValueAsString(personnelRequest), this.mockMvc);
 
     // Same personnel creation should fail
     var errorResponse =
-        objectMapper.readValue(
-            postPersonnel(personnelCounter, this.mockMvc), ErrorResponse.class);
+        objectMapper
+            .readValue(
+                postPersonnel(objectMapper.writeValueAsString(personnelRequest), this.mockMvc),
+                new TypeReference<List<ErrorResponse>>() {})
+            .get(0);
     assertEquals(DUPLICATE_PERSONNEL.getCode(), errorResponse.getCode());
   }
 }
