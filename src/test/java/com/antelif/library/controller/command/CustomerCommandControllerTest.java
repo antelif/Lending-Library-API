@@ -2,15 +2,13 @@ package com.antelif.library.controller.command;
 
 import static com.antelif.library.application.error.GenericError.DUPLICATE_CUSTOMER;
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.factory.CustomerFactory.createCustomerResponse;
+import static com.antelif.library.utils.Request.postCustomer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.antelif.library.application.error.ErrorResponse;
-import com.antelif.library.domain.dto.request.CustomerRequest;
 import com.antelif.library.domain.dto.response.CustomerResponse;
-import com.antelif.library.factory.CustomerFactory;
 import com.antelif.library.integration.BaseIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,9 +17,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,71 +28,57 @@ import org.springframework.web.context.WebApplicationContext;
 @AutoConfigureMockMvc
 class CustomerCommandControllerTest extends BaseIntegrationTest {
 
-  private final String ENDPOINT = "/library/customers";
-  private final String CONTENT_TYPE = "application/json";
-
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
 
-  private ObjectMapper objectMapper;
-  private ModelMapper modelMapper;
-
-  private CustomerRequest customerRequest;
-  private CustomerResponse customerResponse;
+  private CustomerResponse expectedCustomerResponse;
 
   @BeforeEach
   @SneakyThrows
   void setUp() {
     this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
 
-    objectMapper = new ObjectMapper();
-    modelMapper = new ModelMapper();
-
     customerCounter++;
 
-    customerRequest = CustomerFactory.createCustomerRequest(customerCounter);
-    customerResponse = modelMapper.map(customerRequest, CustomerResponse.class);
+    expectedCustomerResponse = createCustomerResponse(customerCounter);
   }
 
   @Test
-  @DisplayName("Create successfully customer.")
+  @DisplayName("Customer: Successful creation.")
   @SneakyThrows
   void testNewCustomerIsCreated() {
 
-    Map<String, CustomerResponse> response =
-        objectMapper.readValue(createCustomer(customerRequest), new TypeReference<>() {});
+    Map<String, CustomerResponse> customerResponseMap =
+        objectMapper.readValue(
+            postCustomer(customerCounter, this.mockMvc), new TypeReference<>() {});
 
-    customerResponse.setId(response.get(CREATED).getId());
+    var actualCustomer =
+        objectMapper.readValue(
+            objectMapper.writeValueAsString(customerResponseMap.get(CREATED)),
+            CustomerResponse.class);
 
-    JSONAssert.assertEquals(
-        objectMapper.writeValueAsString(customerResponse),
-        objectMapper.writeValueAsString(response.get(CREATED)),
-        JSONCompareMode.STRICT);
+    assertNotNull(actualCustomer);
+
+    assertNotNull(actualCustomer.getId());
+    assertEquals(expectedCustomerResponse.getName(), actualCustomer.getName());
+    assertEquals(expectedCustomerResponse.getSurname(), actualCustomer.getSurname());
+    assertEquals(expectedCustomerResponse.getEmail(), actualCustomer.getEmail());
+    assertEquals(expectedCustomerResponse.getFee(), actualCustomer.getFee());
+    assertEquals(expectedCustomerResponse.getPhoneNo(), actualCustomer.getPhoneNo());
   }
 
   @Test
-  @DisplayName("Create customer fails when phone number exists.")
+  @DisplayName("Customer: Unsuccessful creation when phone number exists.")
   @SneakyThrows
   void testCustomerIsNotCreatedWhenDuplicatePhoneNumber() {
 
     // Create first customer
-    createCustomer(customerRequest);
+    postCustomer(customerCounter, this.mockMvc);
 
     // Same customer creation should fail
-    var response = createCustomer(customerRequest);
-    var errorResponse = objectMapper.readValue(response, ErrorResponse.class);
+    var errorResponse =
+        objectMapper.readValue(postCustomer(customerCounter, this.mockMvc), ErrorResponse.class);
     assertEquals(DUPLICATE_CUSTOMER.getCode(), errorResponse.getCode());
-  }
-
-  @SneakyThrows
-  private String createCustomer(CustomerRequest customer) {
-    var content = objectMapper.writeValueAsString(customer);
-    return this.mockMvc
-        .perform(post(ENDPOINT).contentType(CONTENT_TYPE).content(content))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
   }
 }

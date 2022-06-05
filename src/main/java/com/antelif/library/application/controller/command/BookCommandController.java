@@ -1,6 +1,7 @@
 package com.antelif.library.application.controller.command;
 
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Endpoints.BOOKS_ENDPOINT;
 
 import com.antelif.library.domain.dto.request.BookRequest;
 import com.antelif.library.domain.dto.response.BookResponse;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping(value = "/library/books")
+@RequestMapping(value = BOOKS_ENDPOINT)
 public class BookCommandController {
 
   private final BookService bookService;

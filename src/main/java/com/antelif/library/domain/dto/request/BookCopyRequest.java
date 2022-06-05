@@ -1,17 +1,19 @@
 package com.antelif.library.domain.dto.request;
 
+import static com.antelif.library.domain.type.Status.SHELF;
+
 import com.antelif.library.domain.type.State;
 import com.antelif.library.domain.type.Status;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
-/** BookCopyEntity DTO. */
+/** Book copy request DTO used as request body in HTTP requests. */
 @Getter
 @Setter
-@EqualsAndHashCode
+@ToString
 public class BookCopyRequest {
   private String isbn;
   private State state;
-  private Status status;
+  private Status status = SHELF;
 }

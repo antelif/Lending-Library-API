@@ -1,23 +1,37 @@
 package com.antelif.library.domain.service;
 
+import static com.antelif.library.application.error.GenericError.BOOK_CREATION_FAILED;
+
+import com.antelif.library.domain.converter.BookCopyConverter;
 import com.antelif.library.domain.dto.request.BookCopyRequest;
-import java.util.List;
+import com.antelif.library.domain.dto.response.BookCopyResponse;
+import com.antelif.library.domain.exception.EntityCreationException;
+import com.antelif.library.infrastructure.repository.BookCopyRepository;
+import java.util.Optional;
+import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /** Book copy service. */
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BookCopyService {
 
-  /**
-   * Retuof the copies added.rn the number of copies added.
-   *
-   * @param bookCopies the copies to add in the database.
-   * @return the number
-   */
-  public Integer addBookCopies(List<BookCopyRequest> bookCopies) {
+  private final BookCopyConverter converter;
+  private final BookCopyRepository repository;
 
-    return 0;
+  /**
+   * Adds a book copy to database.
+   *
+   * @param bookCopyRequest the DTO to get information about the book copy to create.
+   * @return a book copy response DTO.
+   */
+  public BookCopyResponse addBookCopy(BookCopyRequest bookCopyRequest) {
+
+    return Optional.of(converter.convertFromRequestToEntity(bookCopyRequest))
+        .map(repository::save)
+        .map(converter::convertFromEntityToResponse)
+        .orElseThrow(() -> new EntityCreationException(BOOK_CREATION_FAILED));
   }
 }

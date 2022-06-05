@@ -1,6 +1,7 @@
 package com.antelif.library.application.controller.command;
 
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Endpoints.AUTHORS_ENDPOINT;
 
 import com.antelif.library.domain.dto.request.AuthorRequest;
 import com.antelif.library.domain.dto.response.AuthorResponse;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping(value = "/library/authors")
+@RequestMapping(value = AUTHORS_ENDPOINT)
 public class AuthorCommandController {
 
   private final AuthorService authorService;
