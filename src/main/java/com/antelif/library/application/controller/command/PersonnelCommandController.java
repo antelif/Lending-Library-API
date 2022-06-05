@@ -1,6 +1,7 @@
 package com.antelif.library.application.controller.command;
 
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Endpoints.PERSONNEL_ENDPOINT;
 
 import com.antelif.library.domain.dto.request.PersonnelRequest;
 import com.antelif.library.domain.dto.response.PersonnelResponse;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping(value = "/library/personnel")
+@RequestMapping(value = PERSONNEL_ENDPOINT)
 public class PersonnelCommandController {
 
   private final PersonnelService personnelService;

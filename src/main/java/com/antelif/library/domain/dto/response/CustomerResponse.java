@@ -12,5 +12,5 @@ public class CustomerResponse {
   private String surname;
   private String phoneNo;
   private String email;
-  private double fee = 0;
+  private double fee;
 }

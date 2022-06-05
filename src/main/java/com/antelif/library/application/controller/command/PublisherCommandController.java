@@ -1,6 +1,7 @@
 package com.antelif.library.application.controller.command;
 
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Endpoints.PUBLISHERS_ENDPOINT;
 
 import com.antelif.library.domain.dto.request.PublisherRequest;
 import com.antelif.library.domain.dto.response.PublisherResponse;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping(value = "/library/publishers")
+@RequestMapping(value = PUBLISHERS_ENDPOINT)
 public class PublisherCommandController {
 
   private final PublisherService publisherService;

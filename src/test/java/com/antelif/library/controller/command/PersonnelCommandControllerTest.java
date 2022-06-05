@@ -2,15 +2,13 @@ package com.antelif.library.controller.command;
 
 import static com.antelif.library.application.error.GenericError.DUPLICATE_PERSONNEL;
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.factory.PersonnelFactory.createPersonnelResponse;
+import static com.antelif.library.utils.Request.postPersonnel;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.antelif.library.application.error.ErrorResponse;
-import com.antelif.library.domain.dto.request.PersonnelRequest;
 import com.antelif.library.domain.dto.response.PersonnelResponse;
-import com.antelif.library.factory.PersonnelFactory;
 import com.antelif.library.integration.BaseIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,9 +17,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,71 +28,54 @@ import org.springframework.web.context.WebApplicationContext;
 @AutoConfigureMockMvc
 class PersonnelCommandControllerTest extends BaseIntegrationTest {
 
-  private final String ENDPOINT = "/library/personnel";
-  private final String CONTENT_TYPE = "application/json";
-
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
 
-  private ObjectMapper objectMapper;
-  private ModelMapper modelMapper;
-
-  private PersonnelRequest personnelRequest;
-  private PersonnelResponse personnelResponse;
+  private PersonnelResponse expectedPersonnelResponse;
 
   @BeforeEach
   @SneakyThrows
   void setUp() {
     this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
 
-    objectMapper = new ObjectMapper();
-    modelMapper = new ModelMapper();
-
     personnelCounter++;
-
-    personnelRequest = PersonnelFactory.createPersonnelRequest(personnelCounter);
-    personnelResponse = modelMapper.map(personnelRequest, PersonnelResponse.class);
+    expectedPersonnelResponse = createPersonnelResponse(personnelCounter);
   }
 
   @Test
-  @DisplayName("Create successfully personnel.")
+  @DisplayName("Personnel: Successful creation.")
   @SneakyThrows
   void testNewPersonnelIsCreated() {
 
-    Map<String, PersonnelResponse> response =
-        objectMapper.readValue(createPersonnel(personnelRequest), new TypeReference<>() {});
+    var personnelResponseMap =
+        objectMapper.readValue(
+            postPersonnel(personnelCounter, this.mockMvc),
+            new TypeReference<Map<String, Object>>() {});
 
-    personnelResponse.setId(response.get(CREATED).getId());
+    var actualPersonnelResponse =
+        objectMapper.readValue(
+            objectMapper.writeValueAsString(personnelResponseMap.get(CREATED)),
+            PersonnelResponse.class);
 
-    JSONAssert.assertEquals(
-        objectMapper.writeValueAsString(personnelResponse),
-        objectMapper.writeValueAsString(response.get(CREATED)),
-        JSONCompareMode.STRICT);
+    assertNotNull(actualPersonnelResponse);
+
+    assertNotNull(actualPersonnelResponse.getId());
+    assertEquals(expectedPersonnelResponse.getUsername(), actualPersonnelResponse.getUsername());
   }
 
   @Test
-  @DisplayName("Create personnel fails when username exists.")
+  @DisplayName("Personnel: Unsuccessful creation when username exists.")
   @SneakyThrows
   void testPersonnelIsNotCreatedWhenDuplicateUsername() {
 
     // Create first personnel
-    createPersonnel(personnelRequest);
+    postPersonnel(personnelCounter, this.mockMvc);
 
     // Same personnel creation should fail
-    var response = createPersonnel(personnelRequest);
-    var errorResponse = objectMapper.readValue(response, ErrorResponse.class);
+    var errorResponse =
+        objectMapper.readValue(
+            postPersonnel(personnelCounter, this.mockMvc), ErrorResponse.class);
     assertEquals(DUPLICATE_PERSONNEL.getCode(), errorResponse.getCode());
-  }
-
-  @SneakyThrows
-  private String createPersonnel(PersonnelRequest personnel) {
-    var content = objectMapper.writeValueAsString(personnel);
-    return this.mockMvc
-        .perform(post(ENDPOINT).contentType(CONTENT_TYPE).content(content))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
   }
 }

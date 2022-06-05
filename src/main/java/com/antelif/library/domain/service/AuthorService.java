@@ -13,9 +13,7 @@ import com.antelif.library.domain.exception.DuplicateEntityException;
 import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
 import com.antelif.library.infrastructure.repository.AuthorRepository;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -69,19 +67,5 @@ public class AuthorService {
     return persistedAuthor
         .map(converter::convertFromEntityToResponse)
         .orElseThrow(() -> new ConverterException(AUTHOR_CONVERTER_FAILED));
-  }
-
-  /**
-   * Retrieve authors from the database based on the provided name and surname.
-   *
-   * @param surname of the author to retrieve.
-   * @return a list of author response DTOs.
-   */
-  public List<AuthorResponse> getAuthorsBySurname(String surname) {
-    var persistedAuthors = authorRepository.getAuthorEntitiesBySurname(surname);
-
-    return persistedAuthors.stream()
-        .map(converter::convertFromEntityToResponse)
-        .collect(Collectors.toList());
   }
 }

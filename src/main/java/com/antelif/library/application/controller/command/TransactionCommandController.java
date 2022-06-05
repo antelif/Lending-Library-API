@@ -1,5 +1,7 @@
 package com.antelif.library.application.controller.command;
 
+import static com.antelif.library.domain.common.Endpoints.TRANSACTIONS_ENDPOINT;
+
 import com.antelif.library.domain.dto.request.TransactionRequest;
 import com.antelif.library.domain.service.TransactionService;
 import java.util.Map;
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 /** TransactionEntity Command Controller. */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/transactions")
+@RequestMapping(value = TRANSACTIONS_ENDPOINT)
 public class TransactionCommandController {
 
   private final TransactionService transactionService;

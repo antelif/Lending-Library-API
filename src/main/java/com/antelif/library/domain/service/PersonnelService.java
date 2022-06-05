@@ -18,6 +18,7 @@ import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/** Personnel service. */
 @Service
 @RequiredArgsConstructor
 public class PersonnelService {

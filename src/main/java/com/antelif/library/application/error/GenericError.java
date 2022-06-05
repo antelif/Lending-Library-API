@@ -16,6 +16,7 @@ public enum GenericError {
   PUBLISHER_CREATION_FAILED(8, "Could not create new publisher."),
 
   DUPLICATE_BOOK(9, "Book already exists"),
+  BOOK_DOES_NOT_EXIST(9, "Book does not exist."),
   BOOK_CREATION_FAILED(10, "Could not create new author."),
 
   DUPLICATE_PERSONNEL(13, "Personnel already exists."),

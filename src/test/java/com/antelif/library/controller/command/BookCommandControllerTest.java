@@ -4,19 +4,16 @@ import static com.antelif.library.application.error.GenericError.AUTHOR_DOES_NOT
 import static com.antelif.library.application.error.GenericError.DUPLICATE_BOOK;
 import static com.antelif.library.application.error.GenericError.PUBLISHER_DOES_NOT_EXIST;
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.utils.Request.postBook;
+import static com.antelif.library.utils.Request.postBookWithExistingAuthor;
+import static com.antelif.library.utils.Request.postBookWithExistingAuthorAndPublisher;
+import static com.antelif.library.utils.Request.postBookWithExistingPublisher;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.antelif.library.application.error.ErrorResponse;
-import com.antelif.library.domain.dto.request.BookRequest;
-import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.domain.dto.response.BookResponse;
-import com.antelif.library.domain.dto.response.PublisherResponse;
-import com.antelif.library.factory.AuthorDtoFactory;
 import com.antelif.library.factory.BookFactory;
-import com.antelif.library.factory.PublisherFactory;
 import com.antelif.library.integration.BaseIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,8 +22,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,18 +33,11 @@ import org.springframework.web.context.WebApplicationContext;
 @AutoConfigureMockMvc
 class BookCommandControllerTest extends BaseIntegrationTest {
 
-  private final String ENDPOINT = "/library/books";
-  private final String CONTENT_TYPE = "application/json";
-
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
 
-  private ObjectMapper objectMapper;
-
-  private BookRequest bookRequest;
-  private BookResponse bookExpectedResponse;
-  private AuthorResponse author;
-  private PublisherResponse publisher;
+  private BookResponse expectedBookResponse;
 
   @BeforeEach
   @SneakyThrows
@@ -62,118 +50,85 @@ class BookCommandControllerTest extends BaseIntegrationTest {
     authorCounter++;
     publisherCounter++;
 
-    author = createNewAuthorAndGetId(authorCounter);
-    publisher = createNewPublisherAndGetId(publisherCounter);
-
-    bookRequest =
-        BookFactory.createBookRequest(
-            bookCounter, Long.valueOf(author.getId()), Long.valueOf(publisher.getId()));
-    bookExpectedResponse = BookFactory.createBookResponse(bookCounter, author, publisher);
+    expectedBookResponse =
+        BookFactory.createBookResponse(authorCounter, publisherCounter, bookCounter);
   }
 
   @Test
-  @DisplayName("Create successfully a book.")
+  @DisplayName("Book: Successful creation.")
   @SneakyThrows
   void testBookIsCreatedSuccessfully() {
 
-    Map<String, BookResponse> response =
-        objectMapper.readValue(createNewBook(bookRequest), new TypeReference<>() {});
+    var response =
+        objectMapper.readValue(
+            postBook(authorCounter, publisherCounter, bookCounter, this.mockMvc),
+            new TypeReference<Map<String, Object>>() {});
 
-    bookExpectedResponse.setId(response.get(CREATED).getId());
+    var actualBookResponse =
+        objectMapper.readValue(
+            objectMapper.writeValueAsString(response.get(CREATED)), BookResponse.class);
 
-    JSONAssert.assertEquals(
-        objectMapper.writeValueAsString(bookExpectedResponse),
-        objectMapper.writeValueAsString(response.get(CREATED)),
-        JSONCompareMode.STRICT);
+    assertNotNull(actualBookResponse);
+
+    assertNotNull(actualBookResponse.getId());
+    assertEquals(expectedBookResponse.getTitle(), actualBookResponse.getTitle());
+    assertEquals(expectedBookResponse.getIsbn(), actualBookResponse.getIsbn());
+
+    assertNotNull(actualBookResponse.getAuthor().getId());
+    assertEquals(
+        expectedBookResponse.getAuthor().getName(), actualBookResponse.getAuthor().getName());
+    assertEquals(
+        expectedBookResponse.getAuthor().getMiddleName(),
+        actualBookResponse.getAuthor().getMiddleName());
+    assertEquals(
+        expectedBookResponse.getAuthor().getSurname(), actualBookResponse.getAuthor().getSurname());
+
+    assertNotNull(actualBookResponse.getPublisher().getId());
+    assertEquals(
+        expectedBookResponse.getPublisher().getName(), actualBookResponse.getPublisher().getName());
   }
 
   @Test
-  @DisplayName("Create book fails when record exists for this isbn.")
+  @DisplayName("Book: Unsuccessful creation when record exists for this isbn.")
   @SneakyThrows
   void testDuplicateBookIsNotCreated() {
 
     // Create first book
-    createNewBook(bookRequest);
+    postBook(authorCounter, publisherCounter, bookCounter, this.mockMvc);
 
     // Same book creation should fail
-    var response = createNewBook(bookRequest);
+    var response =
+        postBookWithExistingAuthorAndPublisher(
+            authorCounter, publisherCounter, bookCounter, this.mockMvc);
     var errorResponse = objectMapper.readValue(response, ErrorResponse.class);
     assertEquals(DUPLICATE_BOOK.getCode(), errorResponse.getCode());
   }
 
   @Test
-  @DisplayName("Create book fails when author does not exist.")
+  @DisplayName("Book: Unsuccessful creation when author does not exist.")
   @SneakyThrows
   void testBookIsNotCreatedWhenAuthorDoesNotExist() {
 
-    // Set author id to a non-existing author.
-    bookRequest.setAuthorId(authorCounter + 1);
-
-    var response = objectMapper.readValue(createNewBook(bookRequest), ErrorResponse.class);
+    var response =
+        objectMapper.readValue(
+            postBookWithExistingAuthor(
+                authorCounter + 1, publisherCounter, bookCounter, this.mockMvc),
+            ErrorResponse.class);
 
     assertEquals(AUTHOR_DOES_NOT_EXIST.getCode(), response.getCode());
   }
 
   @Test
-  @DisplayName("Create book fails when publisher does not exist.")
+  @DisplayName("Book: Unsuccessful creation when publisher does not exist.")
   @SneakyThrows
   void testBookIsNotCreatedWhenPublisherDoesNotExist() {
 
-    // Set author id to a non-existing author.
-    bookRequest.setPublisherId(publisherCounter + 1);
-
-    var response = objectMapper.readValue(createNewBook(bookRequest), ErrorResponse.class);
+    var response =
+        objectMapper.readValue(
+            postBookWithExistingPublisher(
+                authorCounter, publisherCounter + 1, bookCounter, this.mockMvc),
+            ErrorResponse.class);
 
     assertEquals(PUBLISHER_DOES_NOT_EXIST.getCode(), response.getCode());
-  }
-
-  @SneakyThrows
-  private String createNewBook(BookRequest book) {
-    var content = objectMapper.writeValueAsString(book);
-    return this.mockMvc
-        .perform(post(ENDPOINT).contentType(CONTENT_TYPE).content(content))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andReturn()
-        .getResponse()
-        .getContentAsString();
-  }
-
-  @SneakyThrows
-  private AuthorResponse createNewAuthorAndGetId(int authorCounter) {
-    var authorRequest = AuthorDtoFactory.createAuthorRequest(authorCounter);
-    var content = objectMapper.writeValueAsString(authorRequest);
-
-    var authorResponse =
-        this.mockMvc
-            .perform(post("/library/authors").contentType(CONTENT_TYPE).content(content))
-            .andDo(print())
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    return objectMapper
-        .readValue(authorResponse, new TypeReference<Map<String, AuthorResponse>>() {})
-        .get(CREATED);
-  }
-
-  @SneakyThrows
-  private PublisherResponse createNewPublisherAndGetId(int publisherCounter) {
-    var publisherRequest = PublisherFactory.createPublisherRequest(publisherCounter);
-    var content = objectMapper.writeValueAsString(publisherRequest);
-
-    var authorResponse =
-        this.mockMvc
-            .perform(post("/library/publishers").contentType(CONTENT_TYPE).content(content))
-            .andDo(print())
-            .andExpect(status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
-
-    return objectMapper
-        .readValue(authorResponse, new TypeReference<Map<String, PublisherResponse>>() {})
-        .get(CREATED);
   }
 }

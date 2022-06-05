@@ -1,6 +1,7 @@
 package com.antelif.library.application.controller.command;
 
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Endpoints.CUSTOMERS_ENDPOINT;
 
 import com.antelif.library.domain.dto.request.CustomerRequest;
 import com.antelif.library.domain.dto.response.CustomerResponse;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping(value = "/library/customers")
+@RequestMapping(value = CUSTOMERS_ENDPOINT)
 public class CustomerCommandController {
 
   private final CustomerService customerService;

@@ -7,7 +7,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.Hibernate;
 
 /** Author entity object that gets persisted in database. */
 @Getter
@@ -25,23 +24,4 @@ public class AuthorEntity {
   private String middleName;
 
   private String surname;
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
-      return false;
-    }
-    AuthorEntity that = (AuthorEntity) o;
-    return name.equals(that.getName())
-        && surname.equals(that.getSurname())
-        && middleName.equals(that.getMiddleName());
-  }
-
-  @Override
-  public int hashCode() {
-    return getClass().hashCode();
-  }
 }
