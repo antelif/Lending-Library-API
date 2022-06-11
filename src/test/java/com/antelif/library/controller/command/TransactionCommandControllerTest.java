@@ -6,7 +6,7 @@ import static com.antelif.library.application.error.GenericError.CUSTOMER_DOES_N
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_FEE;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_THE_BOOK;
 import static com.antelif.library.application.error.GenericError.PERSONNEL_DOES_NOT_EXIST;
-import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Endpoints.TRANSACTIONS_ENDPOINT;
 import static com.antelif.library.domain.type.BookCopyStatus.LENT;
 import static com.antelif.library.domain.type.State.BAD;
 import static com.antelif.library.factory.AuthorFactory.createAuthorRequest;
@@ -18,30 +18,22 @@ import static com.antelif.library.factory.PersonnelFactory.createPersonnelReques
 import static com.antelif.library.factory.PublisherFactory.createPublisherRequest;
 import static com.antelif.library.factory.TransactionFactory.createTransactionRequest;
 import static com.antelif.library.factory.TransactionFactory.createTransactionResponse;
-import static com.antelif.library.utils.Request.postAuthor;
-import static com.antelif.library.utils.Request.postBook;
-import static com.antelif.library.utils.Request.postBookCopy;
-import static com.antelif.library.utils.Request.postCustomer;
-import static com.antelif.library.utils.Request.postPersonnel;
-import static com.antelif.library.utils.Request.postPublisher;
-import static com.antelif.library.utils.Request.postTransaction;
+import static com.antelif.library.utils.RequestBuilder.postAuthor;
+import static com.antelif.library.utils.RequestBuilder.postBook;
+import static com.antelif.library.utils.RequestBuilder.postBookCopy;
+import static com.antelif.library.utils.RequestBuilder.postCustomer;
+import static com.antelif.library.utils.RequestBuilder.postPersonnel;
+import static com.antelif.library.utils.RequestBuilder.postPublisher;
+import static com.antelif.library.utils.RequestBuilder.postRequestAndExpectError;
+import static com.antelif.library.utils.RequestBuilder.postTransaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.antelif.library.application.error.ErrorResponse;
 import com.antelif.library.domain.dto.request.TransactionRequest;
-import com.antelif.library.domain.dto.response.AuthorResponse;
-import com.antelif.library.domain.dto.response.BookCopyResponse;
-import com.antelif.library.domain.dto.response.BookResponse;
-import com.antelif.library.domain.dto.response.CustomerResponse;
-import com.antelif.library.domain.dto.response.PersonnelResponse;
-import com.antelif.library.domain.dto.response.PublisherResponse;
 import com.antelif.library.domain.dto.response.TransactionResponse;
 import com.antelif.library.integration.BaseIntegrationTest;
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
-import java.util.Map;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -82,78 +74,29 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
             customerCounter, personnelCounter, authorCounter, publisherCounter, bookCounter);
 
     var authorRequest = createAuthorRequest(authorCounter);
+    var authorResponse = postAuthor(authorRequest, this.mockMvc);
+
     var publisherRequest = createPublisherRequest(publisherCounter);
+    var publisherResponse = postPublisher(publisherRequest, this.mockMvc);
 
-    // Set author id
-    var authorMap =
-        objectMapper.readValue(
-            postAuthor(objectMapper.writeValueAsString(authorRequest), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var authorId =
-        objectMapper
-            .readValue(
-                objectMapper.writeValueAsString(authorMap.get(CREATED)), AuthorResponse.class)
-            .getId();
+    var bookRequest =
+        createBookRequest(bookCounter, authorResponse.getId(), publisherResponse.getId());
 
-    // Set publisher id
-    var publisherMap =
-        objectMapper.readValue(
-            postPublisher(objectMapper.writeValueAsString(publisherRequest), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var publisherId =
-        objectMapper
-            .readValue(
-                objectMapper.writeValueAsString(publisherMap.get(CREATED)), PublisherResponse.class)
-            .getId();
+    var bookResponse = postBook(bookRequest, this.mockMvc);
+    isbn = bookResponse.getIsbn();
 
-    var bookRequest = createBookRequest(bookCounter, authorId, publisherId);
+    var bookCopyRequest = createBookCopyRequest(isbn);
+    var bookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
 
-    // Set book isbn
-    var bookMap =
-        objectMapper.readValue(
-            postBook(objectMapper.writeValueAsString(bookRequest), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    isbn =
-        objectMapper
-            .readValue(objectMapper.writeValueAsString(bookMap.get(CREATED)), BookResponse.class)
-            .getIsbn();
+    var customerRequest = createCustomerRequest(customerCounter);
+    var customerResponse = postCustomer(customerRequest, this.mockMvc);
 
-    var bookCopyMap =
-        objectMapper.readValue(
-            postBookCopy(
-                objectMapper.writeValueAsString(createBookCopyRequest(isbn)), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var bookCopyId =
-        objectMapper
-            .readValue(
-                objectMapper.writeValueAsString(bookCopyMap.get(CREATED)), BookCopyResponse.class)
-            .getId();
+    var personnelRequest = createPersonnelRequest(personnelCounter);
+    var personnelResponse = postPersonnel(personnelRequest, this.mockMvc);
 
-    var customerMap =
-        objectMapper.readValue(
-            postCustomer(
-                objectMapper.writeValueAsString(createCustomerRequest(customerCounter)),
-                this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var customerId =
-        objectMapper
-            .readValue(
-                objectMapper.writeValueAsString(customerMap.get(CREATED)), CustomerResponse.class)
-            .getId();
-
-    var personnelMap =
-        objectMapper.readValue(
-            postPersonnel(
-                objectMapper.writeValueAsString(createPersonnelRequest(personnelCounter)),
-                this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var personnelId =
-        objectMapper
-            .readValue(
-                objectMapper.writeValueAsString(personnelMap.get(CREATED)), PersonnelResponse.class)
-            .getId();
-
-    transactionRequest = createTransactionRequest(customerId, personnelId, bookCopyId);
+    transactionRequest =
+        createTransactionRequest(
+            customerResponse.getId(), personnelResponse.getId(), bookCopyResponse.getId());
   }
 
   @Test
@@ -161,15 +104,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testTransactionIsCreatedSuccessfully() {
 
-    var transactionMapResponse =
-        objectMapper.readValue(
-            postTransaction(objectMapper.writeValueAsString(transactionRequest), mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-
-    var actualTransactionResponse =
-        objectMapper.readValue(
-            objectMapper.writeValueAsString(transactionMapResponse.get(CREATED)),
-            TransactionResponse.class);
+    var actualTransactionResponse = postTransaction(transactionRequest, this.mockMvc);
 
     assertNotNull(actualTransactionResponse);
 
@@ -234,23 +169,13 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
 
     customerCounter++;
     var customerRequest = createCustomerRequestWithFee(customerCounter);
+    var customerResponse = postCustomer(customerRequest, this.mockMvc);
 
-    var customerMap =
-        objectMapper.readValue(
-            postCustomer(objectMapper.writeValueAsString(customerRequest), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var customerId =
-        objectMapper
-            .readValue(
-                objectMapper.writeValueAsString(customerMap.get(CREATED)), CustomerResponse.class)
-            .getId();
-
-    transactionRequest.setCustomerId(customerId);
+    transactionRequest.setCustomerId(customerResponse.getId());
 
     var transactionMapResponse =
-        objectMapper.readValue(
-            postTransaction(objectMapper.writeValueAsString(transactionRequest), mockMvc),
-            new TypeReference<List<ErrorResponse>>() {});
+        postRequestAndExpectError(
+            TRANSACTIONS_ENDPOINT, objectMapper.writeValueAsString(transactionRequest), mockMvc);
     assertTrue(transactionMapResponse.size() > 0);
     assertEquals(CUSTOMER_HAS_FEE.getCode(), transactionMapResponse.get(0).getCode());
   }
@@ -261,14 +186,15 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
       "Transaction: Unsuccessful creation when customer has lent this title and has active transaction.")
   void testTransactionFailsWhenCustomerHasLentThisBook() {
     // First transaction
-    postTransaction(objectMapper.writeValueAsString(transactionRequest), mockMvc);
+    postTransaction(transactionRequest, mockMvc);
 
-    var transactionMapResponse =
-        objectMapper.readValue(
-            postTransaction(objectMapper.writeValueAsString(transactionRequest), mockMvc),
-            new TypeReference<List<ErrorResponse>>() {});
-    assertTrue(transactionMapResponse.size() > 0);
-    assertEquals(CUSTOMER_HAS_THE_BOOK.getCode(), transactionMapResponse.get(0).getCode());
+    var transactionResponse =
+        postRequestAndExpectError(
+            TRANSACTIONS_ENDPOINT,
+            objectMapper.writeValueAsString(transactionRequest),
+            this.mockMvc);
+    assertTrue(transactionResponse.size() > 0);
+    assertEquals(CUSTOMER_HAS_THE_BOOK.getCode(), transactionResponse.get(0).getCode());
   }
 
   @Test
@@ -279,25 +205,18 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
     var bookCopyRequest = createBookCopyRequest(isbn);
     bookCopyRequest.setState(BAD);
 
-    var bookCopyMap =
-        objectMapper.readValue(
-            postBookCopy(objectMapper.writeValueAsString(bookCopyRequest), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var bookCopyId =
-        objectMapper
-            .readValue(
-                objectMapper.writeValueAsString(bookCopyMap.get(CREATED)), BookCopyResponse.class)
-            .getId();
+    var bookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
 
-    transactionRequest.setCopyIds(List.of(bookCopyId));
+    transactionRequest.setCopyIds(List.of(bookCopyResponse.getId()));
 
-    var transactionMapResponse =
-        objectMapper.readValue(
-            postTransaction(objectMapper.writeValueAsString(transactionRequest), mockMvc),
-            new TypeReference<List<ErrorResponse>>() {});
+    var transactionResponse =
+        postRequestAndExpectError(
+            TRANSACTIONS_ENDPOINT,
+            objectMapper.writeValueAsString(transactionRequest),
+            this.mockMvc);
 
-    assertTrue(transactionMapResponse.size() > 0);
-    assertEquals(BOOK_COPY_UNAVAILABLE.getCode(), transactionMapResponse.get(0).getCode());
+    assertTrue(transactionResponse.size() > 0);
+    assertEquals(BOOK_COPY_UNAVAILABLE.getCode(), transactionResponse.get(0).getCode());
   }
 
   @Test
@@ -308,25 +227,18 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
     var bookCopyRequest = createBookCopyRequest(isbn);
     bookCopyRequest.setStatus(LENT);
 
-    var bookCopyMap =
-        objectMapper.readValue(
-            postBookCopy(objectMapper.writeValueAsString(bookCopyRequest), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var bookCopyId =
-        objectMapper
-            .readValue(
-                objectMapper.writeValueAsString(bookCopyMap.get(CREATED)), BookCopyResponse.class)
-            .getId();
+    var bookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
 
-    transactionRequest.setCopyIds(List.of(bookCopyId));
+    transactionRequest.setCopyIds(List.of(bookCopyResponse.getId()));
 
-    var transactionMapResponse =
-        objectMapper.readValue(
-            postTransaction(objectMapper.writeValueAsString(transactionRequest), mockMvc),
-            new TypeReference<List<ErrorResponse>>() {});
+    var transactionResponse =
+        postRequestAndExpectError(
+            TRANSACTIONS_ENDPOINT,
+            objectMapper.writeValueAsString(transactionRequest),
+            this.mockMvc);
 
-    assertTrue(transactionMapResponse.size() > 0);
-    assertEquals(BOOK_COPY_UNAVAILABLE.getCode(), transactionMapResponse.get(0).getCode());
+    assertTrue(transactionResponse.size() > 0);
+    assertEquals(BOOK_COPY_UNAVAILABLE.getCode(), transactionResponse.get(0).getCode());
   }
 
   @Test
@@ -336,13 +248,14 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
 
     transactionRequest.setCopyIds(List.of(9999L));
 
-    var transactionMapResponse =
-        objectMapper.readValue(
-            postTransaction(objectMapper.writeValueAsString(transactionRequest), mockMvc),
-            new TypeReference<List<ErrorResponse>>() {});
+    var transactionResponse =
+        postRequestAndExpectError(
+            TRANSACTIONS_ENDPOINT,
+            objectMapper.writeValueAsString(transactionRequest),
+            this.mockMvc);
 
-    assertTrue(transactionMapResponse.size() > 0);
-    assertEquals(BOOK_COPY_DOES_NOT_EXIST.getCode(), transactionMapResponse.get(0).getCode());
+    assertTrue(transactionResponse.size() > 0);
+    assertEquals(BOOK_COPY_DOES_NOT_EXIST.getCode(), transactionResponse.get(0).getCode());
   }
 
   @Test
@@ -351,13 +264,14 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   void testTransactionFailsWhenCustomerDoesNotExist() {
     transactionRequest.setCustomerId((9999L));
 
-    var transactionMapResponse =
-        objectMapper.readValue(
-            postTransaction(objectMapper.writeValueAsString(transactionRequest), mockMvc),
-            new TypeReference<List<ErrorResponse>>() {});
+    var transactionResponse =
+        postRequestAndExpectError(
+            TRANSACTIONS_ENDPOINT,
+            objectMapper.writeValueAsString(transactionRequest),
+            this.mockMvc);
 
-    assertTrue(transactionMapResponse.size() > 0);
-    assertEquals(CUSTOMER_DOES_NOT_EXIST.getCode(), transactionMapResponse.get(0).getCode());
+    assertTrue(transactionResponse.size() > 0);
+    assertEquals(CUSTOMER_DOES_NOT_EXIST.getCode(), transactionResponse.get(0).getCode());
   }
 
   @Test
@@ -366,12 +280,12 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   void testTransactionFailsWhenPersonnelDoesNotExist() {
     transactionRequest.setPersonnelId(9999L);
 
-    var transactionMapResponse =
-        objectMapper.readValue(
-            postTransaction(objectMapper.writeValueAsString(transactionRequest), mockMvc),
-            new TypeReference<List<ErrorResponse>>() {});
-
-    assertTrue(transactionMapResponse.size() > 0);
-    assertEquals(PERSONNEL_DOES_NOT_EXIST.getCode(), transactionMapResponse.get(0).getCode());
+    var transactionResponse =
+        postRequestAndExpectError(
+            TRANSACTIONS_ENDPOINT,
+            objectMapper.writeValueAsString(transactionRequest),
+            this.mockMvc);
+    assertTrue(transactionResponse.size() > 0);
+    assertEquals(PERSONNEL_DOES_NOT_EXIST.getCode(), transactionResponse.get(0).getCode());
   }
 }

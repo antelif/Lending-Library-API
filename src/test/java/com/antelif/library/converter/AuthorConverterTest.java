@@ -8,7 +8,6 @@ import com.antelif.library.domain.converter.AuthorConverter;
 import com.antelif.library.domain.dto.request.AuthorRequest;
 import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.infrastructure.entity.AuthorEntity;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -21,16 +20,11 @@ class AuthorConverterTest {
 
   @Autowired private AuthorConverter authorConverter;
 
-  private static ModelMapper modelMapper;
+  private final ModelMapper modelMapper = new ModelMapper();
 
   private final AuthorRequest expectedRequest = createAuthorRequest(1);
   private final AuthorResponse authorResponse = createAuthorResponse(1);
   private final AuthorEntity expectedEntity = modelMapper.map(authorResponse, AuthorEntity.class);
-
-  @BeforeAll
-  static void setUp() {
-    modelMapper = new ModelMapper();
-  }
 
   @Test
   @DisplayName("Convert Author: Request to Entity")

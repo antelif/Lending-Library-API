@@ -1,20 +1,17 @@
 package com.antelif.library.controller.command;
 
 import static com.antelif.library.application.error.GenericError.DUPLICATE_PUBLISHER;
-import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Endpoints.PUBLISHERS_ENDPOINT;
 import static com.antelif.library.factory.PublisherFactory.createPublisherRequest;
 import static com.antelif.library.factory.PublisherFactory.createPublisherResponse;
-import static com.antelif.library.utils.Request.postPublisher;
+import static com.antelif.library.utils.RequestBuilder.postPublisher;
+import static com.antelif.library.utils.RequestBuilder.postRequestAndExpectError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.antelif.library.application.error.ErrorResponse;
 import com.antelif.library.domain.dto.request.PublisherRequest;
 import com.antelif.library.domain.dto.response.PublisherResponse;
 import com.antelif.library.integration.BaseIntegrationTest;
-import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.List;
-import java.util.Map;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,17 +48,9 @@ class PublisherCommandControllerTest extends BaseIntegrationTest {
   @Test
   @DisplayName("Publisher: Successful creation.")
   @SneakyThrows
-  void testNewPublisherIsCreatedSuccesfully() {
+  void testNewPublisherIsCreatedSuccessfully() {
 
-    var publisherResponseMap =
-        objectMapper.readValue(
-            postPublisher(objectMapper.writeValueAsString(publisherRequest), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-
-    var actualPublisherResponse =
-        objectMapper.readValue(
-            objectMapper.writeValueAsString(publisherResponseMap.get(CREATED)),
-            PublisherResponse.class);
+    var actualPublisherResponse = postPublisher(publisherRequest, this.mockMvc);
 
     assertNotNull(actualPublisherResponse);
     assertNotNull(actualPublisherResponse.getId());
@@ -74,15 +63,14 @@ class PublisherCommandControllerTest extends BaseIntegrationTest {
   void testDuplicatePublisherIsNotCreated() {
 
     // Create first publisher
-    postPublisher(objectMapper.writeValueAsString(publisherRequest), this.mockMvc);
+    postPublisher(publisherRequest, this.mockMvc);
 
     // Same publisher creation should fail
     var errorResponse =
-        objectMapper
-            .readValue(
-                postPublisher(objectMapper.writeValueAsString(publisherRequest), this.mockMvc),
-                new TypeReference<List<ErrorResponse>>() {})
-            .get(0);
-    assertEquals(DUPLICATE_PUBLISHER.getCode(), errorResponse.getCode());
+        postRequestAndExpectError(
+            PUBLISHERS_ENDPOINT, objectMapper.writeValueAsString(publisherRequest), this.mockMvc);
+
+    assertEquals(1, errorResponse.size());
+    assertEquals(DUPLICATE_PUBLISHER.getCode(), errorResponse.get(0).getCode());
   }
 }

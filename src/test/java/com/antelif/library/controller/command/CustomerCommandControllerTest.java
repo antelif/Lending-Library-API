@@ -1,20 +1,17 @@
 package com.antelif.library.controller.command;
 
 import static com.antelif.library.application.error.GenericError.DUPLICATE_CUSTOMER;
-import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Endpoints.CUSTOMERS_ENDPOINT;
 import static com.antelif.library.factory.CustomerFactory.createCustomerRequest;
 import static com.antelif.library.factory.CustomerFactory.createCustomerResponse;
-import static com.antelif.library.utils.Request.postCustomer;
+import static com.antelif.library.utils.RequestBuilder.postCustomer;
+import static com.antelif.library.utils.RequestBuilder.postRequestAndExpectError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.antelif.library.application.error.ErrorResponse;
 import com.antelif.library.domain.dto.request.CustomerRequest;
 import com.antelif.library.domain.dto.response.CustomerResponse;
 import com.antelif.library.integration.BaseIntegrationTest;
-import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.List;
-import java.util.Map;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -54,15 +51,7 @@ class CustomerCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testNewCustomerIsCreated() {
 
-    Map<String, CustomerResponse> customerResponseMap =
-        objectMapper.readValue(
-            postCustomer(objectMapper.writeValueAsString(customerRequest), this.mockMvc),
-            new TypeReference<>() {});
-
-    var actualCustomer =
-        objectMapper.readValue(
-            objectMapper.writeValueAsString(customerResponseMap.get(CREATED)),
-            CustomerResponse.class);
+    var actualCustomer = postCustomer(customerRequest, this.mockMvc);
 
     assertNotNull(actualCustomer);
 
@@ -80,15 +69,14 @@ class CustomerCommandControllerTest extends BaseIntegrationTest {
   void testCustomerIsNotCreatedWhenDuplicatePhoneNumber() {
 
     // Create first customer
-    postCustomer(objectMapper.writeValueAsString(customerRequest), this.mockMvc);
+    postCustomer(customerRequest, this.mockMvc);
 
     // Same customer creation should fail
     var errorResponse =
-        objectMapper
-            .readValue(
-                postCustomer(objectMapper.writeValueAsString(customerRequest), this.mockMvc),
-                new TypeReference<List<ErrorResponse>>() {})
-            .get(0);
-    assertEquals(DUPLICATE_CUSTOMER.getCode(), errorResponse.getCode());
+        postRequestAndExpectError(
+            CUSTOMERS_ENDPOINT, objectMapper.writeValueAsString(customerRequest), this.mockMvc);
+
+    assertEquals(1, errorResponse.size());
+    assertEquals(DUPLICATE_CUSTOMER.getCode(), errorResponse.get(0).getCode());
   }
 }

@@ -1,29 +1,23 @@
 package com.antelif.library.controller.command;
 
 import static com.antelif.library.application.error.GenericError.BOOK_DOES_NOT_EXIST;
-import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Endpoints.BOOK_COPIES_ENDPOINT;
 import static com.antelif.library.factory.AuthorFactory.createAuthorRequest;
 import static com.antelif.library.factory.BookCopyFactory.createBookCopyRequest;
 import static com.antelif.library.factory.BookCopyFactory.createBookCopyResponse;
 import static com.antelif.library.factory.BookFactory.createBookRequest;
 import static com.antelif.library.factory.PublisherFactory.createPublisherRequest;
-import static com.antelif.library.utils.Request.postAuthor;
-import static com.antelif.library.utils.Request.postBook;
-import static com.antelif.library.utils.Request.postBookCopy;
-import static com.antelif.library.utils.Request.postPublisher;
+import static com.antelif.library.utils.RequestBuilder.postAuthor;
+import static com.antelif.library.utils.RequestBuilder.postBook;
+import static com.antelif.library.utils.RequestBuilder.postBookCopy;
+import static com.antelif.library.utils.RequestBuilder.postPublisher;
+import static com.antelif.library.utils.RequestBuilder.postRequestAndExpectError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.antelif.library.application.error.ErrorResponse;
 import com.antelif.library.domain.dto.request.BookCopyRequest;
-import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.domain.dto.response.BookCopyResponse;
-import com.antelif.library.domain.dto.response.BookResponse;
-import com.antelif.library.domain.dto.response.PublisherResponse;
 import com.antelif.library.integration.BaseIntegrationTest;
-import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.List;
-import java.util.Map;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -59,43 +53,18 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
     expectedBookCopyResponse = createBookCopyResponse(authorCounter, publisherCounter, bookCounter);
 
     var authorRequest = createAuthorRequest(authorCounter);
+    var authorResponse = postAuthor(authorRequest, this.mockMvc);
+
     var publisherRequest = createPublisherRequest(publisherCounter);
+    var publisherResponse = postPublisher(publisherRequest, this.mockMvc);
 
-    // Set author id
-    var authorMap =
-        objectMapper.readValue(
-            postAuthor(objectMapper.writeValueAsString(authorRequest), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var authorId =
-        objectMapper
-            .readValue(
-                objectMapper.writeValueAsString(authorMap.get(CREATED)), AuthorResponse.class)
-            .getId();
-
-    // Set publisher id
-    var publisherMap =
-        objectMapper.readValue(
-            postPublisher(objectMapper.writeValueAsString(publisherRequest), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var publisherId =
-        objectMapper
-            .readValue(
-                objectMapper.writeValueAsString(publisherMap.get(CREATED)), PublisherResponse.class)
-            .getId();
-
-    var bookRequest = createBookRequest(bookCounter, authorId, publisherId);
+    var bookRequest =
+        createBookRequest(bookCounter, authorResponse.getId(), publisherResponse.getId());
 
     // Set book isbn
-    var bookMap =
-        objectMapper.readValue(
-            postBook(objectMapper.writeValueAsString(bookRequest), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var isbn =
-        objectMapper
-            .readValue(objectMapper.writeValueAsString(bookMap.get(CREATED)), BookResponse.class)
-            .getIsbn();
+    var bookResponse = postBook(bookRequest, this.mockMvc);
 
-    bookCopyRequest = createBookCopyRequest(isbn);
+    bookCopyRequest = createBookCopyRequest(bookResponse.getIsbn());
   }
 
   @Test
@@ -103,14 +72,7 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
   @DisplayName("BookCopy: Successful creation.")
   void testNewBookCopyIsCreated() {
 
-    var bookCopyResponseMap =
-        objectMapper.readValue(
-            postBookCopy(objectMapper.writeValueAsString(bookCopyRequest), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var actualBookCopyResponse =
-        objectMapper.readValue(
-            objectMapper.writeValueAsString(bookCopyResponseMap.get(CREATED)),
-            BookCopyResponse.class);
+    var actualBookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
 
     assertNotNull(actualBookCopyResponse);
 
@@ -148,11 +110,9 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
     bookCopyRequest.setIsbn("RANDOM_ISBN");
 
     var errorResponse =
-        objectMapper
-            .readValue(
-                postBookCopy(objectMapper.writeValueAsString(bookCopyRequest), this.mockMvc),
-                new TypeReference<List<ErrorResponse>>() {})
-            .get(0);
-    assertEquals(BOOK_DOES_NOT_EXIST.getCode(), errorResponse.getCode());
+        postRequestAndExpectError(
+            BOOK_COPIES_ENDPOINT, objectMapper.writeValueAsString(bookCopyRequest), this.mockMvc);
+    assertEquals(1, errorResponse.size());
+    assertEquals(BOOK_DOES_NOT_EXIST.getCode(), errorResponse.get(0).getCode());
   }
 }

@@ -3,27 +3,22 @@ package com.antelif.library.controller.command;
 import static com.antelif.library.application.error.GenericError.AUTHOR_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.DUPLICATE_BOOK;
 import static com.antelif.library.application.error.GenericError.PUBLISHER_DOES_NOT_EXIST;
-import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Endpoints.BOOKS_ENDPOINT;
 import static com.antelif.library.factory.AuthorFactory.createAuthorRequest;
 import static com.antelif.library.factory.BookFactory.createBookRequest;
 import static com.antelif.library.factory.PublisherFactory.createPublisherRequest;
-import static com.antelif.library.utils.Request.postAuthor;
-import static com.antelif.library.utils.Request.postBook;
-import static com.antelif.library.utils.Request.postPublisher;
+import static com.antelif.library.utils.RequestBuilder.postAuthor;
+import static com.antelif.library.utils.RequestBuilder.postBook;
+import static com.antelif.library.utils.RequestBuilder.postPublisher;
+import static com.antelif.library.utils.RequestBuilder.postRequestAndExpectError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.antelif.library.application.error.ErrorResponse;
 import com.antelif.library.domain.dto.request.BookRequest;
-import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.domain.dto.response.BookResponse;
-import com.antelif.library.domain.dto.response.PublisherResponse;
 import com.antelif.library.factory.BookFactory;
 import com.antelif.library.integration.BaseIntegrationTest;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
-import java.util.Map;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -61,31 +56,12 @@ class BookCommandControllerTest extends BaseIntegrationTest {
         BookFactory.createBookResponse(authorCounter, publisherCounter, bookCounter);
 
     var authorRequest = createAuthorRequest(authorCounter);
+    var authorResponse = postAuthor(authorRequest, this.mockMvc);
+
     var publisherRequest = createPublisherRequest(publisherCounter);
+    var publisherResponse = postPublisher(publisherRequest, this.mockMvc);
 
-    // Set author id
-    var authorMap =
-        objectMapper.readValue(
-            postAuthor(objectMapper.writeValueAsString(authorRequest), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var authorId =
-        objectMapper
-            .readValue(
-                objectMapper.writeValueAsString(authorMap.get(CREATED)), AuthorResponse.class)
-            .getId();
-
-    // Set publisher id
-    var publisherMap =
-        objectMapper.readValue(
-            postPublisher(objectMapper.writeValueAsString(publisherRequest), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var publisherId =
-        objectMapper
-            .readValue(
-                objectMapper.writeValueAsString(publisherMap.get(CREATED)), PublisherResponse.class)
-            .getId();
-
-    bookRequest = createBookRequest(bookCounter, authorId, publisherId);
+    bookRequest = createBookRequest(bookCounter, authorResponse.getId(), publisherResponse.getId());
   }
 
   @Test
@@ -93,14 +69,7 @@ class BookCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookIsCreatedSuccessfully() {
 
-    var response =
-        objectMapper.readValue(
-            postBook(objectMapper.writeValueAsString(bookRequest), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-
-    var actualBookResponse =
-        objectMapper.readValue(
-            objectMapper.writeValueAsString(response.get(CREATED)), BookResponse.class);
+    var actualBookResponse = postBook(bookRequest, this.mockMvc);
 
     assertNotNull(actualBookResponse);
 
@@ -128,13 +97,14 @@ class BookCommandControllerTest extends BaseIntegrationTest {
   void testDuplicateBookIsNotCreated() {
 
     // Create first book
-    postBook(objectMapper.writeValueAsString(bookRequest), this.mockMvc);
+    postBook(bookRequest, this.mockMvc);
 
     // Same book creation should fail
-    var response = postBook(objectMapper.writeValueAsString(bookRequest), this.mockMvc);
-    var errorResponse =
-        objectMapper.readValue(response, new TypeReference<List<ErrorResponse>>() {}).get(0);
-    assertEquals(DUPLICATE_BOOK.getCode(), errorResponse.getCode());
+    var response =
+        postRequestAndExpectError(
+            BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
+    assertEquals(1, response.size());
+    assertEquals(DUPLICATE_BOOK.getCode(), response.get(0).getCode());
   }
 
   @Test
@@ -145,13 +115,11 @@ class BookCommandControllerTest extends BaseIntegrationTest {
     bookRequest.setAuthorId(authorCounter + 1);
 
     var response =
-        objectMapper
-            .readValue(
-                postBook(objectMapper.writeValueAsString(bookRequest), this.mockMvc),
-                new TypeReference<List<ErrorResponse>>() {})
-            .get(0);
+        postRequestAndExpectError(
+            BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
 
-    assertEquals(AUTHOR_DOES_NOT_EXIST.getCode(), response.getCode());
+    assertEquals(1, response.size());
+    assertEquals(AUTHOR_DOES_NOT_EXIST.getCode(), response.get(0).getCode());
   }
 
   @Test
@@ -162,12 +130,10 @@ class BookCommandControllerTest extends BaseIntegrationTest {
     bookRequest.setPublisherId(publisherCounter + 1);
 
     var response =
-        objectMapper
-            .readValue(
-                postBook(objectMapper.writeValueAsString(bookRequest), this.mockMvc),
-                new TypeReference<List<ErrorResponse>>() {})
-            .get(0);
+        postRequestAndExpectError(
+            BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
 
-    assertEquals(PUBLISHER_DOES_NOT_EXIST.getCode(), response.getCode());
+    assertEquals(1, response.size());
+    assertEquals(PUBLISHER_DOES_NOT_EXIST.getCode(), response.get(0).getCode());
   }
 }

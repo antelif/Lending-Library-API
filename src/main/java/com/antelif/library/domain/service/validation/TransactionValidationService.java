@@ -61,7 +61,6 @@ public class TransactionValidationService {
 
   private Optional<GenericError> validateCustomerHasThisBook(
       CustomerEntity customer, List<BookCopyEntity> bookCopies) {
-    // TODO: Revise.
     return bookCopies.stream()
             .map(
                 copy ->
@@ -74,7 +73,9 @@ public class TransactionValidationService {
                         .map(BookCopyEntity::getBook)
                         .map(BookEntity::getIsbn)
                         .anyMatch(isbn -> isbn.equals(copy.getBook().getIsbn())))
-        .collect(Collectors.toSet()).stream().anyMatch(b-> b)
+            .collect(Collectors.toSet())
+            .stream()
+            .anyMatch(b -> b)
         ? Optional.of(CUSTOMER_HAS_THE_BOOK)
         : Optional.empty();
   }

@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
 
   @Bean
-  public ModelMapper strictModelMapper() {
+  public ModelMapper modelMapper() {
     ModelMapper strictMapper = new ModelMapper();
     strictMapper.getConfiguration().setMatchingStrategy(STRICT);
     return strictMapper;
@@ -25,7 +25,7 @@ public class AppConfig {
     var objectMapper = new ObjectMapper();
     objectMapper
         .registerModule(javaTimeModule)
-        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     return objectMapper;
   }
 }
