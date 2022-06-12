@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 /** Customer Service. */
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CustomerService {
 
@@ -31,7 +32,6 @@ public class CustomerService {
    * @param customerRequest the DTO to get information about the customer to create.
    * @return a customer response DTO.
    */
-  @Transactional
   public CustomerResponse addCustomer(CustomerRequest customerRequest) {
 
     var persistedCustomer = customerRepository.getCustomerByPhoneNo(customerRequest.getPhoneNo());

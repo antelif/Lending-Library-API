@@ -76,7 +76,6 @@ class CustomerCommandControllerTest extends BaseIntegrationTest {
         postRequestAndExpectError(
             CUSTOMERS_ENDPOINT, objectMapper.writeValueAsString(customerRequest), this.mockMvc);
 
-    assertEquals(1, errorResponse.size());
-    assertEquals(DUPLICATE_CUSTOMER.getCode(), errorResponse.get(0).getCode());
+    assertEquals(DUPLICATE_CUSTOMER.getCode(), errorResponse.getCode());
   }
 }

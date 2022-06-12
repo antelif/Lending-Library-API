@@ -138,8 +138,8 @@ public class RequestBuilder {
   }
 
   @SneakyThrows
-  public static List<ErrorResponse> postRequestAndExpectError(
+  public static ErrorResponse postRequestAndExpectError(
       String endpoint, String content, MockMvc mockMvc) {
-    return mapper.readValue(postRequest(endpoint, content, mockMvc), new TypeReference<>() {});
+    return mapper.readValue(postRequest(endpoint, content, mockMvc), ErrorResponse.class);
   }
 }

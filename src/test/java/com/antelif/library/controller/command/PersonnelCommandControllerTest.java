@@ -69,7 +69,7 @@ class PersonnelCommandControllerTest extends BaseIntegrationTest {
     var errorResponse =
         postRequestAndExpectError(
             PERSONNEL_ENDPOINT, objectMapper.writeValueAsString(personnelRequest), this.mockMvc);
-    assertEquals(1., errorResponse.size());
-    assertEquals(DUPLICATE_PERSONNEL.getCode(), errorResponse.get(0).getCode());
+
+    assertEquals(DUPLICATE_PERSONNEL.getCode(), errorResponse.getCode());
   }
 }

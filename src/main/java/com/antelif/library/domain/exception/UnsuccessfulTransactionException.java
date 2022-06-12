@@ -7,8 +7,4 @@ public class UnsuccessfulTransactionException extends GenericException {
   public UnsuccessfulTransactionException(GenericError error) {
     super(error);
   }
-
-  public UnsuccessfulTransactionException(GenericError error, String args) {
-    super(error, args);
-  }
 }

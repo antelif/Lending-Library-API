@@ -112,7 +112,7 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
     var errorResponse =
         postRequestAndExpectError(
             BOOK_COPIES_ENDPOINT, objectMapper.writeValueAsString(bookCopyRequest), this.mockMvc);
-    assertEquals(1, errorResponse.size());
-    assertEquals(BOOK_DOES_NOT_EXIST.getCode(), errorResponse.get(0).getCode());
+
+    assertEquals(BOOK_DOES_NOT_EXIST.getCode(), errorResponse.getCode());
   }
 }

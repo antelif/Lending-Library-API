@@ -40,12 +40,7 @@ public class TransactionValidationService {
 
   private void validateBookCopiesRetrieved(List<BookCopyEntity> bookCopies) {
     if (bookCopies.isEmpty()) {
-      throw new UnsuccessfulTransactionException(
-          BOOK_COPY_DOES_NOT_EXIST,
-          bookCopies.stream()
-              .map(BookCopyEntity::getId)
-              .map(String::valueOf)
-              .collect(Collectors.joining(",")));
+      throw new UnsuccessfulTransactionException(BOOK_COPY_DOES_NOT_EXIST);
     }
   }
 

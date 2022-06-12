@@ -2,8 +2,6 @@ package com.antelif.library.application.exception;
 
 import com.antelif.library.application.error.ErrorResponse;
 import com.antelif.library.domain.exception.GenericException;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -14,12 +12,11 @@ public class RestControllerExceptionHandler {
   /***
    * Handles all exceptions that extend GenericException.
    * @param exception the exception that was thrown.
-   * @return a list of Error Response objects with information about the errors that occurred.
+   * @return an Error Response object with information about the error that occurred.
    */
   @ExceptionHandler(value = GenericException.class)
-  public List<ErrorResponse> handlerDuplicateEntityException(GenericException exception) {
+  public ErrorResponse handlerDuplicateEntityException(GenericException exception) {
 
-    return List.copyOf(
-        exception.getGenericErrors().stream().map(ErrorResponse::new).collect(Collectors.toList()));
+    return new ErrorResponse(exception.getGenericError());
   }
 }

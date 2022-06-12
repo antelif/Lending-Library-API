@@ -51,7 +51,7 @@ public class PersonnelService {
    * Retrieve personnel from the database by provided id.
    *
    * @param id of the personnel to retrieve.
-   * @return a personnel response DTO.
+   * @return a personnel entity object.
    */
   public PersonnelEntity getPersonnelById(Long id) {
     var persistedPersonnel = personnelRepository.getPersonnelById(id);

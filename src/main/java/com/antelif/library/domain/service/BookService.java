@@ -7,7 +7,6 @@ import static com.antelif.library.application.error.GenericError.DUPLICATE_BOOK;
 import com.antelif.library.domain.converter.BookConverter;
 import com.antelif.library.domain.dto.request.BookRequest;
 import com.antelif.library.domain.dto.response.BookResponse;
-import com.antelif.library.domain.exception.ConverterException;
 import com.antelif.library.domain.exception.DuplicateEntityException;
 import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
@@ -45,15 +44,15 @@ public class BookService {
         .orElseThrow(() -> new EntityCreationException(BOOK_CREATION_FAILED));
   }
 
+  /**
+   * Retrieve a book from the database by provided isbn.
+   *
+   * @param isbn of the book to retrieve.
+   * @return a book entity if book was retrieved.
+   */
   public BookEntity getBookByIsbn(String isbn) {
     var persistedBook = bookRepository.getBookByIsbn(isbn);
 
-    if (persistedBook.isEmpty()) {
-      throw new EntityDoesNotExistException(BOOK_DOES_NOT_EXIST);
-    }
-
-    return persistedBook.stream()
-        .findFirst()
-        .orElseThrow(() -> new ConverterException(BOOK_DOES_NOT_EXIST));
+    return persistedBook.orElseThrow(() -> new EntityDoesNotExistException(BOOK_DOES_NOT_EXIST));
   }
 }

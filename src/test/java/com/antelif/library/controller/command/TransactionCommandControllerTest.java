@@ -28,7 +28,6 @@ import static com.antelif.library.utils.RequestBuilder.postRequestAndExpectError
 import static com.antelif.library.utils.RequestBuilder.postTransaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.antelif.library.domain.dto.request.TransactionRequest;
 import com.antelif.library.domain.dto.response.TransactionResponse;
@@ -176,8 +175,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
     var transactionMapResponse =
         postRequestAndExpectError(
             TRANSACTIONS_ENDPOINT, objectMapper.writeValueAsString(transactionRequest), mockMvc);
-    assertTrue(transactionMapResponse.size() > 0);
-    assertEquals(CUSTOMER_HAS_FEE.getCode(), transactionMapResponse.get(0).getCode());
+    assertEquals(CUSTOMER_HAS_FEE.getCode(), transactionMapResponse.getCode());
   }
 
   @Test
@@ -193,8 +191,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
             TRANSACTIONS_ENDPOINT,
             objectMapper.writeValueAsString(transactionRequest),
             this.mockMvc);
-    assertTrue(transactionResponse.size() > 0);
-    assertEquals(CUSTOMER_HAS_THE_BOOK.getCode(), transactionResponse.get(0).getCode());
+    assertEquals(CUSTOMER_HAS_THE_BOOK.getCode(), transactionResponse.getCode());
   }
 
   @Test
@@ -215,8 +212,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
             objectMapper.writeValueAsString(transactionRequest),
             this.mockMvc);
 
-    assertTrue(transactionResponse.size() > 0);
-    assertEquals(BOOK_COPY_UNAVAILABLE.getCode(), transactionResponse.get(0).getCode());
+    assertEquals(BOOK_COPY_UNAVAILABLE.getCode(), transactionResponse.getCode());
   }
 
   @Test
@@ -237,8 +233,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
             objectMapper.writeValueAsString(transactionRequest),
             this.mockMvc);
 
-    assertTrue(transactionResponse.size() > 0);
-    assertEquals(BOOK_COPY_UNAVAILABLE.getCode(), transactionResponse.get(0).getCode());
+    assertEquals(BOOK_COPY_UNAVAILABLE.getCode(), transactionResponse.getCode());
   }
 
   @Test
@@ -254,8 +249,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
             objectMapper.writeValueAsString(transactionRequest),
             this.mockMvc);
 
-    assertTrue(transactionResponse.size() > 0);
-    assertEquals(BOOK_COPY_DOES_NOT_EXIST.getCode(), transactionResponse.get(0).getCode());
+    assertEquals(BOOK_COPY_DOES_NOT_EXIST.getCode(), transactionResponse.getCode());
   }
 
   @Test
@@ -270,8 +264,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
             objectMapper.writeValueAsString(transactionRequest),
             this.mockMvc);
 
-    assertTrue(transactionResponse.size() > 0);
-    assertEquals(CUSTOMER_DOES_NOT_EXIST.getCode(), transactionResponse.get(0).getCode());
+    assertEquals(CUSTOMER_DOES_NOT_EXIST.getCode(), transactionResponse.getCode());
   }
 
   @Test
@@ -285,7 +278,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
             TRANSACTIONS_ENDPOINT,
             objectMapper.writeValueAsString(transactionRequest),
             this.mockMvc);
-    assertTrue(transactionResponse.size() > 0);
-    assertEquals(PERSONNEL_DOES_NOT_EXIST.getCode(), transactionResponse.get(0).getCode());
+
+    assertEquals(PERSONNEL_DOES_NOT_EXIST.getCode(), transactionResponse.getCode());
   }
 }

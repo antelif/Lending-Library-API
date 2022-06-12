@@ -70,7 +70,6 @@ class PublisherCommandControllerTest extends BaseIntegrationTest {
         postRequestAndExpectError(
             PUBLISHERS_ENDPOINT, objectMapper.writeValueAsString(publisherRequest), this.mockMvc);
 
-    assertEquals(1, errorResponse.size());
-    assertEquals(DUPLICATE_PUBLISHER.getCode(), errorResponse.get(0).getCode());
+    assertEquals(DUPLICATE_PUBLISHER.getCode(), errorResponse.getCode());
   }
 }

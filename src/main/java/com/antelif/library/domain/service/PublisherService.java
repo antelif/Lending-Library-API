@@ -1,17 +1,16 @@
 package com.antelif.library.domain.service;
 
 import static com.antelif.library.application.error.GenericError.DUPLICATE_PUBLISHER;
-import static com.antelif.library.application.error.GenericError.PUBLISHER_CONVERTER_FAILED;
 import static com.antelif.library.application.error.GenericError.PUBLISHER_CREATION_FAILED;
 import static com.antelif.library.application.error.GenericError.PUBLISHER_DOES_NOT_EXIST;
 
 import com.antelif.library.domain.converter.PublisherConverter;
 import com.antelif.library.domain.dto.request.PublisherRequest;
 import com.antelif.library.domain.dto.response.PublisherResponse;
-import com.antelif.library.domain.exception.ConverterException;
 import com.antelif.library.domain.exception.DuplicateEntityException;
 import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
+import com.antelif.library.infrastructure.entity.PublisherEntity;
 import com.antelif.library.infrastructure.repository.PublisherRepository;
 import java.util.Optional;
 import javax.transaction.Transactional;
@@ -52,17 +51,12 @@ public class PublisherService {
    * Retrieve a publisher from the database by provided id.
    *
    * @param id of the publisher to retrieve.
-   * @return a publisher response DTO.
+   * @return a publisher entity object.
    */
-  public PublisherResponse getPublisherById(Long id) {
+  public PublisherEntity getPublisherById(Long id) {
     var persistedPublisher = publisherRepository.getPublisherById(id);
 
-    if (persistedPublisher.isEmpty()) {
-      throw new EntityDoesNotExistException(PUBLISHER_DOES_NOT_EXIST);
-    }
-
-    return persistedPublisher
-        .map(converter::convertFromEntityToResponse)
-        .orElseThrow(() -> new ConverterException(PUBLISHER_CONVERTER_FAILED));
+    return persistedPublisher.orElseThrow(
+        () -> new EntityDoesNotExistException(PUBLISHER_DOES_NOT_EXIST));
   }
 }

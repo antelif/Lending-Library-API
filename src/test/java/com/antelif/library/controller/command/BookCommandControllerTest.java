@@ -103,8 +103,8 @@ class BookCommandControllerTest extends BaseIntegrationTest {
     var response =
         postRequestAndExpectError(
             BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
-    assertEquals(1, response.size());
-    assertEquals(DUPLICATE_BOOK.getCode(), response.get(0).getCode());
+
+    assertEquals(DUPLICATE_BOOK.getCode(), response.getCode());
   }
 
   @Test
@@ -118,8 +118,7 @@ class BookCommandControllerTest extends BaseIntegrationTest {
         postRequestAndExpectError(
             BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
 
-    assertEquals(1, response.size());
-    assertEquals(AUTHOR_DOES_NOT_EXIST.getCode(), response.get(0).getCode());
+    assertEquals(AUTHOR_DOES_NOT_EXIST.getCode(), response.getCode());
   }
 
   @Test
@@ -133,7 +132,6 @@ class BookCommandControllerTest extends BaseIntegrationTest {
         postRequestAndExpectError(
             BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
 
-    assertEquals(1, response.size());
-    assertEquals(PUBLISHER_DOES_NOT_EXIST.getCode(), response.get(0).getCode());
+    assertEquals(PUBLISHER_DOES_NOT_EXIST.getCode(), response.getCode());
   }
 }

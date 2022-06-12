@@ -1,6 +1,6 @@
 package com.antelif.library.domain.service;
 
-import static com.antelif.library.application.error.GenericError.BOOK_CREATION_FAILED;
+import static com.antelif.library.application.error.GenericError.BOOK_COPY_CREATION_FAILED;
 
 import com.antelif.library.domain.converter.BookCopyConverter;
 import com.antelif.library.domain.dto.request.BookCopyRequest;
@@ -35,14 +35,14 @@ public class BookCopyService {
     return Optional.of(converter.convertFromRequestToEntity(bookCopyRequest))
         .map(repository::save)
         .map(converter::convertFromEntityToResponse)
-        .orElseThrow(() -> new EntityCreationException(BOOK_CREATION_FAILED));
+        .orElseThrow(() -> new EntityCreationException(BOOK_COPY_CREATION_FAILED));
   }
 
   /**
    * Gets all book copies by their ids.
    *
    * @param bookCopyIds the ids of the book copies to fetch.
-   * @return a list of book copy response DTO objects.
+   * @return a list of book copy entity objects.
    */
   public List<BookCopyEntity> getBookCopiesByBookCopyIds(List<Long> bookCopyIds) {
     return new ArrayList<>(repository.getByIdIn(bookCopyIds));

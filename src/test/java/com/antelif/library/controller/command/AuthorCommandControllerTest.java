@@ -91,8 +91,7 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
         postRequestAndExpectError(
             AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
 
-    assertEquals(1, response.size());
-    assertEquals(DUPLICATE_AUTHOR.getCode(), response.get(0).getCode());
+    assertEquals(DUPLICATE_AUTHOR.getCode(), response.getCode());
   }
 
   @Test
@@ -110,7 +109,6 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
         postRequestAndExpectError(
             AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
 
-    assertEquals(1, response.size());
-    assertEquals(DUPLICATE_AUTHOR.getCode(), response.get(0).getCode());
+    assertEquals(DUPLICATE_AUTHOR.getCode(), response.getCode());
   }
 }

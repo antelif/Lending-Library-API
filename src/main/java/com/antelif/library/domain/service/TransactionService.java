@@ -1,6 +1,7 @@
 package com.antelif.library.domain.service;
 
-import com.antelif.library.application.error.GenericError;
+import static com.antelif.library.application.error.GenericError.TRANSACTION_CREATION_FAILED;
+
 import com.antelif.library.domain.converter.TransactionConverter;
 import com.antelif.library.domain.dto.request.TransactionRequest;
 import com.antelif.library.domain.dto.response.TransactionResponse;
@@ -30,6 +31,6 @@ public class TransactionService {
     return Optional.ofNullable(transactionConverter.convertFromRequestToEntity(transactionRequest))
         .map(transactionRepository::save)
         .map(transactionConverter::convertFromEntityToResponse)
-        .orElseThrow(() -> new EntityCreationException(GenericError.TRANSACTION_CREATION_FAILED));
+        .orElseThrow(() -> new EntityCreationException(TRANSACTION_CREATION_FAILED));
   }
 }

@@ -4,9 +4,7 @@ import com.antelif.library.domain.dto.request.BookRequest;
 import com.antelif.library.domain.dto.response.BookResponse;
 import com.antelif.library.domain.service.AuthorService;
 import com.antelif.library.domain.service.PublisherService;
-import com.antelif.library.infrastructure.entity.AuthorEntity;
 import com.antelif.library.infrastructure.entity.BookEntity;
-import com.antelif.library.infrastructure.entity.PublisherEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -28,15 +26,11 @@ public class BookConverter implements Converter<BookRequest, BookEntity, BookRes
     var bookEntity = modelMapper.map(bookRequest, BookEntity.class);
 
     // Decorate
-    var authorResponse = authorService.getAuthorById(bookRequest.getAuthorId());
-    var authorEntity = modelMapper.map(authorResponse, AuthorEntity.class);
+    var author = authorService.getAuthorById(bookRequest.getAuthorId());
+    bookEntity.setAuthor(author);
 
-    bookEntity.setAuthor(authorEntity);
-
-    var publisherResponse = publisherService.getPublisherById(bookRequest.getPublisherId());
-    var publisherEntity = modelMapper.map(publisherResponse, PublisherEntity.class);
-
-    bookEntity.setPublisher(publisherEntity);
+    var publisher = publisherService.getPublisherById(bookRequest.getPublisherId());
+    bookEntity.setPublisher(publisher);
 
     return bookEntity;
   }
