@@ -14,14 +14,12 @@ public class RestControllerExceptionHandler {
   /***
    * Handles all exceptions that extend GenericException.
    * @param exception the exception that was thrown.
-   * @return an Error Response with information about the error that occurred.
+   * @return a list of Error Response objects with information about the errors that occurred.
    */
   @ExceptionHandler(value = GenericException.class)
   public List<ErrorResponse> handlerDuplicateEntityException(GenericException exception) {
 
     return List.copyOf(
-        exception.getGenericErrors().stream()
-            .map(ErrorResponse::new)
-            .collect(Collectors.toList()));
+        exception.getGenericErrors().stream().map(ErrorResponse::new).collect(Collectors.toList()));
   }
 }

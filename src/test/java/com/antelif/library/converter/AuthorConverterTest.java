@@ -8,6 +8,7 @@ import com.antelif.library.domain.converter.AuthorConverter;
 import com.antelif.library.domain.dto.request.AuthorRequest;
 import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.infrastructure.entity.AuthorEntity;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -19,12 +20,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 class AuthorConverterTest {
 
   @Autowired private AuthorConverter authorConverter;
+  @Autowired private ModelMapper modelMapper;
 
-  private final ModelMapper modelMapper = new ModelMapper();
+  private AuthorRequest expectedRequest;
+  private AuthorResponse authorResponse;
+  private AuthorEntity expectedEntity;
 
-  private final AuthorRequest expectedRequest = createAuthorRequest(1);
-  private final AuthorResponse authorResponse = createAuthorResponse(1);
-  private final AuthorEntity expectedEntity = modelMapper.map(authorResponse, AuthorEntity.class);
+  @BeforeEach
+  void setUp() {
+    expectedRequest = createAuthorRequest(1);
+    authorResponse = createAuthorResponse(1);
+    expectedEntity = modelMapper.map(authorResponse, AuthorEntity.class);
+  }
 
   @Test
   @DisplayName("Convert Author: Request to Entity")

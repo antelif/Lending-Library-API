@@ -36,7 +36,7 @@ public class BookService {
   public BookResponse addBook(BookRequest bookRequest) {
     var persistedEntity = bookRepository.getBookByIsbn(bookRequest.getIsbn());
 
-    if (!persistedEntity.isEmpty()) {
+    if (persistedEntity.isPresent()) {
       throw new DuplicateEntityException(DUPLICATE_BOOK);
     }
     return Optional.of(converter.convertFromRequestToEntity(bookRequest))
@@ -48,9 +48,6 @@ public class BookService {
   public BookEntity getBookByIsbn(String isbn) {
     var persistedBook = bookRepository.getBookByIsbn(isbn);
 
-    if (persistedBook.size() > 1) {
-      throw new DuplicateEntityException(DUPLICATE_BOOK);
-    }
     if (persistedBook.isEmpty()) {
       throw new EntityDoesNotExistException(BOOK_DOES_NOT_EXIST);
     }

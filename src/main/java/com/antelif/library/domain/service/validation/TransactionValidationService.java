@@ -5,8 +5,7 @@ import static com.antelif.library.application.error.GenericError.BOOK_COPY_UNAVA
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_FEE;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_THE_BOOK;
 
-import com.antelif.library.application.error.GenericError;
-import com.antelif.library.domain.exception.UnsuccessfulTransaction;
+import com.antelif.library.domain.exception.UnsuccessfulTransactionException;
 import com.antelif.library.domain.type.TransactionStatus;
 import com.antelif.library.infrastructure.entity.BookCopyEntity;
 import com.antelif.library.infrastructure.entity.BookEntity;
@@ -15,10 +14,8 @@ import com.antelif.library.infrastructure.entity.TransactionEntity;
 import com.antelif.library.infrastructure.entity.TransactionItemEntity;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -34,56 +31,55 @@ public class TransactionValidationService {
    * @param bookCopies the book copies that will be lent in this transaction.
    */
   public void validate(CustomerEntity customer, List<BookCopyEntity> bookCopies) {
-    var errors =
-        Stream.of(
-                validateBookCopiesRetrieved(bookCopies),
-                validateCustomerHasPendingFee(customer),
-                validateCustomerHasThisBook(customer, bookCopies),
-                validateCopyIsNotEligibleForLending(bookCopies))
-            .filter(Objects::nonNull)
-            .flatMap(Optional::stream)
-            .collect(Collectors.toList());
 
-    if (!errors.isEmpty()) {
-      throw new UnsuccessfulTransaction(errors);
+    validateBookCopiesRetrieved(bookCopies);
+    validateCustomerHasPendingFee(customer);
+    validateCustomerHasThisBook(customer, bookCopies);
+    validateCopyIsNotEligibleForLending(bookCopies);
+  }
+
+  private void validateBookCopiesRetrieved(List<BookCopyEntity> bookCopies) {
+    if (bookCopies.isEmpty()) {
+      throw new UnsuccessfulTransactionException(
+          BOOK_COPY_DOES_NOT_EXIST,
+          bookCopies.stream()
+              .map(BookCopyEntity::getId)
+              .map(String::valueOf)
+              .collect(Collectors.joining(",")));
     }
   }
 
-  private Optional<GenericError> validateBookCopiesRetrieved(List<BookCopyEntity> bookCopies) {
-    // TODO: Throw assigned exception or somehow include arguments of the error.
-    return bookCopies.isEmpty() ? Optional.of(BOOK_COPY_DOES_NOT_EXIST) : Optional.empty();
+  private void validateCustomerHasPendingFee(CustomerEntity customer) {
+
+    if (customer.getFee() > 0) {
+      throw new UnsuccessfulTransactionException(CUSTOMER_HAS_FEE);
+    }
   }
 
-  private Optional<GenericError> validateCustomerHasPendingFee(CustomerEntity customer) {
-
-    return customer.getFee() > 0 ? Optional.of(CUSTOMER_HAS_FEE) : Optional.empty();
-  }
-
-  private Optional<GenericError> validateCustomerHasThisBook(
+  private void validateCustomerHasThisBook(
       CustomerEntity customer, List<BookCopyEntity> bookCopies) {
-    return bookCopies.stream()
-            .map(
-                copy ->
-                    Optional.ofNullable(customer.getTransactions()).stream()
-                        .flatMap(Collection::stream)
-                        .filter(t -> t.getStatus().equals(TransactionStatus.ACTIVE))
-                        .map(TransactionEntity::getTransactionItems)
-                        .flatMap(Collection::stream)
-                        .map(TransactionItemEntity::getBookCopy)
-                        .map(BookCopyEntity::getBook)
-                        .map(BookEntity::getIsbn)
-                        .anyMatch(isbn -> isbn.equals(copy.getBook().getIsbn())))
-            .collect(Collectors.toSet())
-            .stream()
-            .anyMatch(b -> b)
-        ? Optional.of(CUSTOMER_HAS_THE_BOOK)
-        : Optional.empty();
+    if (bookCopies.stream()
+        .map(
+            copy ->
+                Optional.ofNullable(customer.getTransactions()).stream()
+                    .flatMap(Collection::stream)
+                    .filter(t -> t.getStatus().equals(TransactionStatus.ACTIVE))
+                    .map(TransactionEntity::getTransactionItems)
+                    .flatMap(Collection::stream)
+                    .map(TransactionItemEntity::getBookCopy)
+                    .map(BookCopyEntity::getBook)
+                    .map(BookEntity::getIsbn)
+                    .anyMatch(isbn -> isbn.equals(copy.getBook().getIsbn())))
+        .collect(Collectors.toSet())
+        .stream()
+        .anyMatch(b -> b)) {
+      throw new UnsuccessfulTransactionException(CUSTOMER_HAS_THE_BOOK);
+    }
   }
 
-  private Optional<GenericError> validateCopyIsNotEligibleForLending(
-      List<BookCopyEntity> bookCopies) {
-    return bookCopies.stream().anyMatch(bookCopy -> !bookCopy.isEligibleToLent())
-        ? Optional.of(BOOK_COPY_UNAVAILABLE)
-        : Optional.empty();
+  private void validateCopyIsNotEligibleForLending(List<BookCopyEntity> bookCopies) {
+    if (bookCopies.stream().anyMatch(bookCopy -> !bookCopy.isEligibleToLent())) {
+      throw new UnsuccessfulTransactionException(BOOK_COPY_UNAVAILABLE);
+    }
   }
 }

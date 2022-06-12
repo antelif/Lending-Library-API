@@ -38,6 +38,12 @@ public class BookCopyService {
         .orElseThrow(() -> new EntityCreationException(BOOK_CREATION_FAILED));
   }
 
+  /**
+   * Gets all book copies by their ids.
+   *
+   * @param bookCopyIds the ids of the book copies to fetch.
+   * @return a list of book copy response DTO objects.
+   */
   public List<BookCopyEntity> getBookCopiesByBookCopyIds(List<Long> bookCopyIds) {
     return new ArrayList<>(repository.getByIdIn(bookCopyIds));
   }

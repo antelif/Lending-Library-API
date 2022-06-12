@@ -40,7 +40,7 @@ import org.springframework.test.web.servlet.MockMvc;
 /** Helper class with all requests. */
 public class RequestBuilder {
 
-  static ObjectMapper mapper =
+  private static final ObjectMapper mapper =
       new ObjectMapper()
           .registerModule(new JavaTimeModule())
           .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
