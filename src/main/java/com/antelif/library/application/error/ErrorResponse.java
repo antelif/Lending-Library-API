@@ -13,7 +13,6 @@ public class ErrorResponse {
   private String name;
   private int code;
   private String description;
-  private String args;
 
   /**
    * Constructor.
@@ -24,18 +23,5 @@ public class ErrorResponse {
     this.name = genericError.getName();
     this.code = genericError.getCode();
     this.description = genericError.getDescription();
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param genericError the error that occurred
-   * @param args error arguments
-   */
-  public ErrorResponse(GenericError genericError, String args) {
-    this.name = genericError.getName();
-    this.code = genericError.getCode();
-    this.description = genericError.getDescription();
-    this.args = args;
   }
 }

@@ -181,7 +181,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   @Test
   @SneakyThrows
   @DisplayName(
-      "Transaction: Unsuccessful creation when customer has lent this title and has active transaction.")
+      "Transaction: Unsuccessful creation when customer has borrowed this title and has active transaction.")
   void testTransactionFailsWhenCustomerHasLentThisBook() {
     // First transaction
     postTransaction(transactionRequest, mockMvc);
