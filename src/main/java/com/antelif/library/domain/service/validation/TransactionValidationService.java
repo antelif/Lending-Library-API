@@ -7,15 +7,12 @@ import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_TH
 import static com.antelif.library.domain.type.TransactionStatus.ACTIVE;
 
 import com.antelif.library.domain.exception.UnsuccessfulTransactionException;
-import com.antelif.library.domain.type.TransactionStatus;
 import com.antelif.library.infrastructure.entity.BookCopyEntity;
-import com.antelif.library.infrastructure.entity.BookEntity;
 import com.antelif.library.infrastructure.entity.CustomerEntity;
 import com.antelif.library.infrastructure.entity.TransactionEntity;
 import com.antelif.library.infrastructure.entity.TransactionItemEntity;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -55,16 +52,22 @@ public class TransactionValidationService {
 
   private void validateCustomerHasThisBook(
       CustomerEntity customer, List<BookCopyEntity> bookCopies) {
-    var bookCopyIds = Stream.of(bookCopies).flatMap(Collection::stream).map(BookCopyEntity::getId).collect(
-        Collectors.toSet());
-    var customerBookCopyIds = Stream.of(customer).map(CustomerEntity::getTransactions)
-        .flatMap(Collection::stream)
-        .filter(t -> t.getStatus().equals(ACTIVE))
-        .map(TransactionEntity::getTransactionItems)
-        .flatMap(Collection::stream)
-        .map(TransactionItemEntity::getBookCopy)
-        .map(BookCopyEntity::getId).collect(Collectors.toSet());
-    if(bookCopyIds.retainAll(customerBookCopyIds)){
+    var bookCopyIds =
+        Stream.of(bookCopies)
+            .flatMap(Collection::stream)
+            .map(BookCopyEntity::getId)
+            .collect(Collectors.toSet());
+    var customerBookCopyIds =
+        Stream.of(customer)
+            .map(CustomerEntity::getTransactions)
+            .flatMap(Collection::stream)
+            .filter(t -> t.getStatus().equals(ACTIVE))
+            .map(TransactionEntity::getTransactionItems)
+            .flatMap(Collection::stream)
+            .map(TransactionItemEntity::getBookCopy)
+            .map(BookCopyEntity::getId)
+            .collect(Collectors.toSet());
+    if (bookCopyIds.stream().anyMatch(customerBookCopyIds::contains)) {
       throw new UnsuccessfulTransactionException(CUSTOMER_HAS_THE_BOOK);
     }
   }

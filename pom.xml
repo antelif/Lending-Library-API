@@ -18,7 +18,7 @@
   </parent>
 
   <properties>
-    <java.version>11</java.version>
+    <java.version>17</java.version>
     <liquibase.version>4.10.0</liquibase.version>
   </properties>
   <build>
@@ -60,6 +60,7 @@
     <dependency>
       <artifactId>lombok</artifactId>
       <groupId>org.projectlombok</groupId>
+      <version>1.18.24</version>
       <optional>true</optional>
     </dependency>
 
