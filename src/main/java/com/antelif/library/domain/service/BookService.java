@@ -45,14 +45,14 @@ public class BookService {
   }
 
   /**
-   * Get a book by provided isbn.
+   * Retrieve a book from the database by provided isbn.
    *
-   * @param isbn the isbn to retrieve book for.
-   * @return a book entity if the book exists.
+   * @param isbn of the book to retrieve.
+   * @return a book entity if book was retrieved.
    */
   public BookEntity getBookByIsbn(String isbn) {
-    return bookRepository
-        .getBookByIsbn(isbn)
-        .orElseThrow(() -> new EntityDoesNotExistException(BOOK_DOES_NOT_EXIST));
+    var persistedBook = bookRepository.getBookByIsbn(isbn);
+
+    return persistedBook.orElseThrow(() -> new EntityDoesNotExistException(BOOK_DOES_NOT_EXIST));
   }
 }

@@ -1,7 +1,8 @@
 package com.antelif.library.factory;
 
-import static com.antelif.library.domain.type.State.EXCELLENT;
-import static com.antelif.library.domain.type.Status.SHELF;
+import static com.antelif.library.domain.type.BookCopyStatus.AVAILABLE;
+import static com.antelif.library.domain.type.BookCopyStatus.LENT;
+import static com.antelif.library.domain.type.State.NEW;
 import static com.antelif.library.factory.BookFactory.createBookResponse;
 
 import com.antelif.library.domain.dto.request.BookCopyRequest;
@@ -12,7 +13,8 @@ public class BookCopyFactory {
   public static BookCopyRequest createBookCopyRequest(String isbn) {
     var bookCopy = new BookCopyRequest();
     bookCopy.setIsbn(isbn);
-    bookCopy.setState(EXCELLENT);
+    bookCopy.setState(NEW);
+    bookCopy.setStatus(AVAILABLE);
     return bookCopy;
   }
 
@@ -20,10 +22,18 @@ public class BookCopyFactory {
       int authorIndex, int publisherIndex, int bookIndex) {
     var bookCopy = new BookCopyResponse();
 
-    bookCopy.setState(EXCELLENT);
-    bookCopy.setStatus(SHELF);
+    bookCopy.setState(NEW);
+    bookCopy.setStatus(AVAILABLE);
 
     bookCopy.setBook(createBookResponse(authorIndex, publisherIndex, bookIndex));
+
+    return bookCopy;
+  }
+
+  public static BookCopyResponse createBookCopyResponseAfterTransaction(
+      int authorIndex, int publisherIndex, int bookIndex) {
+    var bookCopy = createBookCopyResponse(authorIndex, publisherIndex, bookIndex);
+    bookCopy.setStatus(LENT);
 
     return bookCopy;
   }

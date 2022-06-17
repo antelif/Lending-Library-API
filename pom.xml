@@ -18,8 +18,8 @@
   </parent>
 
   <properties>
-    <java.version>11</java.version>
-    <liquibase.version>4.9.1</liquibase.version>
+    <java.version>17</java.version>
+    <liquibase.version>4.10.0</liquibase.version>
   </properties>
   <build>
     <plugins>
@@ -60,6 +60,7 @@
     <dependency>
       <artifactId>lombok</artifactId>
       <groupId>org.projectlombok</groupId>
+      <version>1.18.24</version>
       <optional>true</optional>
     </dependency>
 
@@ -86,26 +87,31 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>postgresql</artifactId>
-      <version>1.17.0</version>
+      <version>1.17.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>1.17.0</version>
+      <version>1.17.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
-      <version>1.17.0</version>
+      <version>1.17.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-params</artifactId>
-      <version>5.8.1</version>
+      <version>5.8.2</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>2.13.3</version>
     </dependency>
   </dependencies>
 </project>

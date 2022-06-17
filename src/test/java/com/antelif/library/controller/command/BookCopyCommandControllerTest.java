@@ -1,20 +1,23 @@
 package com.antelif.library.controller.command;
 
 import static com.antelif.library.application.error.GenericError.BOOK_DOES_NOT_EXIST;
-import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Endpoints.BOOK_COPIES_ENDPOINT;
+import static com.antelif.library.factory.AuthorFactory.createAuthorRequest;
+import static com.antelif.library.factory.BookCopyFactory.createBookCopyRequest;
 import static com.antelif.library.factory.BookCopyFactory.createBookCopyResponse;
-import static com.antelif.library.utils.Request.postBook;
-import static com.antelif.library.utils.Request.postBookCopy;
+import static com.antelif.library.factory.BookFactory.createBookRequest;
+import static com.antelif.library.factory.PublisherFactory.createPublisherRequest;
+import static com.antelif.library.utils.RequestBuilder.postAuthor;
+import static com.antelif.library.utils.RequestBuilder.postBook;
+import static com.antelif.library.utils.RequestBuilder.postBookCopy;
+import static com.antelif.library.utils.RequestBuilder.postPublisher;
+import static com.antelif.library.utils.RequestBuilder.postRequestAndExpectError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.domain.dto.request.BookCopyRequest;
 import com.antelif.library.domain.dto.response.BookCopyResponse;
-import com.antelif.library.domain.dto.response.BookResponse;
 import com.antelif.library.integration.BaseIntegrationTest;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Map;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,19 +28,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DisplayName("Book copies command controller")
 class BookCopyCommandControllerTest extends BaseIntegrationTest {
 
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
-  @Autowired private ObjectMapper objectMapper;
 
   private BookCopyResponse expectedBookCopyResponse;
 
+  private BookCopyRequest bookCopyRequest;
+
   @BeforeEach
+  @SneakyThrows
   void setUp() {
     this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
 
@@ -46,6 +51,20 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
     bookCounter++;
 
     expectedBookCopyResponse = createBookCopyResponse(authorCounter, publisherCounter, bookCounter);
+
+    var authorRequest = createAuthorRequest(authorCounter);
+    var authorResponse = postAuthor(authorRequest, this.mockMvc);
+
+    var publisherRequest = createPublisherRequest(publisherCounter);
+    var publisherResponse = postPublisher(publisherRequest, this.mockMvc);
+
+    var bookRequest =
+        createBookRequest(bookCounter, authorResponse.getId(), publisherResponse.getId());
+
+    // Set book isbn
+    var bookResponse = postBook(bookRequest, this.mockMvc);
+
+    bookCopyRequest = createBookCopyRequest(bookResponse.getIsbn());
   }
 
   @Test
@@ -53,24 +72,7 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
   @DisplayName("BookCopy: Successful creation.")
   void testNewBookCopyIsCreated() {
 
-    var bookResponseMap =
-        objectMapper.readValue(
-            postBook(authorCounter, publisherCounter, bookCounter, this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var bookResponse =
-        objectMapper.readValue(
-            objectMapper.writeValueAsString(bookResponseMap.get(CREATED)), BookResponse.class);
-
-    Awaitility.await().until(() -> !bookResponse.getId().isEmpty());
-
-    var bookCopyResponseMap =
-        objectMapper.readValue(
-            postBookCopy(bookResponse.getIsbn(), this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var actualBookCopyResponse =
-        objectMapper.readValue(
-            objectMapper.writeValueAsString(bookCopyResponseMap.get(CREATED)),
-            BookCopyResponse.class);
+    var actualBookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
 
     assertNotNull(actualBookCopyResponse);
 
@@ -105,8 +107,12 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   @DisplayName("BookCopy: Unsuccessful creation when isbn does not exist.")
   void testNewBookCopyIsNotCreatedWhenIsbnDoesNotExist() {
+    bookCopyRequest.setIsbn("RANDOM_ISBN");
+
     var errorResponse =
-        objectMapper.readValue(postBookCopy("RANDOM_ISBN", this.mockMvc), ErrorResponse.class);
+        postRequestAndExpectError(
+            BOOK_COPIES_ENDPOINT, objectMapper.writeValueAsString(bookCopyRequest), this.mockMvc);
+
     assertEquals(BOOK_DOES_NOT_EXIST.getCode(), errorResponse.getCode());
   }
 }

@@ -1,23 +1,21 @@
 package com.antelif.library.controller.command;
 
 import static com.antelif.library.application.error.GenericError.DUPLICATE_PUBLISHER;
-import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Endpoints.PUBLISHERS_ENDPOINT;
+import static com.antelif.library.factory.PublisherFactory.createPublisherRequest;
 import static com.antelif.library.factory.PublisherFactory.createPublisherResponse;
-import static com.antelif.library.utils.Request.postPublisher;
+import static com.antelif.library.utils.RequestBuilder.postPublisher;
+import static com.antelif.library.utils.RequestBuilder.postRequestAndExpectError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.domain.dto.request.PublisherRequest;
 import com.antelif.library.domain.dto.response.PublisherResponse;
 import com.antelif.library.integration.BaseIntegrationTest;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Map;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,14 +25,14 @@ import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DisplayName("Publishers command controller")
 class PublisherCommandControllerTest extends BaseIntegrationTest {
 
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
-  @Autowired private ObjectMapper objectMapper;
-  private ModelMapper modelMapper;
 
   private PublisherResponse expectedPublisherResponse;
+  private PublisherRequest publisherRequest;
 
   @BeforeEach
   @SneakyThrows
@@ -44,22 +42,15 @@ class PublisherCommandControllerTest extends BaseIntegrationTest {
     publisherCounter++;
 
     expectedPublisherResponse = createPublisherResponse(publisherCounter);
+    publisherRequest = createPublisherRequest(publisherCounter);
   }
 
   @Test
   @DisplayName("Publisher: Successful creation.")
   @SneakyThrows
-  void testNewPublisherIsCreatedSuccesfully() {
+  void testNewPublisherIsCreatedSuccessfully() {
 
-    var publisherResponseMap =
-        objectMapper.readValue(
-            postPublisher(publisherCounter, this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-
-    var actualPublisherResponse =
-        objectMapper.readValue(
-            objectMapper.writeValueAsString(publisherResponseMap.get(CREATED)),
-            PublisherResponse.class);
+    var actualPublisherResponse = postPublisher(publisherRequest, this.mockMvc);
 
     assertNotNull(actualPublisherResponse);
     assertNotNull(actualPublisherResponse.getId());
@@ -72,12 +63,13 @@ class PublisherCommandControllerTest extends BaseIntegrationTest {
   void testDuplicatePublisherIsNotCreated() {
 
     // Create first publisher
-    postPublisher(publisherCounter, this.mockMvc);
+    postPublisher(publisherRequest, this.mockMvc);
 
     // Same publisher creation should fail
     var errorResponse =
-        objectMapper.readValue(
-            postPublisher(publisherCounter, this.mockMvc), ErrorResponse.class);
+        postRequestAndExpectError(
+            PUBLISHERS_ENDPOINT, objectMapper.writeValueAsString(publisherRequest), this.mockMvc);
+
     assertEquals(DUPLICATE_PUBLISHER.getCode(), errorResponse.getCode());
   }
 }

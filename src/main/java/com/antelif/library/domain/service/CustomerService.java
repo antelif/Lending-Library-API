@@ -1,6 +1,5 @@
 package com.antelif.library.domain.service;
 
-import static com.antelif.library.application.error.GenericError.CUSTOMER_CONVERTER_FAILED;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_CREATION_FAILED;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.DUPLICATE_CUSTOMER;
@@ -8,10 +7,10 @@ import static com.antelif.library.application.error.GenericError.DUPLICATE_CUSTO
 import com.antelif.library.domain.converter.CustomerConverter;
 import com.antelif.library.domain.dto.request.CustomerRequest;
 import com.antelif.library.domain.dto.response.CustomerResponse;
-import com.antelif.library.domain.exception.ConverterException;
 import com.antelif.library.domain.exception.DuplicateEntityException;
 import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
+import com.antelif.library.infrastructure.entity.CustomerEntity;
 import com.antelif.library.infrastructure.repository.CustomerRepository;
 import java.util.Optional;
 import javax.transaction.Transactional;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 /** Customer Service. */
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CustomerService {
 
@@ -32,7 +32,6 @@ public class CustomerService {
    * @param customerRequest the DTO to get information about the customer to create.
    * @return a customer response DTO.
    */
-  @Transactional
   public CustomerResponse addCustomer(CustomerRequest customerRequest) {
 
     var persistedCustomer = customerRepository.getCustomerByPhoneNo(customerRequest.getPhoneNo());
@@ -51,17 +50,13 @@ public class CustomerService {
    * Retrieve a customer from the database by provided id.
    *
    * @param id of the customer to retrieve.
-   * @return a customer response DTO.
+   * @return a customer entity if customer was retrieved.
    */
-  public CustomerResponse getCustomerById(Long id) {
+  public CustomerEntity getCustomerById(Long id) {
+
     var persistedCustomer = customerRepository.getCustomerById(id);
 
-    if (persistedCustomer.isEmpty()) {
-      throw new EntityDoesNotExistException(CUSTOMER_DOES_NOT_EXIST);
-    }
-
-    return persistedCustomer
-        .map(converter::convertFromEntityToResponse)
-        .orElseThrow(() -> new ConverterException(CUSTOMER_CONVERTER_FAILED));
+    return persistedCustomer.orElseThrow(
+        () -> new EntityDoesNotExistException(CUSTOMER_DOES_NOT_EXIST));
   }
 }

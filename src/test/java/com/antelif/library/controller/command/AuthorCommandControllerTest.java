@@ -1,20 +1,18 @@
 package com.antelif.library.controller.command;
 
 import static com.antelif.library.application.error.GenericError.DUPLICATE_AUTHOR;
-import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Endpoints.AUTHORS_ENDPOINT;
+import static com.antelif.library.factory.AuthorFactory.createAuthorRequest;
 import static com.antelif.library.factory.AuthorFactory.createAuthorResponse;
-import static com.antelif.library.utils.Request.postAuthor;
-import static com.antelif.library.utils.Request.postAuthorWithoutMiddleName;
+import static com.antelif.library.utils.RequestBuilder.postAuthor;
+import static com.antelif.library.utils.RequestBuilder.postRequestAndExpectError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.domain.dto.request.AuthorRequest;
 import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.integration.BaseIntegrationTest;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Map;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,13 +26,14 @@ import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DisplayName("Authors command controller")
 class AuthorCommandControllerTest extends BaseIntegrationTest {
 
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
-  @Autowired private ObjectMapper objectMapper;
 
   private AuthorResponse expectedAuthorResponse;
+  private AuthorRequest authorRequest;
 
   @BeforeEach
   @SneakyThrows
@@ -44,6 +43,7 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
     authorCounter++;
 
     expectedAuthorResponse = createAuthorResponse(authorCounter);
+    authorRequest = createAuthorRequest(authorCounter);
   }
 
   @Test
@@ -51,12 +51,7 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testNewAuthorIsCreatedWithAllArguments() {
 
-    var responseMap =
-        objectMapper.readValue(
-            postAuthor(authorCounter, this.mockMvc), new TypeReference<Map<String, Object>>() {});
-    var actualAuthorResponse =
-        objectMapper.readValue(
-            objectMapper.writeValueAsString(responseMap.get(CREATED)), AuthorResponse.class);
+    var actualAuthorResponse = postAuthor(authorRequest, this.mockMvc);
 
     assertNotNull(actualAuthorResponse);
 
@@ -71,14 +66,9 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testNewAuthorIsCreatedWithNameAndSurname() {
 
-    var responseMap =
-        objectMapper.readValue(
-            postAuthorWithoutMiddleName(authorCounter, this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    var actualAuthorResponse =
-        objectMapper.readValue(
-            objectMapper.writeValueAsString(responseMap.get(CREATED)), AuthorResponse.class);
+    authorRequest.setMiddleName(null);
 
+    var actualAuthorResponse = postAuthor(authorRequest, this.mockMvc);
     assertNotNull(actualAuthorResponse);
 
     assertNotNull(actualAuthorResponse.getId());
@@ -94,12 +84,14 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
   void testDuplicateAuthorIsNotCreated() {
 
     // Create first author
-    postAuthor(authorCounter, this.mockMvc);
+    postAuthor(authorRequest, this.mockMvc);
 
     // Same author creation should fail
-    var response = postAuthor(authorCounter, this.mockMvc);
-    var errorResponse = objectMapper.readValue(response, ErrorResponse.class);
-    assertEquals(DUPLICATE_AUTHOR.getCode(), errorResponse.getCode());
+    var response =
+        postRequestAndExpectError(
+            AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
+
+    assertEquals(DUPLICATE_AUTHOR.getCode(), response.getCode());
   }
 
   @Test
@@ -107,12 +99,16 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testDuplicateAuthorIsNotCreatedWhenGivingNameAndSurnameOnly() {
 
+    authorRequest.setMiddleName(null);
+
     // Create first author
-    postAuthorWithoutMiddleName(authorCounter, this.mockMvc);
+    postAuthor(authorRequest, this.mockMvc);
 
     // Same author without middle name should fail
-    var response = postAuthorWithoutMiddleName(authorCounter, this.mockMvc);
-    var errorResponse = objectMapper.readValue(response, ErrorResponse.class);
-    assertEquals(DUPLICATE_AUTHOR.getCode(), errorResponse.getCode());
+    var response =
+        postRequestAndExpectError(
+            AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
+
+    assertEquals(DUPLICATE_AUTHOR.getCode(), response.getCode());
   }
 }

@@ -1,7 +1,10 @@
 package com.antelif.library.infrastructure.entity;
 
+import static com.antelif.library.domain.type.BookCopyStatus.AVAILABLE;
+import static com.antelif.library.domain.type.State.BAD;
+
+import com.antelif.library.domain.type.BookCopyStatus;
 import com.antelif.library.domain.type.State;
-import com.antelif.library.domain.type.Status;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -33,5 +36,9 @@ public class BookCopyEntity {
   private State state;
 
   @Enumerated(value = EnumType.STRING)
-  private Status status;
+  private BookCopyStatus status;
+
+  public boolean isEligibleToLent() {
+    return status.equals(AVAILABLE) && !state.equals(BAD);
+  }
 }

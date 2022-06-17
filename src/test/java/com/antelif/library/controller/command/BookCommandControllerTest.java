@@ -3,21 +3,22 @@ package com.antelif.library.controller.command;
 import static com.antelif.library.application.error.GenericError.AUTHOR_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.DUPLICATE_BOOK;
 import static com.antelif.library.application.error.GenericError.PUBLISHER_DOES_NOT_EXIST;
-import static com.antelif.library.domain.common.Constants.CREATED;
-import static com.antelif.library.utils.Request.postBook;
-import static com.antelif.library.utils.Request.postBookWithExistingAuthor;
-import static com.antelif.library.utils.Request.postBookWithExistingAuthorAndPublisher;
-import static com.antelif.library.utils.Request.postBookWithExistingPublisher;
+import static com.antelif.library.domain.common.Endpoints.BOOKS_ENDPOINT;
+import static com.antelif.library.factory.AuthorFactory.createAuthorRequest;
+import static com.antelif.library.factory.BookFactory.createBookRequest;
+import static com.antelif.library.factory.PublisherFactory.createPublisherRequest;
+import static com.antelif.library.utils.RequestBuilder.postAuthor;
+import static com.antelif.library.utils.RequestBuilder.postBook;
+import static com.antelif.library.utils.RequestBuilder.postPublisher;
+import static com.antelif.library.utils.RequestBuilder.postRequestAndExpectError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.domain.dto.request.BookRequest;
 import com.antelif.library.domain.dto.response.BookResponse;
 import com.antelif.library.factory.BookFactory;
 import com.antelif.library.integration.BaseIntegrationTest;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Map;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,13 +32,14 @@ import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DisplayName("Books command controller")
 class BookCommandControllerTest extends BaseIntegrationTest {
 
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
-  @Autowired private ObjectMapper objectMapper;
 
   private BookResponse expectedBookResponse;
+  private BookRequest bookRequest;
 
   @BeforeEach
   @SneakyThrows
@@ -52,6 +54,14 @@ class BookCommandControllerTest extends BaseIntegrationTest {
 
     expectedBookResponse =
         BookFactory.createBookResponse(authorCounter, publisherCounter, bookCounter);
+
+    var authorRequest = createAuthorRequest(authorCounter);
+    var authorResponse = postAuthor(authorRequest, this.mockMvc);
+
+    var publisherRequest = createPublisherRequest(publisherCounter);
+    var publisherResponse = postPublisher(publisherRequest, this.mockMvc);
+
+    bookRequest = createBookRequest(bookCounter, authorResponse.getId(), publisherResponse.getId());
   }
 
   @Test
@@ -59,14 +69,7 @@ class BookCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookIsCreatedSuccessfully() {
 
-    var response =
-        objectMapper.readValue(
-            postBook(authorCounter, publisherCounter, bookCounter, this.mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-
-    var actualBookResponse =
-        objectMapper.readValue(
-            objectMapper.writeValueAsString(response.get(CREATED)), BookResponse.class);
+    var actualBookResponse = postBook(bookRequest, this.mockMvc);
 
     assertNotNull(actualBookResponse);
 
@@ -94,14 +97,14 @@ class BookCommandControllerTest extends BaseIntegrationTest {
   void testDuplicateBookIsNotCreated() {
 
     // Create first book
-    postBook(authorCounter, publisherCounter, bookCounter, this.mockMvc);
+    postBook(bookRequest, this.mockMvc);
 
     // Same book creation should fail
     var response =
-        postBookWithExistingAuthorAndPublisher(
-            authorCounter, publisherCounter, bookCounter, this.mockMvc);
-    var errorResponse = objectMapper.readValue(response, ErrorResponse.class);
-    assertEquals(DUPLICATE_BOOK.getCode(), errorResponse.getCode());
+        postRequestAndExpectError(
+            BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
+
+    assertEquals(DUPLICATE_BOOK.getCode(), response.getCode());
   }
 
   @Test
@@ -109,11 +112,11 @@ class BookCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookIsNotCreatedWhenAuthorDoesNotExist() {
 
+    bookRequest.setAuthorId(authorCounter + 1);
+
     var response =
-        objectMapper.readValue(
-            postBookWithExistingAuthor(
-                authorCounter + 1, publisherCounter, bookCounter, this.mockMvc),
-            ErrorResponse.class);
+        postRequestAndExpectError(
+            BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
 
     assertEquals(AUTHOR_DOES_NOT_EXIST.getCode(), response.getCode());
   }
@@ -123,11 +126,11 @@ class BookCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookIsNotCreatedWhenPublisherDoesNotExist() {
 
+    bookRequest.setPublisherId(publisherCounter + 1);
+
     var response =
-        objectMapper.readValue(
-            postBookWithExistingPublisher(
-                authorCounter, publisherCounter + 1, bookCounter, this.mockMvc),
-            ErrorResponse.class);
+        postRequestAndExpectError(
+            BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
 
     assertEquals(PUBLISHER_DOES_NOT_EXIST.getCode(), response.getCode());
   }

@@ -1,17 +1,16 @@
 package com.antelif.library.domain.service;
 
-import static com.antelif.library.application.error.GenericError.AUTHOR_CONVERTER_FAILED;
 import static com.antelif.library.application.error.GenericError.AUTHOR_CREATION_FAILED;
 import static com.antelif.library.application.error.GenericError.AUTHOR_DOES_NOT_EXIST;
+import static com.antelif.library.application.error.GenericError.DUPLICATE_AUTHOR;
 
-import com.antelif.library.application.error.GenericError;
 import com.antelif.library.domain.converter.AuthorConverter;
 import com.antelif.library.domain.dto.request.AuthorRequest;
 import com.antelif.library.domain.dto.response.AuthorResponse;
-import com.antelif.library.domain.exception.ConverterException;
 import com.antelif.library.domain.exception.DuplicateEntityException;
 import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
+import com.antelif.library.infrastructure.entity.AuthorEntity;
 import com.antelif.library.infrastructure.repository.AuthorRepository;
 import java.util.Optional;
 import javax.transaction.Transactional;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 /** Author service. */
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AuthorService {
 
@@ -32,7 +32,6 @@ public class AuthorService {
    * @param authorRequest the DTO to get information about the author to create.
    * @return an author response DTO.
    */
-  @Transactional
   public AuthorResponse addAuthor(AuthorRequest authorRequest) {
 
     var persistedEntity =
@@ -43,7 +42,7 @@ public class AuthorService {
                 authorRequest.getName(), authorRequest.getSurname());
 
     if (!persistedEntity.isEmpty()) {
-      throw new DuplicateEntityException(GenericError.DUPLICATE_AUTHOR);
+      throw new DuplicateEntityException(DUPLICATE_AUTHOR);
     }
     return Optional.of(converter.convertFromRequestToEntity(authorRequest))
         .map(authorRepository::save)
@@ -55,17 +54,12 @@ public class AuthorService {
    * Retrieve an author from the database by provided id.
    *
    * @param id of the author to retrieve.
-   * @return an author response DTO.
+   * @return an author entity object.
    */
-  public AuthorResponse getAuthorById(Long id) {
+  public AuthorEntity getAuthorById(Long id) {
     var persistedAuthor = authorRepository.getAuthorEntityById(id);
 
-    if (persistedAuthor.isEmpty()) {
-      throw new EntityDoesNotExistException(AUTHOR_DOES_NOT_EXIST);
-    }
-
-    return persistedAuthor
-        .map(converter::convertFromEntityToResponse)
-        .orElseThrow(() -> new ConverterException(AUTHOR_CONVERTER_FAILED));
+    return persistedAuthor.orElseThrow(
+        () -> new EntityDoesNotExistException(AUTHOR_DOES_NOT_EXIST));
   }
 }

@@ -3,6 +3,8 @@ package com.antelif.library.configuration;
 import static org.modelmapper.convention.MatchingStrategies.STRICT;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
 
   @Bean
-  public ModelMapper strictModelMapper() {
+  public ModelMapper modelMapper() {
     ModelMapper strictMapper = new ModelMapper();
     strictMapper.getConfiguration().setMatchingStrategy(STRICT);
     return strictMapper;
@@ -19,6 +21,11 @@ public class AppConfig {
 
   @Bean
   public ObjectMapper objectMapper() {
-    return new ObjectMapper();
+    var javaTimeModule = new JavaTimeModule();
+    var objectMapper = new ObjectMapper();
+    objectMapper
+        .registerModule(javaTimeModule)
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    return objectMapper;
   }
 }

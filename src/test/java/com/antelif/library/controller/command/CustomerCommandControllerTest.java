@@ -1,18 +1,17 @@
 package com.antelif.library.controller.command;
 
 import static com.antelif.library.application.error.GenericError.DUPLICATE_CUSTOMER;
-import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Endpoints.CUSTOMERS_ENDPOINT;
+import static com.antelif.library.factory.CustomerFactory.createCustomerRequest;
 import static com.antelif.library.factory.CustomerFactory.createCustomerResponse;
-import static com.antelif.library.utils.Request.postCustomer;
+import static com.antelif.library.utils.RequestBuilder.postCustomer;
+import static com.antelif.library.utils.RequestBuilder.postRequestAndExpectError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.domain.dto.request.CustomerRequest;
 import com.antelif.library.domain.dto.response.CustomerResponse;
 import com.antelif.library.integration.BaseIntegrationTest;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Map;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,13 +25,15 @@ import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@DisplayName("Customer command controller")
 class CustomerCommandControllerTest extends BaseIntegrationTest {
 
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
-  @Autowired private ObjectMapper objectMapper;
 
   private CustomerResponse expectedCustomerResponse;
+
+  private CustomerRequest customerRequest;
 
   @BeforeEach
   @SneakyThrows
@@ -42,6 +43,7 @@ class CustomerCommandControllerTest extends BaseIntegrationTest {
     customerCounter++;
 
     expectedCustomerResponse = createCustomerResponse(customerCounter);
+    customerRequest = createCustomerRequest(customerCounter);
   }
 
   @Test
@@ -49,14 +51,7 @@ class CustomerCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testNewCustomerIsCreated() {
 
-    Map<String, CustomerResponse> customerResponseMap =
-        objectMapper.readValue(
-            postCustomer(customerCounter, this.mockMvc), new TypeReference<>() {});
-
-    var actualCustomer =
-        objectMapper.readValue(
-            objectMapper.writeValueAsString(customerResponseMap.get(CREATED)),
-            CustomerResponse.class);
+    var actualCustomer = postCustomer(customerRequest, this.mockMvc);
 
     assertNotNull(actualCustomer);
 
@@ -74,11 +69,13 @@ class CustomerCommandControllerTest extends BaseIntegrationTest {
   void testCustomerIsNotCreatedWhenDuplicatePhoneNumber() {
 
     // Create first customer
-    postCustomer(customerCounter, this.mockMvc);
+    postCustomer(customerRequest, this.mockMvc);
 
     // Same customer creation should fail
     var errorResponse =
-        objectMapper.readValue(postCustomer(customerCounter, this.mockMvc), ErrorResponse.class);
+        postRequestAndExpectError(
+            CUSTOMERS_ENDPOINT, objectMapper.writeValueAsString(customerRequest), this.mockMvc);
+
     assertEquals(DUPLICATE_CUSTOMER.getCode(), errorResponse.getCode());
   }
 }

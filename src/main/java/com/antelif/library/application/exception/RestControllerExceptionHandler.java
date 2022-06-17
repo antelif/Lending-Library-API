@@ -12,7 +12,7 @@ public class RestControllerExceptionHandler {
   /***
    * Handles all exceptions that extend GenericException.
    * @param exception the exception that was thrown.
-   * @return an Error Response with information about the error that occurred.
+   * @return an Error Response object with information about the error that occurred.
    */
   @ExceptionHandler(value = GenericException.class)
   public ErrorResponse handlerDuplicateEntityException(GenericException exception) {
