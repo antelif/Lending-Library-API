@@ -9,7 +9,6 @@ import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.validator.constraints.ISBN;
 
 /** Book copy request DTO used as request body in HTTP requests. */
 @Getter
@@ -18,7 +17,7 @@ import org.hibernate.validator.constraints.ISBN;
 public class BookCopyRequest {
 
   @NotBlank(message = "Book copy ISBN cannot be blank.")
-//  @ISBN(message = "Book ISBN should have correct format.")
+  //  @ISBN(message = "Book ISBN should have correct format.")
   private String isbn;
 
   @NotNull(message = "Book copy state cannot be blank.")
