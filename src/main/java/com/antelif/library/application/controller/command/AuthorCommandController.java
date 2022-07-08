@@ -7,6 +7,7 @@ import com.antelif.library.domain.dto.request.AuthorRequest;
 import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.domain.service.AuthorService;
 import java.util.Map;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class AuthorCommandController {
    */
   @PostMapping
   public ResponseEntity<Map<String, AuthorResponse>> addAuthor(
-      @RequestBody AuthorRequest authorRequest) {
+      @RequestBody @Valid AuthorRequest authorRequest) {
     log.info("Received request to add author {}", authorRequest);
     return ResponseEntity.ok(Map.of(CREATED, authorService.addAuthor(authorRequest)));
   }

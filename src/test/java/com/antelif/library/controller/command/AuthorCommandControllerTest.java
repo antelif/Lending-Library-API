@@ -111,4 +111,13 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
 
     assertEquals(DUPLICATE_AUTHOR.getCode(), response.getCode());
   }
+
+  @Test
+  @DisplayName("Author: Unsuccessful creation when request does not contain author name")
+  void testAuthorIsNotCreatedIfNameIsNotProvided() {}
+
+  @Test
+  @DisplayName(
+      "Author: Unsuccessful creation when request contains author name longer than 50 characters.")
+  void testAuthorIsNotCreatedIfNameIsTooLong() {}
 }

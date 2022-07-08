@@ -115,4 +115,12 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
 
     assertEquals(BOOK_DOES_NOT_EXIST.getCode(), errorResponse.getCode());
   }
+
+  @Test
+  @DisplayName("BookCopy: Unsuccessful creation when ISBN has incorrect format.")
+  void testBookCopyIsNotCreatedWhenIsbnHasIncorrectFormat(){}
+
+  @Test
+  @DisplayName("BookCopy: Unsuccessful creation when state is blank.")
+  void testBookCopyIsNotCreatedWhenStateIsBlank(){}
 }
