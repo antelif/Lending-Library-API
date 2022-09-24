@@ -1,11 +1,13 @@
 package com.antelif.library.application.controller.command;
 
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.ControllerTags.AUTHOR_CONTROLLER;
 import static com.antelif.library.domain.common.Endpoints.AUTHORS_ENDPOINT;
 
 import com.antelif.library.domain.dto.request.AuthorRequest;
 import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.domain.service.AuthorService;
+import io.swagger.annotations.Api;
 import java.util.Map;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Api(tags = AUTHOR_CONTROLLER)
 @RequestMapping(value = AUTHORS_ENDPOINT)
 public class AuthorCommandController {
 
