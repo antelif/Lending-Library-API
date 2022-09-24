@@ -1,11 +1,13 @@
 package com.antelif.library.application.controller.command;
 
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.ControllerTags.CUSTOMER_CONTROLLER;
 import static com.antelif.library.domain.common.Endpoints.CUSTOMERS_ENDPOINT;
 
 import com.antelif.library.domain.dto.request.CustomerRequest;
 import com.antelif.library.domain.dto.response.CustomerResponse;
 import com.antelif.library.domain.service.CustomerService;
+import io.swagger.annotations.Api;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+@Api(tags = CUSTOMER_CONTROLLER)
 @RequestMapping(value = CUSTOMERS_ENDPOINT)
 public class CustomerCommandController {
 

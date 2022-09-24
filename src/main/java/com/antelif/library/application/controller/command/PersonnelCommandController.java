@@ -1,11 +1,13 @@
 package com.antelif.library.application.controller.command;
 
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.ControllerTags.PERSONNEL_CONTROLLER;
 import static com.antelif.library.domain.common.Endpoints.PERSONNEL_ENDPOINT;
 
 import com.antelif.library.domain.dto.request.PersonnelRequest;
 import com.antelif.library.domain.dto.response.PersonnelResponse;
 import com.antelif.library.domain.service.PersonnelService;
+import io.swagger.annotations.Api;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Api(tags = PERSONNEL_CONTROLLER)
 @RequestMapping(value = PERSONNEL_ENDPOINT)
 public class PersonnelCommandController {
 

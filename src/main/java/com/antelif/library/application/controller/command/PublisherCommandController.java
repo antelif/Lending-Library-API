@@ -1,11 +1,13 @@
 package com.antelif.library.application.controller.command;
 
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.ControllerTags.PUBLISHER_CONTROLLER;
 import static com.antelif.library.domain.common.Endpoints.PUBLISHERS_ENDPOINT;
 
 import com.antelif.library.domain.dto.request.PublisherRequest;
 import com.antelif.library.domain.dto.response.PublisherResponse;
 import com.antelif.library.domain.service.PublisherService;
+import io.swagger.annotations.Api;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+@Api(tags = PUBLISHER_CONTROLLER)
 @RequestMapping(value = PUBLISHERS_ENDPOINT)
 public class PublisherCommandController {
 

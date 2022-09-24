@@ -1,11 +1,13 @@
 package com.antelif.library.application.controller.command;
 
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.ControllerTags.TRANSACTION_CONTROLLER;
 import static com.antelif.library.domain.common.Endpoints.TRANSACTIONS_ENDPOINT;
 
 import com.antelif.library.domain.dto.request.TransactionRequest;
 import com.antelif.library.domain.dto.response.TransactionResponse;
 import com.antelif.library.domain.service.TransactionService;
+import io.swagger.annotations.Api;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+@Api(tags = TRANSACTION_CONTROLLER)
 @RequestMapping(value = TRANSACTIONS_ENDPOINT)
 public class TransactionCommandController {
 

@@ -20,6 +20,7 @@
   <properties>
     <java.version>17</java.version>
     <liquibase.version>4.10.0</liquibase.version>
+    <swagger.version>3.0.0</swagger.version>
   </properties>
   <build>
     <plugins>
@@ -81,6 +82,18 @@
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-maven-plugin</artifactId>
       <version>${liquibase.version}</version>
+    </dependency>
+
+    <!--    Swagger. -->
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-boot-starter</artifactId>
+      <version>${swagger.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger-ui</artifactId>
+      <version>${swagger.version}</version>
     </dependency>
 
     <!--    Testing. -->
