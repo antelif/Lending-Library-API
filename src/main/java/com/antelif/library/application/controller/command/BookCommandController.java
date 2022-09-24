@@ -1,11 +1,13 @@
 package com.antelif.library.application.controller.command;
 
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.ControllerTags.BOOK_CONTROLLER;
 import static com.antelif.library.domain.common.Endpoints.BOOKS_ENDPOINT;
 
 import com.antelif.library.domain.dto.request.BookRequest;
 import com.antelif.library.domain.dto.response.BookResponse;
 import com.antelif.library.domain.service.BookService;
+import io.swagger.annotations.Api;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Api(tags = BOOK_CONTROLLER)
 @RequestMapping(value = BOOKS_ENDPOINT)
 public class BookCommandController {
 
