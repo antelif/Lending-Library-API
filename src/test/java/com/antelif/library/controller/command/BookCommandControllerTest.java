@@ -108,7 +108,7 @@ class BookCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookIsNotCreatedWhenAuthorDoesNotExist() {
 
-    bookRequest.setAuthorId(authorCounter + 1);
+    bookRequest.setAuthorId(authorCounter + 1L);
 
     var response =
         postRequestAndExpectError(
@@ -122,7 +122,7 @@ class BookCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookIsNotCreatedWhenPublisherDoesNotExist() {
 
-    bookRequest.setPublisherId(publisherCounter + 1);
+    bookRequest.setPublisherId(publisherCounter + 1L);
 
     var response =
         postRequestAndExpectError(

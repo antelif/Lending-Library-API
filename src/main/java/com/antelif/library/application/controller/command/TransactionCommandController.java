@@ -9,6 +9,7 @@ import com.antelif.library.domain.dto.response.TransactionResponse;
 import com.antelif.library.domain.service.TransactionService;
 import io.swagger.annotations.Api;
 import java.util.Map;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class TransactionCommandController {
    */
   @PostMapping
   public ResponseEntity<Map<String, TransactionResponse>> createTransaction(
-      @RequestBody TransactionRequest transaction) {
+      @RequestBody @Valid TransactionRequest transaction) {
     log.info("Received request to add transaction {}", transaction);
     return ResponseEntity.ok(Map.of(CREATED, transactionService.createTransaction(transaction)));
   }

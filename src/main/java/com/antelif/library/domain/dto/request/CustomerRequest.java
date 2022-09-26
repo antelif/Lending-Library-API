@@ -7,6 +7,7 @@ import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.validator.constraints.Length;
 
 /** Customer Request DTO used as request body in HTTP requests. */
 @Getter
@@ -23,6 +24,7 @@ public class CustomerRequest {
   private String surname;
 
   @Pattern(regexp = "\\d+", message = "Customer phone number should contain digits.")
+  @Length(min = 10, max = 15, message = "Customer phone number should be between 10 and 15 digits.")
   private String phoneNo;
 
   @Email(message = "Customer should contain a valid email.")

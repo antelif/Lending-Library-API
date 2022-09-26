@@ -15,7 +15,7 @@ public class ErrorResponse {
   private String description;
 
   /**
-   * Constructor.
+   * Constructor for custom exceptions.
    *
    * @param genericError the error that occurred
    */
@@ -23,5 +23,17 @@ public class ErrorResponse {
     this.name = genericError.getName();
     this.code = genericError.getCode();
     this.description = genericError.getDescription();
+  }
+
+  /**
+   * Constructor for validation exceptions.
+   *
+   * @param genericError the error that occurred,
+   * @param description the description provided by the runtime exception that occurred.
+   */
+  public ErrorResponse(GenericError genericError, String description) {
+    this.name = genericError.getName();
+    this.code = genericError.getCode();
+    this.description = description;
   }
 }

@@ -9,6 +9,7 @@ import com.antelif.library.domain.dto.response.PersonnelResponse;
 import com.antelif.library.domain.service.PersonnelService;
 import io.swagger.annotations.Api;
 import java.util.Map;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class PersonnelCommandController {
    */
   @PostMapping
   public ResponseEntity<Map<String, PersonnelResponse>> addPersonnel(
-      @RequestBody PersonnelRequest personnelRequest) {
+      @RequestBody @Valid PersonnelRequest personnelRequest) {
     log.info("Received request to add personnel {}", personnelRequest);
     return ResponseEntity.ok(Map.of(CREATED, personnelService.addPersonnel(personnelRequest)));
   }
