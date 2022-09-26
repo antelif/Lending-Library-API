@@ -18,7 +18,7 @@ public class RestControllerExceptionHandler {
    * @return an Error Response object with information about the error that occurred.
    */
   @ExceptionHandler(value = GenericException.class)
-  public ErrorResponse duplicateEntityExceptionHandler(GenericException exception) {
+  public ErrorResponse genericExceptionHandler(GenericException exception) {
 
     return new ErrorResponse(exception.getGenericError());
   }
