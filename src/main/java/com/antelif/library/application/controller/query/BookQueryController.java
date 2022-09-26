@@ -23,10 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = BOOKS_ENDPOINT)
 public class BookQueryController {
 
-
-
-
-
   private final BookService bookService;
 
   @GetMapping
