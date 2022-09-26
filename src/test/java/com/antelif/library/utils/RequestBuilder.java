@@ -9,6 +9,7 @@ import static com.antelif.library.domain.common.Endpoints.PERSONNEL_ENDPOINT;
 import static com.antelif.library.domain.common.Endpoints.PUBLISHERS_ENDPOINT;
 import static com.antelif.library.domain.common.Endpoints.TRANSACTIONS_ENDPOINT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,6 +29,9 @@ import com.antelif.library.domain.dto.response.CustomerResponse;
 import com.antelif.library.domain.dto.response.PersonnelResponse;
 import com.antelif.library.domain.dto.response.PublisherResponse;
 import com.antelif.library.domain.dto.response.TransactionResponse;
+import com.antelif.library.factory.AuthorFactory;
+import com.antelif.library.factory.BookFactory;
+import com.antelif.library.factory.PublisherFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -40,11 +44,53 @@ import org.springframework.test.web.servlet.MockMvc;
 /** Helper class with all requests. */
 public class RequestBuilder {
 
-  private static final ObjectMapper mapper =
+  private static final ObjectMapper objectMapper =
       new ObjectMapper()
           .registerModule(new JavaTimeModule())
           .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
+  /*
+   * There are GET and POST methods that replicate calls to all controllers, so that depending on
+   * the request we wish to mock, we can call one method and provide necessary arguments, instead of
+   * mocking requests all the time.
+   * GET: Depending on the request arguments must be provided, such as path variables or parameters.
+   *      Finally, all GET methods call getRequest().
+   * POST: Each method builds their needed request-body to include in request.
+   *       Finally, all methods call postRequest().
+   * ERROR: When asserting exception postRequestAndExpectError() and getRequestAndExpectError() are
+   *        used so that the response can be mapped to an ErrorResponse without making such
+   *        conversions in tests.
+   */
+
+  // GET
+  @SneakyThrows
+  public static String getRequest(String endpoint, MockMvc mockMvc) {
+    var response =
+        mockMvc
+            .perform(get(endpoint).contentType(APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    var mapResponse = objectMapper.readValue(response, new TypeReference<>() {});
+    return objectMapper.writeValueAsString(mapResponse);
+  }
+
+  @SneakyThrows
+  public static List<BookResponse> getBooks(MockMvc mockMvc) {
+    return objectMapper.readValue(
+        getRequest(BOOKS_ENDPOINT, mockMvc), new TypeReference<List<BookResponse>>() {});
+  }
+
+  @SneakyThrows
+  public static BookResponse getBookById(Long id, MockMvc mockMvc) {
+    return objectMapper.readValue(
+        getRequest(BOOKS_ENDPOINT + "/" + id, mockMvc), BookResponse.class);
+  }
+
+  // POST
   @SneakyThrows
   private static String postRequest(String endpoint, String content, MockMvc mockMvc) {
     var response =
@@ -56,18 +102,18 @@ public class RequestBuilder {
             .getResponse()
             .getContentAsString();
 
-    var mapResponse = mapper.readValue(response, new TypeReference<>() {});
-    return mapper.writeValueAsString(mapResponse);
+    var mapResponse = objectMapper.readValue(response, new TypeReference<>() {});
+    return objectMapper.writeValueAsString(mapResponse);
   }
 
   @SneakyThrows
   public static AuthorResponse postAuthor(AuthorRequest authorContent, MockMvc mockMvc) {
     var authorMap =
-        mapper.readValue(
-            postRequest(AUTHORS_ENDPOINT, mapper.writeValueAsString(authorContent), mockMvc),
+        objectMapper.readValue(
+            postRequest(AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorContent), mockMvc),
             new TypeReference<Map<String, Object>>() {});
-    return mapper.readValue(
-        mapper.writeValueAsString(authorMap.get(CREATED)), AuthorResponse.class);
+    return objectMapper.readValue(
+        objectMapper.writeValueAsString(authorMap.get(CREATED)), AuthorResponse.class);
   }
 
   @SneakyThrows
@@ -75,71 +121,99 @@ public class RequestBuilder {
       PublisherRequest publisherContent, MockMvc mockMvc) {
 
     var publisherMap =
-        mapper.readValue(
-            postRequest(PUBLISHERS_ENDPOINT, mapper.writeValueAsString(publisherContent), mockMvc),
+        objectMapper.readValue(
+            postRequest(
+                PUBLISHERS_ENDPOINT, objectMapper.writeValueAsString(publisherContent), mockMvc),
             new TypeReference<Map<String, Object>>() {});
-    return mapper.readValue(
-        mapper.writeValueAsString(publisherMap.get(CREATED)), PublisherResponse.class);
+    return objectMapper.readValue(
+        objectMapper.writeValueAsString(publisherMap.get(CREATED)), PublisherResponse.class);
   }
 
   @SneakyThrows
   public static PersonnelResponse postPersonnel(
       PersonnelRequest personnelContent, MockMvc mockMvc) {
     var personnelMap =
-        mapper.readValue(
-            postRequest(PERSONNEL_ENDPOINT, mapper.writeValueAsString(personnelContent), mockMvc),
+        objectMapper.readValue(
+            postRequest(
+                PERSONNEL_ENDPOINT, objectMapper.writeValueAsString(personnelContent), mockMvc),
             new TypeReference<Map<String, Object>>() {});
-    return mapper.readValue(
-        mapper.writeValueAsString(personnelMap.get(CREATED)), PersonnelResponse.class);
+    return objectMapper.readValue(
+        objectMapper.writeValueAsString(personnelMap.get(CREATED)), PersonnelResponse.class);
   }
 
   @SneakyThrows
   public static CustomerResponse postCustomer(CustomerRequest customerContent, MockMvc mockMvc) {
 
     var customerMap =
-        mapper.readValue(
-            postRequest(CUSTOMERS_ENDPOINT, mapper.writeValueAsString(customerContent), mockMvc),
+        objectMapper.readValue(
+            postRequest(
+                CUSTOMERS_ENDPOINT, objectMapper.writeValueAsString(customerContent), mockMvc),
             new TypeReference<Map<String, Object>>() {});
-    return mapper.readValue(
-        mapper.writeValueAsString(customerMap.get(CREATED)), CustomerResponse.class);
+    return objectMapper.readValue(
+        objectMapper.writeValueAsString(customerMap.get(CREATED)), CustomerResponse.class);
   }
 
   @SneakyThrows
   public static BookCopyResponse postBookCopy(BookCopyRequest bookCopyContent, MockMvc mockMvc) {
     var bookCopyMap =
-        mapper.readValue(
-            postRequest(BOOK_COPIES_ENDPOINT, mapper.writeValueAsString(bookCopyContent), mockMvc),
+        objectMapper.readValue(
+            postRequest(
+                BOOK_COPIES_ENDPOINT, objectMapper.writeValueAsString(bookCopyContent), mockMvc),
             new TypeReference<Map<String, Object>>() {});
-    return mapper.readValue(
-        mapper.writeValueAsString(bookCopyMap.get(CREATED)), BookCopyResponse.class);
+    return objectMapper.readValue(
+        objectMapper.writeValueAsString(bookCopyMap.get(CREATED)), BookCopyResponse.class);
   }
 
   @SneakyThrows
   public static BookResponse postBook(BookRequest bookContent, MockMvc mockMvc) {
 
     var bookMap =
-        mapper.readValue(
-            postRequest(BOOKS_ENDPOINT, mapper.writeValueAsString(bookContent), mockMvc),
+        objectMapper.readValue(
+            postRequest(BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookContent), mockMvc),
             new TypeReference<Map<String, Object>>() {});
-    return mapper.readValue(mapper.writeValueAsString(bookMap.get(CREATED)), BookResponse.class);
+    return objectMapper.readValue(
+        objectMapper.writeValueAsString(bookMap.get(CREATED)), BookResponse.class);
+  }
+
+  @SneakyThrows
+  public static BookResponse postBook(
+      int bookIndex, int authorIndex, int publisherIndex, MockMvc mockMvc) {
+    var authorRequest = AuthorFactory.createAuthorRequest(authorIndex);
+    var authorResponse = postAuthor(authorRequest, mockMvc);
+
+    var publisherRequest = PublisherFactory.createPublisherRequest(publisherIndex);
+    var publisherResponse = postPublisher(publisherRequest, mockMvc);
+
+    var bookRequest =
+        BookFactory.createBookRequest(bookIndex, authorResponse.getId(), publisherResponse.getId());
+
+    return postBook(bookRequest, mockMvc);
   }
 
   @SneakyThrows
   public static TransactionResponse postTransaction(
       TransactionRequest transactionContent, MockMvc mockMvc) {
     var transactionMap =
-        mapper.readValue(
+        objectMapper.readValue(
             postRequest(
-                TRANSACTIONS_ENDPOINT, mapper.writeValueAsString(transactionContent), mockMvc),
+                TRANSACTIONS_ENDPOINT,
+                objectMapper.writeValueAsString(transactionContent),
+                mockMvc),
             new TypeReference<Map<String, Object>>() {});
 
-    return mapper.readValue(
-        mapper.writeValueAsString(transactionMap.get(CREATED)), TransactionResponse.class);
+    return objectMapper.readValue(
+        objectMapper.writeValueAsString(transactionMap.get(CREATED)), TransactionResponse.class);
   }
 
+  // ERROR
   @SneakyThrows
   public static ErrorResponse postRequestAndExpectError(
       String endpoint, String content, MockMvc mockMvc) {
-    return mapper.readValue(postRequest(endpoint, content, mockMvc), ErrorResponse.class);
+    return objectMapper.readValue(postRequest(endpoint, content, mockMvc), ErrorResponse.class);
+  }
+
+  @SneakyThrows
+  public static ErrorResponse getRequestAndExpectError(String endpoint, MockMvc mockMvc) {
+    return objectMapper.readValue(getRequest(endpoint, mockMvc), ErrorResponse.class);
   }
 }
