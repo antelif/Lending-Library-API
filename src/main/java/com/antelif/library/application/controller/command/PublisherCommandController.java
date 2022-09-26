@@ -9,6 +9,7 @@ import com.antelif.library.domain.dto.response.PublisherResponse;
 import com.antelif.library.domain.service.PublisherService;
 import io.swagger.annotations.Api;
 import java.util.Map;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class PublisherCommandController {
    */
   @PostMapping
   public ResponseEntity<Map<String, PublisherResponse>> addPublisher(
-      @RequestBody PublisherRequest publisherRequest) {
+      @RequestBody @Valid PublisherRequest publisherRequest) {
     log.info("Received request to add publisher {}", publisherRequest);
     return ResponseEntity.ok(Map.of(CREATED, publisherService.addPublisher(publisherRequest)));
   }

@@ -9,6 +9,7 @@ import com.antelif.library.domain.dto.response.BookResponse;
 import com.antelif.library.domain.service.BookService;
 import io.swagger.annotations.Api;
 import java.util.Map;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,8 @@ public class BookCommandController {
    * @return a book response DTO.
    */
   @PostMapping
-  public ResponseEntity<Map<String, BookResponse>> addBook(@RequestBody BookRequest bookRequest) {
+  public ResponseEntity<Map<String, BookResponse>> addBook(
+      @RequestBody @Valid BookRequest bookRequest) {
     log.info("Received request to add book {}", bookRequest);
     return ResponseEntity.ok(Map.of(CREATED, bookService.addBook(bookRequest)));
   }

@@ -9,8 +9,8 @@ public class CustomerFactory {
     var customer = new CustomerRequest();
     customer.setName("name" + index);
     customer.setSurname("surname" + index);
-    customer.setPhoneNo("phoneNo" + index);
-    customer.setEmail("email" + index);
+    customer.setPhoneNo("123456789" + index);
+    customer.setEmail("email@" + index + ".com");
     customer.setFee(0);
     return customer;
   }
@@ -25,8 +25,8 @@ public class CustomerFactory {
     var customer = new CustomerResponse();
     customer.setName("name" + index);
     customer.setSurname("surname" + index);
-    customer.setPhoneNo("phoneNo" + index);
-    customer.setEmail("email" + index);
+    customer.setPhoneNo("123456789" + index);
+    customer.setEmail("email@" + index + ".com");
     customer.setFee(0);
     return customer;
   }
