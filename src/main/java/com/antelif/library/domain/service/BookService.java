@@ -12,7 +12,9 @@ import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
 import com.antelif.library.infrastructure.entity.BookEntity;
 import com.antelif.library.infrastructure.repository.BookRepository;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -54,5 +56,29 @@ public class BookService {
     var persistedBook = bookRepository.getBookByIsbn(isbn);
 
     return persistedBook.orElseThrow(() -> new EntityDoesNotExistException(BOOK_DOES_NOT_EXIST));
+  }
+
+  /**
+   * Retrieve all books from database.
+   *
+   * @return a list of book response objects.
+   */
+  public List<BookResponse> getAllBooks() {
+    return bookRepository.findAll().stream()
+        .map(converter::convertFromEntityToResponse)
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Retrieve a book from the database by provided id.
+   *
+   * @param id of the book to retrieve.
+   * @return a book response if book was retrieved, else throw a handled exception.
+   */
+  public BookResponse getBookById(Long id) {
+    return bookRepository
+        .findById(id)
+        .map(converter::convertFromEntityToResponse)
+        .orElseThrow(() -> new EntityDoesNotExistException(BOOK_DOES_NOT_EXIST));
   }
 }
