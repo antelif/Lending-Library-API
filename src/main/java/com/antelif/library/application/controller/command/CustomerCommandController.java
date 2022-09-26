@@ -9,6 +9,7 @@ import com.antelif.library.domain.dto.response.CustomerResponse;
 import com.antelif.library.domain.service.CustomerService;
 import io.swagger.annotations.Api;
 import java.util.Map;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class CustomerCommandController {
    */
   @PostMapping
   public ResponseEntity<Map<String, CustomerResponse>> addCustomer(
-      @RequestBody CustomerRequest customerRequest) {
+      @RequestBody @Valid CustomerRequest customerRequest) {
     log.info("Received request to add customer {}", customerRequest);
     return ResponseEntity.ok(Map.of(CREATED, customerService.addCustomer(customerRequest)));
   }

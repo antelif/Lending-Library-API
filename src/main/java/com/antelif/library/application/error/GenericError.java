@@ -32,7 +32,9 @@ public enum GenericError {
   TRANSACTION_CREATION_FAILED(27, "Could not create new transaction."),
 
   CUSTOMER_HAS_FEE(28, "Customer has pending fee."),
-  CUSTOMER_HAS_THE_BOOK(29, "Customer has already this book.");
+  CUSTOMER_HAS_THE_BOOK(29, "Customer has already this book."),
+
+  INPUT_VALIDATIONS_ERROR(30, "Wrong input.");
 
   private final int code;
   private final String description;

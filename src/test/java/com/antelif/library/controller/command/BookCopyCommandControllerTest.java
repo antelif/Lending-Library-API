@@ -98,25 +98,4 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
         expectedBookCopyResponse.getBook().getPublisher().getName(),
         actualBookCopyResponse.getBook().getPublisher().getName());
   }
-
-  @Test
-  @SneakyThrows
-  @DisplayName("BookCopy: Unsuccessful creation when isbn does not exist.")
-  void testNewBookCopyIsNotCreatedWhenIsbnDoesNotExist() {
-    bookCopyRequest.setIsbn("RANDOM_ISBN");
-
-    var errorResponse =
-        postRequestAndExpectError(
-            BOOK_COPIES_ENDPOINT, objectMapper.writeValueAsString(bookCopyRequest), this.mockMvc);
-
-    assertEquals(BOOK_DOES_NOT_EXIST.getCode(), errorResponse.getCode());
-  }
-
-  @Test
-  @DisplayName("BookCopy: Unsuccessful creation when ISBN has incorrect format.")
-  void testBookCopyIsNotCreatedWhenIsbnHasIncorrectFormat(){}
-
-  @Test
-  @DisplayName("BookCopy: Unsuccessful creation when state is blank.")
-  void testBookCopyIsNotCreatedWhenStateIsBlank(){}
 }
