@@ -1,13 +1,19 @@
 package com.antelif.library.infrastructure.entity;
 
+import static com.antelif.library.domain.type.BookCopyStatus.AVAILABLE;
 import static com.antelif.library.domain.type.TransactionStatus.ACTIVE;
+import static com.antelif.library.domain.type.TransactionStatus.FINALIZED;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.EnumType.STRING;
 
 import com.antelif.library.domain.type.TransactionStatus;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,6 +38,7 @@ public class TransactionEntity {
 
   private Instant returnDate;
 
+  @Enumerated(STRING)
   private TransactionStatus status = ACTIVE;
 
   @ManyToOne
@@ -65,7 +72,56 @@ public class TransactionEntity {
     this.returnDate = calculateReturnDate(daysUntilReturn);
   }
 
+  /**
+   * Creates a list of TransactionItemEntity for each one of the book copies provided.
+   *
+   * @param bookCopies the list with the BookCopyEntity objects of the transaction to create
+   *     TransactionEntityItems for.
+   * @return a set of TransactionItemEntity objects, one for each book copy.
+   */
+  public Set<TransactionItemEntity> createTransactionItemsOfCopies(
+      List<BookCopyEntity> bookCopies) {
+    return bookCopies.stream()
+        .map(
+            bookCopy -> {
+              var transactionItem = new TransactionItemEntity();
+              transactionItem.setBookCopy(bookCopy);
+              return transactionItem;
+            })
+        .collect(Collectors.toSet());
+  }
+
   private Instant calculateReturnDate(int daysUntilReturn) {
     return Instant.now().plus(daysUntilReturn, DAYS).truncatedTo(DAYS);
+  }
+
+  /**
+   * Toggles book copy entity item statuses of this transaction.
+   *
+   * @param bookCopyIds the ids of the book copies to toggle status.
+   */
+  public void updateTransactionItems(List<Long> bookCopyIds) {
+    transactionItems.stream()
+        .map(TransactionItemEntity::getBookCopy)
+        .filter(bookCopy -> bookCopyIds.contains(bookCopy.getId()))
+        .forEach(BookCopyEntity::toggleStatus);
+  }
+
+  /**
+   * A transaction can be finalized if all book copies of this transaction are returned, aka
+   * AVAILABLE.
+   *
+   * @return true if a transaction is finalized.
+   */
+  public boolean canBeFinalized() {
+    return this.transactionItems.stream()
+        .map(TransactionItemEntity::getBookCopy)
+        .map(BookCopyEntity::getStatus)
+        .allMatch(status -> status.equals(AVAILABLE));
+  }
+
+  /** Sets the transaction status to 'FINALIZED' */
+  public void finalizeTransaction() {
+    this.status = FINALIZED;
   }
 }

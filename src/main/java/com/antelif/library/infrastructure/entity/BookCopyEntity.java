@@ -1,6 +1,7 @@
 package com.antelif.library.infrastructure.entity;
 
 import static com.antelif.library.domain.type.BookCopyStatus.AVAILABLE;
+import static com.antelif.library.domain.type.BookCopyStatus.LENT;
 import static com.antelif.library.domain.type.State.BAD;
 
 import com.antelif.library.domain.type.BookCopyStatus;
@@ -40,5 +41,10 @@ public class BookCopyEntity {
 
   public boolean isEligibleToLent() {
     return status.equals(AVAILABLE) && !state.equals(BAD);
+  }
+
+  /** Changes the lending status of the book. */
+  protected void toggleStatus() {
+    this.status = this.status.equals(AVAILABLE) ? LENT : AVAILABLE;
   }
 }

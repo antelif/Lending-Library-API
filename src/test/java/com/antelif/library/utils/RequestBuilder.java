@@ -1,6 +1,7 @@
 package com.antelif.library.utils;
 
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Constants.UPDATED;
 import static com.antelif.library.domain.common.Endpoints.AUTHORS_ENDPOINT;
 import static com.antelif.library.domain.common.Endpoints.BOOKS_ENDPOINT;
 import static com.antelif.library.domain.common.Endpoints.BOOK_COPIES_ENDPOINT;
@@ -8,8 +9,10 @@ import static com.antelif.library.domain.common.Endpoints.CUSTOMERS_ENDPOINT;
 import static com.antelif.library.domain.common.Endpoints.PERSONNEL_ENDPOINT;
 import static com.antelif.library.domain.common.Endpoints.PUBLISHERS_ENDPOINT;
 import static com.antelif.library.domain.common.Endpoints.TRANSACTIONS_ENDPOINT;
+import static com.github.dockerjava.zerodep.shaded.org.apache.commons.codec.CharEncoding.UTF_8;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -57,6 +60,8 @@ public class RequestBuilder {
    *      Finally, all GET methods call getRequest().
    * POST: Each method builds their needed request-body to include in request.
    *       Finally, all methods call postRequest().
+   * PATCH: Each method builds their needed request body ton include in request and provides an endpoint.
+   *        Finally, all methods call patchRequest()
    * ERROR: When asserting exception postRequestAndExpectError() and getRequestAndExpectError() are
    *        used so that the response can be mapped to an ErrorResponse without making such
    *        conversions in tests.
@@ -205,6 +210,39 @@ public class RequestBuilder {
         objectMapper.writeValueAsString(transactionMap.get(CREATED)), TransactionResponse.class);
   }
 
+  // PATCH
+  @SneakyThrows
+  public static List<TransactionResponse> patchTransactions(
+      String customerId, List<Long> bookCopyIds, MockMvc mockMvc) {
+    var transactionMap =
+        objectMapper.readValue(
+            patchRequest(
+                TRANSACTIONS_ENDPOINT + "/customer/" + customerId, bookCopyIds.toString(), mockMvc),
+            new TypeReference<Map<String, Object>>() {});
+
+    return objectMapper.readValue(
+        objectMapper.writeValueAsString(transactionMap.get(UPDATED)), new TypeReference<>() {});
+  }
+
+  @SneakyThrows
+  private static String patchRequest(String endpoint, String content, MockMvc mockMvc) {
+    var response =
+        mockMvc
+            .perform(
+                patch(endpoint)
+                    .characterEncoding(UTF_8)
+                    .contentType(APPLICATION_JSON)
+                    .content(content))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    var mapResponse = objectMapper.readValue(response, new TypeReference<>() {});
+    return objectMapper.writeValueAsString(mapResponse);
+  }
+
   // ERROR
   @SneakyThrows
   public static ErrorResponse postRequestAndExpectError(
@@ -215,5 +253,11 @@ public class RequestBuilder {
   @SneakyThrows
   public static ErrorResponse getRequestAndExpectError(String endpoint, MockMvc mockMvc) {
     return objectMapper.readValue(getRequest(endpoint, mockMvc), ErrorResponse.class);
+  }
+
+  @SneakyThrows
+  public static ErrorResponse patchRequestAndExpectError(
+      String endpoint, String content, MockMvc mockMvc) {
+    return objectMapper.readValue(patchRequest(endpoint, content, mockMvc), ErrorResponse.class);
   }
 }
