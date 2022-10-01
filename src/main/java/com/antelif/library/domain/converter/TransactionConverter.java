@@ -1,13 +1,10 @@
 package com.antelif.library.domain.converter;
 
-import static com.antelif.library.domain.type.BookCopyStatus.LENT;
-
 import com.antelif.library.domain.dto.request.TransactionRequest;
 import com.antelif.library.domain.dto.response.TransactionResponse;
 import com.antelif.library.domain.service.BookCopyService;
 import com.antelif.library.domain.service.CustomerService;
 import com.antelif.library.domain.service.PersonnelService;
-import com.antelif.library.domain.service.validation.TransactionValidationService;
 import com.antelif.library.infrastructure.entity.TransactionEntity;
 import com.antelif.library.infrastructure.entity.TransactionItemEntity;
 import java.util.stream.Collectors;
@@ -31,8 +28,6 @@ public class TransactionConverter
   private final PersonnelConverter personnelConverter;
   private final BookCopyConverter bookCopyConverter;
 
-  private final TransactionValidationService validationService;
-
   @Override
   public TransactionEntity convertFromRequestToEntity(TransactionRequest transactionRequest) {
     var transaction = modelMapper.map(transactionRequest, TransactionEntity.class);
@@ -41,23 +36,10 @@ public class TransactionConverter
     var personnel = personnelService.getPersonnelById(transactionRequest.getPersonnelId());
     var bookCopies = bookCopyService.getBookCopiesByBookCopyIds(transactionRequest.getCopyIds());
 
-    validationService.validate(customer, bookCopies);
-
-    var transactionItems =
-        bookCopies.stream()
-            .map(
-                bookCopy -> {
-                  var transactionItem = new TransactionItemEntity();
-                  bookCopy.setStatus(LENT);
-                  transactionItem.setBookCopy(bookCopy);
-                  return transactionItem;
-                })
-            .collect(Collectors.toSet());
-
     transaction.setCustomer(customer);
     transaction.setPersonnel(personnel);
     transaction.setDates(transactionRequest.getDaysUntilReturn());
-    transaction.addItems(transactionItems);
+    transaction.addItems(transaction.createTransactionItemsOfCopies(bookCopies));
 
     return transaction;
   }

@@ -1,5 +1,6 @@
 package com.antelif.library.controller.command;
 
+import static com.antelif.library.application.error.GenericError.BOOK_COPIES_NOT_IN_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.BOOK_COPY_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.BOOK_COPY_UNAVAILABLE;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_DOES_NOT_EXIST;
@@ -7,8 +8,10 @@ import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_FE
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_THE_BOOK;
 import static com.antelif.library.application.error.GenericError.PERSONNEL_DOES_NOT_EXIST;
 import static com.antelif.library.domain.common.Endpoints.TRANSACTIONS_ENDPOINT;
+import static com.antelif.library.domain.type.BookCopyStatus.AVAILABLE;
 import static com.antelif.library.domain.type.BookCopyStatus.LENT;
 import static com.antelif.library.domain.type.State.BAD;
+import static com.antelif.library.domain.type.TransactionStatus.FINALIZED;
 import static com.antelif.library.factory.AuthorFactory.createAuthorRequest;
 import static com.antelif.library.factory.BookCopyFactory.createBookCopyRequest;
 import static com.antelif.library.factory.BookFactory.createBookRequest;
@@ -18,6 +21,8 @@ import static com.antelif.library.factory.PersonnelFactory.createPersonnelReques
 import static com.antelif.library.factory.PublisherFactory.createPublisherRequest;
 import static com.antelif.library.factory.TransactionFactory.createTransactionRequest;
 import static com.antelif.library.factory.TransactionFactory.createTransactionResponse;
+import static com.antelif.library.utils.RequestBuilder.patchRequestAndExpectError;
+import static com.antelif.library.utils.RequestBuilder.patchTransactions;
 import static com.antelif.library.utils.RequestBuilder.postAuthor;
 import static com.antelif.library.utils.RequestBuilder.postBook;
 import static com.antelif.library.utils.RequestBuilder.postBookCopy;
@@ -30,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.antelif.library.domain.dto.request.TransactionRequest;
+import com.antelif.library.domain.dto.response.BookCopyResponse;
 import com.antelif.library.domain.dto.response.TransactionResponse;
 import com.antelif.library.integration.BaseIntegrationTest;
 import java.util.List;
@@ -38,10 +44,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+@DirtiesContext
 @DisplayName("Transactions command controller")
 class TransactionCommandControllerTest extends BaseIntegrationTest {
 
@@ -276,5 +284,46 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
             this.mockMvc);
 
     assertEquals(PERSONNEL_DOES_NOT_EXIST.getCode(), transactionResponse.getCode());
+  }
+
+  @Test
+  @SneakyThrows
+  @DisplayName("Transaction: Successful update of transaction")
+  void testSuccessfulUpdateOfTransaction() {
+    var transactionResponse = postTransaction(transactionRequest, this.mockMvc);
+
+    var customerId = transactionResponse.getCustomer().getId();
+    var bookCopyIds = transactionResponse.getBooks().stream().map(BookCopyResponse::getId).toList();
+
+    var updatedTransactions =
+        patchTransactions(String.valueOf(customerId), bookCopyIds, this.mockMvc);
+
+    assertEquals(1, updatedTransactions.size());
+
+    var updatedTransaction = updatedTransactions.get(0);
+    assertEquals(FINALIZED, updatedTransaction.getStatus());
+
+    assertEquals(1, updatedTransaction.getBooks().size());
+    var bookCopy = updatedTransaction.getBooks().stream().findAny().get();
+    assertEquals(AVAILABLE, bookCopy.getStatus());
+  }
+
+  @Test
+  @SneakyThrows
+  @DisplayName(
+      "Transaction: Unsuccessful update when book copies do not exist in active transaction")
+  void testUnsuccessfulUpdateWhenBookCopyIdsDoNotExistInTransaction() {
+    var transactionResponse = postTransaction(transactionRequest, this.mockMvc);
+
+    var customerId = transactionResponse.getCustomer().getId();
+    var bookCopyIds = List.of(9999L);
+
+    var errorResponse =
+        patchRequestAndExpectError(
+            TRANSACTIONS_ENDPOINT + "/customer/" + customerId,
+            objectMapper.writeValueAsString(bookCopyIds),
+            this.mockMvc);
+
+    assertEquals(BOOK_COPIES_NOT_IN_TRANSACTION.getCode(), errorResponse.getCode());
   }
 }

@@ -1,9 +1,12 @@
 package com.antelif.library.domain.service.validation;
 
+import static com.antelif.library.application.error.GenericError.BOOK_COPIES_NOT_IN_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.BOOK_COPY_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.BOOK_COPY_UNAVAILABLE;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_FEE;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_THE_BOOK;
+import static com.antelif.library.application.error.GenericError.INCORRECT_BOOK_COPY_STATUS;
+import static com.antelif.library.domain.type.BookCopyStatus.LENT;
 import static com.antelif.library.domain.type.TransactionStatus.ACTIVE;
 
 import com.antelif.library.domain.exception.UnsuccessfulTransactionException;
@@ -15,21 +18,24 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /** Transaction validation service. */
 @Component
-@RequiredArgsConstructor
-public class TransactionValidationService {
+public final class TransactionValidationService {
 
   /**
    * Contains all validation for new transactions.
    *
-   * @param customer the customer of the transaction,
-   * @param bookCopies the book copies that will be lent in this transaction.
+   * @param transaction the transaction to validate.
    */
-  public void validate(CustomerEntity customer, List<BookCopyEntity> bookCopies) {
+  public static void validateCreation(TransactionEntity transaction) {
+
+    var bookCopies =
+        transaction.getTransactionItems().stream()
+            .map(TransactionItemEntity::getBookCopy)
+            .collect(Collectors.toList());
+    var customer = transaction.getCustomer();
 
     validateBookCopiesRetrieved(bookCopies);
     validateCustomerHasPendingFee(customer);
@@ -37,20 +43,71 @@ public class TransactionValidationService {
     validateCopyIsNotEligibleForLending(bookCopies);
   }
 
-  private void validateBookCopiesRetrieved(List<BookCopyEntity> bookCopies) {
+  /**
+   * Contains all validations for transactions to be updated.
+   *
+   * @param transactions a list of TransactionEntity items with information about transactions to be
+   *     updated,
+   * @param bookCopyIdsReturned a list of book copy ids to be returned.
+   */
+  public static void validateUpdate(
+      List<TransactionEntity> transactions, List<Long> bookCopyIdsReturned) {
+
+    validateBookCopiesToReturnExistInTransaction(transactions, bookCopyIdsReturned);
+    validateBookCopiesToReturnAreLent(transactions, bookCopyIdsReturned);
+  }
+
+  /**
+   * Throws an exception if there are books copies to return that do not exist in customer's active
+   * transactions.
+   */
+  private static void validateBookCopiesToReturnExistInTransaction(
+      List<TransactionEntity> transactions, List<Long> bookCopyIdsReturned) {
+    var bookCopyIdsInTransactions =
+        transactions.stream()
+            .map(TransactionEntity::getTransactionItems)
+            .flatMap(Collection::stream)
+            .map(TransactionItemEntity::getBookCopy)
+            .map(BookCopyEntity::getId)
+            .toList();
+
+    if (bookCopyIdsReturned.stream().anyMatch(id -> !bookCopyIdsInTransactions.contains(id))) {
+      throw new UnsuccessfulTransactionException(BOOK_COPIES_NOT_IN_TRANSACTION);
+    }
+  }
+  /** Throws an exception if book copy id to return is not of status 'LENT' in transaction. */
+  private static void validateBookCopiesToReturnAreLent(
+      List<TransactionEntity> transactions, List<Long> bookCopyIdsReturned) {
+
+    var availableBookCopies =
+        transactions.stream()
+            .map(TransactionEntity::getTransactionItems)
+            .flatMap(Collection::stream)
+            .map(TransactionItemEntity::getBookCopy)
+            .filter(
+                bookCopy ->
+                    bookCopyIdsReturned.contains(bookCopy.getId())
+                        && !bookCopy.getStatus().equals(LENT))
+            .collect(Collectors.toSet());
+    if (0 < availableBookCopies.size()) {
+      throw new UnsuccessfulTransactionException(INCORRECT_BOOK_COPY_STATUS);
+    }
+  }
+
+  private static void validateBookCopiesRetrieved(List<BookCopyEntity> bookCopies) {
     if (bookCopies.isEmpty()) {
       throw new UnsuccessfulTransactionException(BOOK_COPY_DOES_NOT_EXIST);
     }
   }
 
-  private void validateCustomerHasPendingFee(CustomerEntity customer) {
+  private static void validateCustomerHasPendingFee(CustomerEntity customer) {
 
     if (customer.getFee() > 0) {
       throw new UnsuccessfulTransactionException(CUSTOMER_HAS_FEE);
     }
   }
 
-  private void validateCustomerHasThisBook(
+  private static void validateCustomerHasThisBook(
       CustomerEntity customer, List<BookCopyEntity> bookCopies) {
     var bookCopyIds =
         Stream.of(bookCopies)
@@ -72,9 +129,11 @@ public class TransactionValidationService {
     }
   }
 
-  private void validateCopyIsNotEligibleForLending(List<BookCopyEntity> bookCopies) {
+  private static void validateCopyIsNotEligibleForLending(List<BookCopyEntity> bookCopies) {
     if (bookCopies.stream().anyMatch(bookCopy -> !bookCopy.isEligibleToLent())) {
       throw new UnsuccessfulTransactionException(BOOK_COPY_UNAVAILABLE);
     }
   }
+
+  private TransactionValidationService() {}
 }
