@@ -44,7 +44,7 @@ public class BookCopyEntity {
   }
 
   /** Changes the lending status of the book. */
-  public void toggleStatus() {
+  protected void toggleStatus() {
     this.status = this.status.equals(AVAILABLE) ? LENT : AVAILABLE;
   }
 }

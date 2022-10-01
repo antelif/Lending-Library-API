@@ -9,9 +9,7 @@ import com.antelif.library.domain.converter.TransactionConverter;
 import com.antelif.library.domain.dto.request.TransactionRequest;
 import com.antelif.library.domain.dto.response.TransactionResponse;
 import com.antelif.library.domain.exception.EntityCreationException;
-import com.antelif.library.infrastructure.entity.BookCopyEntity;
 import com.antelif.library.infrastructure.entity.TransactionEntity;
-import com.antelif.library.infrastructure.entity.TransactionItemEntity;
 import com.antelif.library.infrastructure.repository.TransactionRepository;
 import java.util.List;
 import java.util.Optional;
@@ -40,10 +38,8 @@ public class TransactionService {
 
     validateCreation(transactionEntity);
 
-    // Change all book copy statuses to lent.
-    transactionEntity.getTransactionItems().stream()
-        .map(TransactionItemEntity::getBookCopy)
-        .forEach(BookCopyEntity::toggleStatus);
+    // Change all book copy statuses to lend.
+    transactionEntity.updateTransactionItems(transactionRequest.getCopyIds());
 
     return Optional.of(transactionEntity)
         .map(transactionRepository::save)
