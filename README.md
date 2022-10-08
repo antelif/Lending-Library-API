@@ -565,8 +565,8 @@ When returning book by sending a patch transaction:
 
 ___
 
-1. (2022-10-08) Customer cannot borrow a book copy that is contained in an active transaction, event
-   though thy have returned it.
+1. ~~(2022-10-08) Customer cannot borrow a book copy that is contained in an active transaction, event
+   though thy have returned it.~~
 2. (2022-10-08) Customer can borrow more than one copies of the same book in the same transaction.
 
 ## Ideas for the future.
