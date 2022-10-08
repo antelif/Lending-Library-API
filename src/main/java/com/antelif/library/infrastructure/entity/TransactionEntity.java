@@ -2,6 +2,7 @@ package com.antelif.library.infrastructure.entity;
 
 import static com.antelif.library.domain.type.BookCopyStatus.AVAILABLE;
 import static com.antelif.library.domain.type.TransactionStatus.ACTIVE;
+import static com.antelif.library.domain.type.TransactionStatus.CANCELLED;
 import static com.antelif.library.domain.type.TransactionStatus.FINALIZED;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static javax.persistence.CascadeType.ALL;
@@ -123,5 +124,16 @@ public class TransactionEntity {
   /** Sets the transaction status to 'FINALIZED' */
   public void finalizeTransaction() {
     this.status = FINALIZED;
+  }
+
+  /**
+   * Cancels a transaction by setting the transaction status to 'CANCELLED' and toggling each status
+   * of book copies in transaction back to AVAILABLE.
+   */
+  public void cancelTransaction() {
+    this.status = CANCELLED;
+    this.transactionItems.stream()
+        .map(TransactionItemEntity::getBookCopy)
+        .forEach(BookCopyEntity::toggleStatus);
   }
 }

@@ -1,6 +1,7 @@
 package com.antelif.library.application.controller.command;
 
 import static com.antelif.library.domain.common.Constants.CREATED;
+import static com.antelif.library.domain.common.Constants.CANCELLED;
 import static com.antelif.library.domain.common.Constants.UPDATED;
 import static com.antelif.library.domain.common.ControllerTags.TRANSACTION_CONTROLLER;
 import static com.antelif.library.domain.common.Endpoints.TRANSACTIONS_ENDPOINT;
@@ -63,5 +64,19 @@ public class TransactionCommandController {
 
     return ResponseEntity.ok(
         Map.of(UPDATED, transactionService.updateTransactions(bookCopyIds, customerId)));
+  }
+
+  /**
+   * Cancels a transaction.
+   *
+   * @param transactionId the id of the transaction to cancel.
+   * @return the canceled transaction.
+   */
+  @PatchMapping("/cancel/{id}")
+  public ResponseEntity<Map<String, TransactionResponse>> cancelTransaction(
+      @PathVariable("id") Long transactionId) {
+    log.info("received request to cancel transaction {}", transactionId);
+
+    return ResponseEntity.ok(Map.of(CANCELLED, transactionService.cancelTransaction(transactionId)));
   }
 }

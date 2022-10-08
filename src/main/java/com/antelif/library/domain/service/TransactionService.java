@@ -1,6 +1,8 @@
 package com.antelif.library.domain.service;
 
 import static com.antelif.library.application.error.GenericError.TRANSACTION_CREATION_FAILED;
+import static com.antelif.library.application.error.GenericError.TRANSACTION_DOES_NOT_EXIST;
+import static com.antelif.library.domain.service.validation.TransactionValidationService.validateCancel;
 import static com.antelif.library.domain.service.validation.TransactionValidationService.validateCreation;
 import static com.antelif.library.domain.service.validation.TransactionValidationService.validateUpdate;
 import static com.antelif.library.domain.type.TransactionStatus.ACTIVE;
@@ -9,6 +11,7 @@ import com.antelif.library.domain.converter.TransactionConverter;
 import com.antelif.library.domain.dto.request.TransactionRequest;
 import com.antelif.library.domain.dto.response.TransactionResponse;
 import com.antelif.library.domain.exception.EntityCreationException;
+import com.antelif.library.domain.exception.EntityDoesNotExistException;
 import com.antelif.library.infrastructure.entity.TransactionEntity;
 import com.antelif.library.infrastructure.repository.TransactionRepository;
 import java.util.List;
@@ -73,5 +76,19 @@ public class TransactionService {
     return transactionsToUpdate.stream()
         .map(transactionConverter::convertFromEntityToResponse)
         .collect(Collectors.toList());
+  }
+
+  public TransactionResponse cancelTransaction(Long transactionId) {
+    var persistedTransaction = transactionRepository.findById(transactionId);
+
+    if (persistedTransaction.isEmpty()) {
+      throw new EntityDoesNotExistException(TRANSACTION_DOES_NOT_EXIST);
+    }
+
+    validateCancel(persistedTransaction.get());
+
+    persistedTransaction.ifPresent(TransactionEntity::cancelTransaction);
+
+    return transactionConverter.convertFromEntityToResponse(persistedTransaction.get());
   }
 }

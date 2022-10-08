@@ -1,5 +1,6 @@
 package com.antelif.library.utils;
 
+import static com.antelif.library.domain.common.Constants.CANCELLED;
 import static com.antelif.library.domain.common.Constants.CREATED;
 import static com.antelif.library.domain.common.Constants.UPDATED;
 import static com.antelif.library.domain.common.Endpoints.AUTHORS_ENDPOINT;
@@ -213,7 +214,7 @@ public class RequestBuilder {
   // PATCH
   @SneakyThrows
   public static List<TransactionResponse> patchTransactions(
-      String customerId, List<Long> bookCopyIds, MockMvc mockMvc) {
+      Long customerId, List<Long> bookCopyIds, MockMvc mockMvc) {
     var transactionMap =
         objectMapper.readValue(
             patchRequest(
@@ -222,6 +223,25 @@ public class RequestBuilder {
 
     return objectMapper.readValue(
         objectMapper.writeValueAsString(transactionMap.get(UPDATED)), new TypeReference<>() {});
+  }
+
+  @SneakyThrows
+  public static TransactionResponse cancelTransaction(Long transactionId, MockMvc mockMvc) {
+
+    var response =
+        mockMvc
+            .perform(patch(TRANSACTIONS_ENDPOINT + "/cancel/" + transactionId))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    var transactionMap =
+        objectMapper.readValue(response, new TypeReference<Map<String, Object>>() {});
+
+    return objectMapper.readValue(
+        objectMapper.writeValueAsString(transactionMap.get(CANCELLED)), new TypeReference<>() {});
   }
 
   @SneakyThrows
@@ -253,6 +273,20 @@ public class RequestBuilder {
   @SneakyThrows
   public static ErrorResponse getRequestAndExpectError(String endpoint, MockMvc mockMvc) {
     return objectMapper.readValue(getRequest(endpoint, mockMvc), ErrorResponse.class);
+  }
+
+  @SneakyThrows
+  public static ErrorResponse cancelRequestAndExpectError(Long transactionId, MockMvc mockMvc) {
+    var response =
+        mockMvc
+            .perform(patch(TRANSACTIONS_ENDPOINT + "/cancel/" + transactionId))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    return objectMapper.readValue(response, ErrorResponse.class);
   }
 
   @SneakyThrows

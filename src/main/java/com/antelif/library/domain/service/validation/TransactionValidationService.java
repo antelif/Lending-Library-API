@@ -3,11 +3,14 @@ package com.antelif.library.domain.service.validation;
 import static com.antelif.library.application.error.GenericError.BOOK_COPIES_NOT_IN_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.BOOK_COPY_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.BOOK_COPY_UNAVAILABLE;
+import static com.antelif.library.application.error.GenericError.CANNOT_CANCEL_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_FEE;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_THE_BOOK;
 import static com.antelif.library.application.error.GenericError.INCORRECT_BOOK_COPY_STATUS;
+import static com.antelif.library.domain.type.BookCopyStatus.AVAILABLE;
 import static com.antelif.library.domain.type.BookCopyStatus.LENT;
 import static com.antelif.library.domain.type.TransactionStatus.ACTIVE;
+import static com.antelif.library.domain.type.TransactionStatus.FINALIZED;
 
 import com.antelif.library.domain.exception.UnsuccessfulTransactionException;
 import com.antelif.library.infrastructure.entity.BookCopyEntity;
@@ -55,6 +58,31 @@ public final class TransactionValidationService {
 
     validateBookCopiesToReturnExistInTransaction(transactions, bookCopyIdsReturned);
     validateBookCopiesToReturnAreLent(transactions, bookCopyIdsReturned);
+  }
+
+  /**
+   * Throws an exception if the transaction provided to cancel has been finalized.
+   *
+   * @param transaction the transaction to cancel.
+   */
+  public static void validateCancel(TransactionEntity transaction) {
+    validateTransactionIsFinalized(transaction);
+    validateTransactionIsPartiallyUpdated(transaction);
+  }
+
+  private static void validateTransactionIsFinalized(TransactionEntity transaction) {
+    if (transaction.getStatus().equals(FINALIZED)) {
+      throw new UnsuccessfulTransactionException(CANNOT_CANCEL_TRANSACTION);
+    }
+  }
+
+  private static void validateTransactionIsPartiallyUpdated(TransactionEntity transaction) {
+    if (transaction.getTransactionItems().stream()
+        .map(TransactionItemEntity::getBookCopy)
+        .map(BookCopyEntity::getStatus)
+        .anyMatch(status -> status.equals(AVAILABLE))) {
+      throw new UnsuccessfulTransactionException(CANNOT_CANCEL_TRANSACTION);
+    }
   }
 
   /**

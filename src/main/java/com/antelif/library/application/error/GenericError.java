@@ -30,8 +30,10 @@ public enum GenericError {
   BOOK_COPY_UNAVAILABLE(28, "Copy is not eligible for lending due to bad state or unavailability"),
 
   TRANSACTION_CREATION_FAILED(27, "Could not create new transaction."),
+  TRANSACTION_DOES_NOT_EXIST(33, "Transaction does not exist"),
   BOOK_COPIES_NOT_IN_TRANSACTION(31, "Some book copies do not belong to customer's transactions"),
   INCORRECT_BOOK_COPY_STATUS(32, "Some book copies to return have incorrect status"),
+  CANNOT_CANCEL_TRANSACTION(33, "Cannot cancel finalized transaction."),
 
   CUSTOMER_HAS_FEE(28, "Customer has pending fee."),
   CUSTOMER_HAS_THE_BOOK(29, "Customer has already this book."),
