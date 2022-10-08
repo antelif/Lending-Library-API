@@ -65,7 +65,7 @@ public class PublisherQueryControllerTest extends BaseIntegrationTest {
   @Test
   @DisplayName("Publisher: Exception is thrown when retrieving a publisher that does not exist.")
   @SneakyThrows
-  void testExceptionIsThrownWhenBookDoesNotExist() {
+  void testExceptionIsThrownWhenPublisherDoesNotExist() {
 
     var inexistentPublisherId = 9999L;
 
