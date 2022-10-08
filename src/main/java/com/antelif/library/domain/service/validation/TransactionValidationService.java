@@ -149,10 +149,11 @@ public final class TransactionValidationService {
         Stream.of(customer)
             .map(CustomerEntity::getTransactions)
             .flatMap(Collection::stream)
-            .filter(t -> t.getStatus().equals(ACTIVE))
+            .filter(transaction -> transaction.getStatus().equals(ACTIVE))
             .map(TransactionEntity::getTransactionItems)
             .flatMap(Collection::stream)
             .map(TransactionItemEntity::getBookCopy)
+            .filter(bookCopy -> bookCopy.getStatus().equals(LENT))
             .map(BookCopyEntity::getId)
             .collect(Collectors.toSet());
     if (bookCopyIds.stream().anyMatch(customerBookCopyIds::contains)) {
