@@ -491,7 +491,7 @@ ___
     - All book copies provided should exist in database.
     - Customer should not have a pending fee (at this point such functionality is not yet
       implemented and all customers have 0 fee.)
-    - Customer cannot borrow the same book when he haas previously lent this book and has not
+    - Customer cannot borrow the same book when he haas previously borrowed this book and has not
       returned it yet - (See `Known Issues` 1).
     - Customer cannot borrow a book of state `BAD`.
     - Customer cannot borrow the same book twice in the same transaction - (See `Known Issues` 2).
@@ -501,8 +501,8 @@ ___
 
 When returning book by sending a patch transaction:
 
-- Book copies provided should exist in an "ACTIVE" transactions of the customer.
-- Book copies should have status "LENT" in order to be returned.
+- Book copies provided should exist in an `ACTIVE` transactions of the customer.
+- Book copies should have status `LENT` in order to be returned.
 
 #### Transaction Cancellation
 
@@ -514,26 +514,26 @@ When returning book by sending a patch transaction:
 
 ### Validations for request bodies:
 
-1. <b>Create new author:
+1. <b>Create new author:</b>
     ```
     name: String - not blank - max 50 characters
     middleName: String - not required - max 50 characters
     surname: String - not blank - max 50 characters
     ```
-2. Create new book copy
+2. <b>Create new book copy:<b/>
     ```
     isbn: String - not blank :light_bulb_on: to be added ISB validation
     state: String - not null - available values: [NEW,  GOOD, BAD]
     status: String - available values [AVAILABLE, LENT], if value is not provided ‘AVAILABLE’ is default.
     ```
-3. Create a new book
+3. <b>Create a new book:</b>
     ```
     title: String - not blank - max 50 characters
     isbn: String - not blank :light_bulb_on: to be added ISB validation
     authorId: Long - not null
     publisherId: Long - not null
     ```
-4. Create a new customer
+4. <b>Create a new customer:</b>
     ```
     name: String - not blank - max 50 characters
     surname: String - not blank - max 50 characters
@@ -541,18 +541,18 @@ When returning book by sending a patch transaction:
     email: String - must be of email format somethin@something.com
     fee: double, by default 0.
     ```
-5. Create new personnel
+5. <b>Create new personnel:</b>
     ```
     username: String - not blank - max 20 characters
     password: String - not null
     ```
 
-6. Create new publisher
+6. <b>Create new publisher:</b>
     ```
     name: String - not null
     ```
 
-7. Create new transaction
+7. <b>Create new transaction:</b>
    ```
    daysUntilReturn: Integer between 1 and 7, if not provided 5 is default.
    customerId: Long -not null
