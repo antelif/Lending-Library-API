@@ -37,7 +37,7 @@ public enum GenericError {
   CANNOT_CANCEL_PARTIALLY_UPDATED_TRANSACTION(
       34, "Cannot cancel transaction that has books returned. Return all books to finalize."),
   DUPLICATE_BOOKS_IN_TRANSACTION(
-      35, "transaction cannot contains more than one books with the same ISBN."),
+      35, "Transaction cannot contain more than one books with the same ISBN."),
 
   CUSTOMER_HAS_FEE(28, "Customer has pending fee."),
   CUSTOMER_HAS_THE_BOOK(29, "Customer has already this book."),
