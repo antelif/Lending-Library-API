@@ -97,6 +97,18 @@ public class RequestBuilder {
         getRequest(BOOKS_ENDPOINT + "/" + id, mockMvc), BookResponse.class);
   }
 
+  @SneakyThrows
+  public static List<PublisherResponse> getPublishers(MockMvc mockMvc) {
+    return objectMapper.readValue(
+        getRequest(PUBLISHERS_ENDPOINT, mockMvc), new TypeReference<>() {});
+  }
+
+  @SneakyThrows
+  public static PublisherResponse getPublisherById(Long id, MockMvc mockMvc) {
+    return objectMapper.readValue(
+        getRequest(PUBLISHERS_ENDPOINT + "/" + id, mockMvc), PublisherResponse.class);
+  }
+
   // POST
   @SneakyThrows
   private static String postRequest(String endpoint, String content, MockMvc mockMvc) {
