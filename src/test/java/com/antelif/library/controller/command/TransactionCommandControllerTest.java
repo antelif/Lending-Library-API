@@ -8,6 +8,7 @@ import static com.antelif.library.application.error.GenericError.CANNOT_CANCEL_P
 import static com.antelif.library.application.error.GenericError.CUSTOMER_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_FEE;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_THE_BOOK;
+import static com.antelif.library.application.error.GenericError.DUPLICATE_BOOKS_IN_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.PERSONNEL_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.TRANSACTION_DOES_NOT_EXIST;
 import static com.antelif.library.domain.common.Endpoints.TRANSACTIONS_ENDPOINT;
@@ -168,6 +169,26 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
     assertEquals(
         expectedCopy.getBook().getAuthor().getSurname(),
         actualCopy.getBook().getAuthor().getSurname());
+  }
+
+  @Test
+  @SneakyThrows
+  @DisplayName("Transaction: Unsuccessful creation when customer has fee pending.")
+  void testTransactionFailsWhenCustomerBorrowsSameBookInOneTransaction() {
+
+    // Create another book copy for the book of the transaction.
+    var secondBookCopyRequest = createBookCopyRequest(isbn);
+    var secondBookCopyResponse = postBookCopy(secondBookCopyRequest, this.mockMvc);
+
+    // Add the second book copy to transaction request.
+    var bookCopyIds =
+        List.of(transactionRequest.getCopyIds().get(0), secondBookCopyResponse.getId());
+    transactionRequest.setCopyIds(bookCopyIds);
+
+    var transactionMapResponse =
+        postRequestAndExpectError(
+            TRANSACTIONS_ENDPOINT, objectMapper.writeValueAsString(transactionRequest), mockMvc);
+    assertEquals(DUPLICATE_BOOKS_IN_TRANSACTION.getCode(), transactionMapResponse.getCode());
   }
 
   @Test
@@ -375,23 +396,42 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   @DisplayName("Transaction: Unsuccessful cancellation when some books are already returned.")
   void testUnsuccessfulTransactionCancellationWhenPartiallyReturned() {
 
-    // Create additional book copy.
+    // Increase counters to create new book.
+    bookCounter++;
+    publisherCounter++;
+    authorCounter++;
+
+    // Create new book.
+    var secondAuthorRequest = createAuthorRequest(authorCounter);
+    var secondAuthorResponse = postAuthor(secondAuthorRequest, this.mockMvc);
+
+    var secondPublisherRequest = createPublisherRequest(publisherCounter);
+    var secondPublisherResponse = postPublisher(secondPublisherRequest, this.mockMvc);
+
+    var secondBookRequest =
+        createBookRequest(
+            bookCounter, secondAuthorResponse.getId(), secondPublisherResponse.getId());
+
+    var secondBookResponse = postBook(secondBookRequest, this.mockMvc);
+    isbn = secondBookResponse.getIsbn();
+
+    // Create book copy for the new book.
     var secondBookCopyRequest = createBookCopyRequest(isbn);
     var secondBookCopyResponse = postBookCopy(secondBookCopyRequest, this.mockMvc);
 
     var copyIds = List.of(transactionRequest.getCopyIds().get(0), secondBookCopyResponse.getId());
 
-    // Add the book copy to new transaction.
+    // Add the new book copy to new transaction.
     transactionRequest.setCopyIds(new ArrayList<>(copyIds));
     transactionRequest.getCopyIds().add(secondBookCopyResponse.getId());
 
     var transactionResponse = postTransaction(transactionRequest, this.mockMvc);
 
-    // Return second book copy.
+    // Return the new book copy.
     patchTransactions(
         transactionRequest.getCustomerId(), List.of(secondBookCopyResponse.getId()), this.mockMvc);
 
-    // try to cancel transaction when one book is already returned.
+    // Try to cancel transaction when the new book is already returned.
     var result = cancelTransactionAndExpectError(transactionResponse.getId(), this.mockMvc);
 
     assertEquals(CANNOT_CANCEL_PARTIALLY_UPDATED_TRANSACTION.getCode(), result.getCode());
