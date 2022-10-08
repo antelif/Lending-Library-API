@@ -14,7 +14,6 @@ public class BookCopyFactory {
     var bookCopy = new BookCopyRequest();
     bookCopy.setIsbn(isbn);
     bookCopy.setState(NEW);
-    bookCopy.setStatus(AVAILABLE);
     return bookCopy;
   }
 

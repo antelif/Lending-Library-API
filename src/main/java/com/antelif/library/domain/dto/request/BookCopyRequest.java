@@ -1,8 +1,5 @@
 package com.antelif.library.domain.dto.request;
 
-import static com.antelif.library.domain.type.BookCopyStatus.AVAILABLE;
-
-import com.antelif.library.domain.type.BookCopyStatus;
 import com.antelif.library.domain.type.State;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -22,6 +19,4 @@ public class BookCopyRequest {
 
   @NotNull(message = "Book copy state cannot be blank.")
   private State state;
-
-  private BookCopyStatus status = AVAILABLE;
 }

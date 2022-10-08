@@ -37,7 +37,7 @@ public class BookCopyEntity {
   private State state;
 
   @Enumerated(value = EnumType.STRING)
-  private BookCopyStatus status;
+  private BookCopyStatus status = AVAILABLE;
 
   public boolean isEligibleToLent() {
     return status.equals(AVAILABLE) && !state.equals(BAD);

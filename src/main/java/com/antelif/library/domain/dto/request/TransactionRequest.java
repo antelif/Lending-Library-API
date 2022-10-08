@@ -1,8 +1,5 @@
 package com.antelif.library.domain.dto.request;
 
-import static com.antelif.library.domain.type.TransactionStatus.ACTIVE;
-
-import com.antelif.library.domain.type.TransactionStatus;
 import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -25,8 +22,6 @@ public class TransactionRequest {
 
   @NotNull(message = "Personnel id should not be blank.")
   private Long personnelId;
-
-  private TransactionStatus status = ACTIVE;
 
   @NotEmpty(message = "Transaction should contain book copy ids.")
   private List<Long> copyIds;

@@ -6,21 +6,18 @@ import static com.antelif.library.application.error.GenericError.BOOK_COPY_UNAVA
 import static com.antelif.library.application.error.GenericError.CANNOT_CANCEL_FINALIZED_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.CANNOT_CANCEL_PARTIALLY_UPDATED_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_DOES_NOT_EXIST;
-import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_FEE;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_THE_BOOK;
 import static com.antelif.library.application.error.GenericError.DUPLICATE_BOOKS_IN_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.PERSONNEL_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.TRANSACTION_DOES_NOT_EXIST;
 import static com.antelif.library.domain.common.Endpoints.TRANSACTIONS_ENDPOINT;
 import static com.antelif.library.domain.type.BookCopyStatus.AVAILABLE;
-import static com.antelif.library.domain.type.BookCopyStatus.LENT;
 import static com.antelif.library.domain.type.State.BAD;
 import static com.antelif.library.domain.type.TransactionStatus.FINALIZED;
 import static com.antelif.library.factory.AuthorFactory.createAuthorRequest;
 import static com.antelif.library.factory.BookCopyFactory.createBookCopyRequest;
 import static com.antelif.library.factory.BookFactory.createBookRequest;
 import static com.antelif.library.factory.CustomerFactory.createCustomerRequest;
-import static com.antelif.library.factory.CustomerFactory.createCustomerRequestWithFee;
 import static com.antelif.library.factory.PersonnelFactory.createPersonnelRequest;
 import static com.antelif.library.factory.PublisherFactory.createPublisherRequest;
 import static com.antelif.library.factory.TransactionFactory.createTransactionRequest;
@@ -193,23 +190,6 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
 
   @Test
   @SneakyThrows
-  @DisplayName("Transaction: Unsuccessful creation when customer has fee pending.")
-  void testTransactionFailsWhenCustomerHasFee() {
-
-    customerCounter++;
-    var customerRequest = createCustomerRequestWithFee(customerCounter);
-    var customerResponse = postCustomer(customerRequest, this.mockMvc);
-
-    transactionRequest.setCustomerId(customerResponse.getId());
-
-    var transactionMapResponse =
-        postRequestAndExpectError(
-            TRANSACTIONS_ENDPOINT, objectMapper.writeValueAsString(transactionRequest), mockMvc);
-    assertEquals(CUSTOMER_HAS_FEE.getCode(), transactionMapResponse.getCode());
-  }
-
-  @Test
-  @SneakyThrows
   @DisplayName(
       "Transaction: Unsuccessful creation when customer has borrowed this title and has active transaction.")
   void testTransactionFailsWhenCustomerHasLentThisBook() {
@@ -250,12 +230,15 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   @DisplayName("Transaction: Unsuccessful creation when copy status is lent.")
   void testTransactionFailsWhenBookStatusIsLent() {
 
-    var bookCopyRequest = createBookCopyRequest(isbn);
-    bookCopyRequest.setStatus(LENT);
+    // A user lends the book.
+    postTransaction(transactionRequest, this.mockMvc);
 
-    var bookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
+    // When another user tries to lend same book they fail.
+    customerCounter++;
+    var newCustomer = createCustomerRequest(customerCounter);
+    var newCustomerId = postCustomer(newCustomer, this.mockMvc).getId();
 
-    transactionRequest.setCopyIds(List.of(bookCopyResponse.getId()));
+    transactionRequest.setCustomerId(newCustomerId);
 
     var transactionResponse =
         postRequestAndExpectError(
