@@ -66,7 +66,7 @@ interest for each operation.
 
 In order to be able to create new transactions: lending books, return books etc. you will need to
 initialize the database with some data.
-At this point there is no script to auto-load data, however it will be implemented in the future.
+At this point there is no script to preload data, however it will be implemented in the future.
 
 You can manually persist entities in the database following next steps. To properly initialize your
 data you need to:
@@ -100,7 +100,7 @@ data you need to:
         "surname": "string"
     }
     ```
-   This `id` is referred as `authorId` in this document and it will be needed to create new books.
+   This `id` is referred as `authorId` in this document, and it will be needed to create new books.
 
 ### Publisher
 
@@ -119,7 +119,7 @@ data you need to:
        "name": "string"
    }
    ```
-   This `id` is referred as `publisherId` in this document and it will be needed to create new
+   This `id` is referred as `publisherId` in this document, and it will be needed to create new
    books.
 
 ### Book:
@@ -242,7 +242,7 @@ following steps shown above to add an author and a publisher you can create a ne
        "status": "AVAILABLE"
    }
    ```
-   This `id` is referred as `bookCopyId` or `copyId` in this document and it will be needed to
+   This `id` is referred as `bookCopyId` or `copyId` in this document, and it will be needed to
    create new transactions.
 
 ### Personnel
@@ -262,7 +262,7 @@ following steps shown above to add an author and a publisher you can create a ne
        "name": "string"
    }
    ```
-   This `id` is referred as `personnel` in this document and it will be needed to create new
+   This `id` is referred as `personnel` in this document, and it will be needed to create new
    transactions.
 
 ### Customer
@@ -291,7 +291,7 @@ following steps shown above to add an author and a publisher you can create a ne
    }
    ```
 
-This `id` is referred as `customerId` in this document and it will be needed to create and update
+This `id` is referred as `customerId` in this document, and it will be needed to create and update
 new transactions.
 
 ### Transaction:
@@ -316,7 +316,7 @@ copy for this book, and have created a customer and a personnel.
    ```
     - `daysUntilReturn` is optional, if not provided it is set to `5`.
     - `status` is optional. if not provided it is set to `ACTIVE`.
-      This `id` is referred as `transactionId` in this document and it will be needed to update and
+      This `id` is referred as `transactionId` in this document, and it will be needed to update and
       finalize the transaction.
 
    <b>Expected response:</b>
@@ -567,7 +567,7 @@ ___
 
 1. ~~(2022-10-08) Customer cannot borrow a book copy that is contained in an active transaction, event
    though thy have returned it.~~
-2. (2022-10-08) Customer can borrow more than one copies of the same book in the same transaction.
+2. ~~(2022-10-08) Customer can borrow more than one copies of the same book in the same transaction.~~
 
 ## Ideas for the future.
 

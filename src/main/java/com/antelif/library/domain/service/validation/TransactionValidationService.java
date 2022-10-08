@@ -7,6 +7,7 @@ import static com.antelif.library.application.error.GenericError.CANNOT_CANCEL_F
 import static com.antelif.library.application.error.GenericError.CANNOT_CANCEL_PARTIALLY_UPDATED_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_FEE;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_THE_BOOK;
+import static com.antelif.library.application.error.GenericError.DUPLICATE_BOOKS_IN_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.INCORRECT_BOOK_COPY_STATUS;
 import static com.antelif.library.domain.type.BookCopyStatus.AVAILABLE;
 import static com.antelif.library.domain.type.BookCopyStatus.LENT;
@@ -15,6 +16,7 @@ import static com.antelif.library.domain.type.TransactionStatus.FINALIZED;
 
 import com.antelif.library.domain.exception.UnsuccessfulTransactionException;
 import com.antelif.library.infrastructure.entity.BookCopyEntity;
+import com.antelif.library.infrastructure.entity.BookEntity;
 import com.antelif.library.infrastructure.entity.CustomerEntity;
 import com.antelif.library.infrastructure.entity.TransactionEntity;
 import com.antelif.library.infrastructure.entity.TransactionItemEntity;
@@ -42,6 +44,7 @@ public final class TransactionValidationService {
     var customer = transaction.getCustomer();
 
     validateBookCopiesRetrieved(bookCopies);
+    validateBooksToBorrowAreUnique(bookCopies);
     validateCustomerHasPendingFee(customer);
     validateCustomerHasThisBook(customer, bookCopies);
     validateCopyIsNotEligibleForLending(bookCopies);
@@ -128,6 +131,18 @@ public final class TransactionValidationService {
   private static void validateBookCopiesRetrieved(List<BookCopyEntity> bookCopies) {
     if (bookCopies.isEmpty()) {
       throw new UnsuccessfulTransactionException(BOOK_COPY_DOES_NOT_EXIST);
+    }
+  }
+
+  /** Throws an exception if transaction contains books with the same ISBN twice. */
+  private static void validateBooksToBorrowAreUnique(List<BookCopyEntity> bookCopies) {
+    if (bookCopies.stream()
+            .map(BookCopyEntity::getBook)
+            .map(BookEntity::getIsbn)
+            .collect(Collectors.toSet())
+            .size()
+        < bookCopies.size()) {
+      throw new UnsuccessfulTransactionException(DUPLICATE_BOOKS_IN_TRANSACTION);
     }
   }
 
