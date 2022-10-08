@@ -3,10 +3,13 @@ package com.antelif.library.controller.command;
 import static com.antelif.library.application.error.GenericError.BOOK_COPIES_NOT_IN_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.BOOK_COPY_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.BOOK_COPY_UNAVAILABLE;
+import static com.antelif.library.application.error.GenericError.CANNOT_CANCEL_FINALIZED_TRANSACTION;
+import static com.antelif.library.application.error.GenericError.CANNOT_CANCEL_PARTIALLY_UPDATED_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_FEE;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_THE_BOOK;
 import static com.antelif.library.application.error.GenericError.PERSONNEL_DOES_NOT_EXIST;
+import static com.antelif.library.application.error.GenericError.TRANSACTION_DOES_NOT_EXIST;
 import static com.antelif.library.domain.common.Endpoints.TRANSACTIONS_ENDPOINT;
 import static com.antelif.library.domain.type.BookCopyStatus.AVAILABLE;
 import static com.antelif.library.domain.type.BookCopyStatus.LENT;
@@ -21,6 +24,8 @@ import static com.antelif.library.factory.PersonnelFactory.createPersonnelReques
 import static com.antelif.library.factory.PublisherFactory.createPublisherRequest;
 import static com.antelif.library.factory.TransactionFactory.createTransactionRequest;
 import static com.antelif.library.factory.TransactionFactory.createTransactionResponse;
+import static com.antelif.library.utils.RequestBuilder.cancelTransaction;
+import static com.antelif.library.utils.RequestBuilder.cancelTransactionAndExpectError;
 import static com.antelif.library.utils.RequestBuilder.patchRequestAndExpectError;
 import static com.antelif.library.utils.RequestBuilder.patchTransactions;
 import static com.antelif.library.utils.RequestBuilder.postAuthor;
@@ -38,7 +43,9 @@ import com.antelif.library.domain.dto.request.TransactionRequest;
 import com.antelif.library.domain.dto.response.BookCopyResponse;
 import com.antelif.library.domain.dto.response.TransactionResponse;
 import com.antelif.library.integration.BaseIntegrationTest;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -293,8 +300,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
     var customerId = transactionResponse.getCustomer().getId();
     var bookCopyIds = transactionResponse.getBooks().stream().map(BookCopyResponse::getId).toList();
 
-    var updatedTransactions =
-        patchTransactions(String.valueOf(customerId), bookCopyIds, this.mockMvc);
+    var updatedTransactions = patchTransactions(customerId, bookCopyIds, this.mockMvc);
 
     assertEquals(1, updatedTransactions.size());
 
@@ -323,5 +329,71 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
             this.mockMvc);
 
     assertEquals(BOOK_COPIES_NOT_IN_TRANSACTION.getCode(), errorResponse.getCode());
+  }
+
+  @Test
+  @DisplayName("Transaction: Successful cancellation.")
+  void testSuccessfulCancellationWhenAllBookCopiesAreLent() {
+    var transactionResponse = postTransaction(transactionRequest, this.mockMvc);
+
+    var result = cancelTransaction(transactionResponse.getId(), this.mockMvc);
+
+    assertNotNull(result);
+  }
+
+  @Test
+  @DisplayName("Transaction: Unsuccessful cancellation when transaction does not exist.")
+  void testUnsuccessfulTransactionWhenTransactionDoesNotExist() {
+
+    var transactionId = 9999L;
+
+    var response = cancelTransactionAndExpectError(transactionId, this.mockMvc);
+
+    assertEquals(TRANSACTION_DOES_NOT_EXIST.getCode(), response.getCode());
+  }
+
+  @Test
+  @DisplayName("Transaction: Unsuccessful cancellation when transaction is finalized.")
+  void testUnsuccessfulTransactionCancellationWhenFinalized() {
+
+    var transactionResponse = postTransaction(transactionRequest, this.mockMvc);
+
+    // Return books and finalize transaction.
+    patchTransactions(
+        transactionResponse.getCustomer().getId(),
+        transactionResponse.getBooks().stream()
+            .map(BookCopyResponse::getId)
+            .collect(Collectors.toList()),
+        this.mockMvc);
+
+    var result = cancelTransactionAndExpectError(transactionResponse.getId(), this.mockMvc);
+
+    assertEquals(CANNOT_CANCEL_FINALIZED_TRANSACTION.getCode(), result.getCode());
+  }
+
+  @Test
+  @DisplayName("Transaction: Unsuccessful cancellation when some books are already returned.")
+  void testUnsuccessfulTransactionCancellationWhenPartiallyReturned() {
+
+    // Create additional book copy.
+    var secondBookCopyRequest = createBookCopyRequest(isbn);
+    var secondBookCopyResponse = postBookCopy(secondBookCopyRequest, this.mockMvc);
+
+    var copyIds = List.of(transactionRequest.getCopyIds().get(0), secondBookCopyResponse.getId());
+
+    // Add the book copy to new transaction.
+    transactionRequest.setCopyIds(new ArrayList<>(copyIds));
+    transactionRequest.getCopyIds().add(secondBookCopyResponse.getId());
+
+    var transactionResponse = postTransaction(transactionRequest, this.mockMvc);
+
+    // Return second book copy.
+    patchTransactions(
+        transactionRequest.getCustomerId(), List.of(secondBookCopyResponse.getId()), this.mockMvc);
+
+    // try to cancel transaction when one book is already returned.
+    var result = cancelTransactionAndExpectError(transactionResponse.getId(), this.mockMvc);
+
+    assertEquals(CANNOT_CANCEL_PARTIALLY_UPDATED_TRANSACTION.getCode(), result.getCode());
   }
 }

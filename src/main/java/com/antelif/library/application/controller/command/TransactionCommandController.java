@@ -1,8 +1,10 @@
 package com.antelif.library.application.controller.command;
 
+import static com.antelif.library.domain.common.Constants.CANCELLED;
 import static com.antelif.library.domain.common.Constants.CREATED;
 import static com.antelif.library.domain.common.Constants.UPDATED;
 import static com.antelif.library.domain.common.ControllerTags.TRANSACTION_CONTROLLER;
+import static com.antelif.library.domain.common.Endpoints.CANCEL_TRANSACTION_ENDPOINT;
 import static com.antelif.library.domain.common.Endpoints.TRANSACTIONS_ENDPOINT;
 
 import com.antelif.library.domain.dto.request.TransactionRequest;
@@ -19,7 +21,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /** TransactionEntity Command Controller. */
@@ -27,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @Api(tags = TRANSACTION_CONTROLLER)
-@RequestMapping(value = TRANSACTIONS_ENDPOINT)
 public class TransactionCommandController {
 
   private final TransactionService transactionService;
@@ -38,7 +38,7 @@ public class TransactionCommandController {
    * @param transaction the DTO to get information to create the new transaction.
    * @return a transaction response DTO.
    */
-  @PostMapping
+  @PostMapping(TRANSACTIONS_ENDPOINT)
   public ResponseEntity<Map<String, TransactionResponse>> createTransaction(
       @RequestBody @Valid TransactionRequest transaction) {
     log.info("Received request to add transaction {}", transaction);
@@ -52,7 +52,7 @@ public class TransactionCommandController {
    * @param bookCopyIds the ids of the book copies that are returned,
    * @return a list of updated transaction response DTOs.
    */
-  @PatchMapping("/customer/{customerId}")
+  @PatchMapping(TRANSACTIONS_ENDPOINT + "/customer/{customerId}")
   public ResponseEntity<Map<String, List<TransactionResponse>>> returnBooksAndUpdateTransactions(
       @PathVariable("customerId") String customerId, @RequestBody List<Long> bookCopyIds) {
 
@@ -63,5 +63,20 @@ public class TransactionCommandController {
 
     return ResponseEntity.ok(
         Map.of(UPDATED, transactionService.updateTransactions(bookCopyIds, customerId)));
+  }
+
+  /**
+   * Cancels a transaction.
+   *
+   * @param transactionId the id of the transaction to cancel.
+   * @return the canceled transaction.
+   */
+  @PatchMapping(CANCEL_TRANSACTION_ENDPOINT + "/{id}")
+  public ResponseEntity<Map<String, TransactionResponse>> cancelTransaction(
+      @PathVariable("id") Long transactionId) {
+    log.info("received request to cancel transaction {}", transactionId);
+
+    return ResponseEntity.ok(
+        Map.of(CANCELLED, transactionService.cancelTransaction(transactionId)));
   }
 }

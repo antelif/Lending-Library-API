@@ -7,6 +7,7 @@ public final class Constants {
 
   public static final String CREATED = "created";
   public static final String UPDATED = "updated";
+  public static final String CANCELLED = "cancelled";
 
   // Parameters
   public static final String ID = "id";
