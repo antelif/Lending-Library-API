@@ -47,6 +47,8 @@ directly, rather a list of book copies.
 <b>Publisher</b>
 
 - Add new publisher
+- Get all publishers
+- Get a publisher by their id
 
 <b>Transactions: </b> The process of lending a list of books to a customer.
 
@@ -121,6 +123,28 @@ data you need to:
    ```
    This `id` is referred as `publisherId` in this document, and it will be needed to create new
    books.
+2. <b>Get all publisher:</b>
+   <br/><b>URL:</b> GET request at `/library/publishers`.
+   <br/><b>Request body:</b> none
+   <b>Expected response:</b>
+   ```
+   [
+       {
+           "id": 0,
+           "name": "string"
+       }
+   ]
+   ```
+3. <b>Get a publisher by their id:</b>
+   <br/><b>URL:</b> GET request at `/library/publishers/{publisherId}`.
+   <br/><b>Request body:</b> none
+   <b>Expected response:</b>
+   ```
+   {
+     "id": 0,
+     "name": "string"
+   }
+   ```
 
 ### Book:
 

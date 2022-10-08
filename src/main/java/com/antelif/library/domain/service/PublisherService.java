@@ -12,13 +12,16 @@ import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
 import com.antelif.library.infrastructure.entity.PublisherEntity;
 import com.antelif.library.infrastructure.repository.PublisherRepository;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /** Publisher service. */
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PublisherService {
 
@@ -31,7 +34,6 @@ public class PublisherService {
    * @param publisherRequest the request DTO to get information about the publisher to create.
    * @return a publisher response DTO.
    */
-  @Transactional
   public PublisherResponse addPublisher(PublisherRequest publisherRequest) {
 
     var persistedEntity =
@@ -45,6 +47,17 @@ public class PublisherService {
         .map(publisherRepository::save)
         .map(converter::convertFromEntityToResponse)
         .orElseThrow(() -> new EntityCreationException(PUBLISHER_CREATION_FAILED));
+  }
+
+  /**
+   * Gets a list of all publishers persisted in database.
+   *
+   * @return a list of publisher response object.
+   */
+  public List<PublisherResponse> getAllPublishers() {
+    return publisherRepository.findAll().stream()
+        .map(converter::convertFromEntityToResponse)
+        .collect(Collectors.toList());
   }
 
   /**
