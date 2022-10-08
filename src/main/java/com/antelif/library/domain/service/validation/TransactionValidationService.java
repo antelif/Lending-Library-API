@@ -3,7 +3,8 @@ package com.antelif.library.domain.service.validation;
 import static com.antelif.library.application.error.GenericError.BOOK_COPIES_NOT_IN_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.BOOK_COPY_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.BOOK_COPY_UNAVAILABLE;
-import static com.antelif.library.application.error.GenericError.CANNOT_CANCEL_TRANSACTION;
+import static com.antelif.library.application.error.GenericError.CANNOT_CANCEL_FINALIZED_TRANSACTION;
+import static com.antelif.library.application.error.GenericError.CANNOT_CANCEL_PARTIALLY_UPDATED_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_FEE;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_THE_BOOK;
 import static com.antelif.library.application.error.GenericError.INCORRECT_BOOK_COPY_STATUS;
@@ -70,18 +71,20 @@ public final class TransactionValidationService {
     validateTransactionIsPartiallyUpdated(transaction);
   }
 
+  /** Throws an exception if the transaction to cancel is finalized. */
   private static void validateTransactionIsFinalized(TransactionEntity transaction) {
     if (transaction.getStatus().equals(FINALIZED)) {
-      throw new UnsuccessfulTransactionException(CANNOT_CANCEL_TRANSACTION);
+      throw new UnsuccessfulTransactionException(CANNOT_CANCEL_FINALIZED_TRANSACTION);
     }
   }
 
+  /** Throws an exception if the transaction to cancel has some books returned already. */
   private static void validateTransactionIsPartiallyUpdated(TransactionEntity transaction) {
     if (transaction.getTransactionItems().stream()
         .map(TransactionItemEntity::getBookCopy)
         .map(BookCopyEntity::getStatus)
         .anyMatch(status -> status.equals(AVAILABLE))) {
-      throw new UnsuccessfulTransactionException(CANNOT_CANCEL_TRANSACTION);
+      throw new UnsuccessfulTransactionException(CANNOT_CANCEL_PARTIALLY_UPDATED_TRANSACTION);
     }
   }
 

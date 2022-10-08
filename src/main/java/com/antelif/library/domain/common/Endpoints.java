@@ -10,6 +10,7 @@ public final class Endpoints {
   public static final String PERSONNEL_ENDPOINT = "/library/personnel";
   public static final String PUBLISHERS_ENDPOINT = "/library/publishers";
   public static final String TRANSACTIONS_ENDPOINT = "/library/transactions";
+  public static final String CANCEL_TRANSACTION_ENDPOINT = "/library/cancel/transaction";
 
   private Endpoints() {}
 }

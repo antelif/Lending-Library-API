@@ -3,7 +3,8 @@ package com.antelif.library.controller.command;
 import static com.antelif.library.application.error.GenericError.BOOK_COPIES_NOT_IN_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.BOOK_COPY_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.BOOK_COPY_UNAVAILABLE;
-import static com.antelif.library.application.error.GenericError.CANNOT_CANCEL_TRANSACTION;
+import static com.antelif.library.application.error.GenericError.CANNOT_CANCEL_FINALIZED_TRANSACTION;
+import static com.antelif.library.application.error.GenericError.CANNOT_CANCEL_PARTIALLY_UPDATED_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_FEE;
 import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_THE_BOOK;
@@ -23,8 +24,8 @@ import static com.antelif.library.factory.PersonnelFactory.createPersonnelReques
 import static com.antelif.library.factory.PublisherFactory.createPublisherRequest;
 import static com.antelif.library.factory.TransactionFactory.createTransactionRequest;
 import static com.antelif.library.factory.TransactionFactory.createTransactionResponse;
-import static com.antelif.library.utils.RequestBuilder.cancelRequestAndExpectError;
 import static com.antelif.library.utils.RequestBuilder.cancelTransaction;
+import static com.antelif.library.utils.RequestBuilder.cancelTransactionAndExpectError;
 import static com.antelif.library.utils.RequestBuilder.patchRequestAndExpectError;
 import static com.antelif.library.utils.RequestBuilder.patchTransactions;
 import static com.antelif.library.utils.RequestBuilder.postAuthor;
@@ -346,7 +347,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
 
     var transactionId = 9999L;
 
-    var response = cancelRequestAndExpectError(transactionId, this.mockMvc);
+    var response = cancelTransactionAndExpectError(transactionId, this.mockMvc);
 
     assertEquals(TRANSACTION_DOES_NOT_EXIST.getCode(), response.getCode());
   }
@@ -365,9 +366,9 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
             .collect(Collectors.toList()),
         this.mockMvc);
 
-    var result = cancelRequestAndExpectError(transactionResponse.getId(), this.mockMvc);
+    var result = cancelTransactionAndExpectError(transactionResponse.getId(), this.mockMvc);
 
-    assertEquals(CANNOT_CANCEL_TRANSACTION.getCode(), result.getCode());
+    assertEquals(CANNOT_CANCEL_FINALIZED_TRANSACTION.getCode(), result.getCode());
   }
 
   @Test
@@ -391,8 +392,8 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
         transactionRequest.getCustomerId(), List.of(secondBookCopyResponse.getId()), this.mockMvc);
 
     // try to cancel transaction when one book is already returned.
-    var result = cancelRequestAndExpectError(transactionResponse.getId(), this.mockMvc);
+    var result = cancelTransactionAndExpectError(transactionResponse.getId(), this.mockMvc);
 
-    assertEquals(CANNOT_CANCEL_TRANSACTION.getCode(), result.getCode());
+    assertEquals(CANNOT_CANCEL_PARTIALLY_UPDATED_TRANSACTION.getCode(), result.getCode());
   }
 }

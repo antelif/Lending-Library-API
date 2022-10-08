@@ -6,6 +6,7 @@ import static com.antelif.library.domain.common.Constants.UPDATED;
 import static com.antelif.library.domain.common.Endpoints.AUTHORS_ENDPOINT;
 import static com.antelif.library.domain.common.Endpoints.BOOKS_ENDPOINT;
 import static com.antelif.library.domain.common.Endpoints.BOOK_COPIES_ENDPOINT;
+import static com.antelif.library.domain.common.Endpoints.CANCEL_TRANSACTION_ENDPOINT;
 import static com.antelif.library.domain.common.Endpoints.CUSTOMERS_ENDPOINT;
 import static com.antelif.library.domain.common.Endpoints.PERSONNEL_ENDPOINT;
 import static com.antelif.library.domain.common.Endpoints.PUBLISHERS_ENDPOINT;
@@ -230,7 +231,7 @@ public class RequestBuilder {
 
     var response =
         mockMvc
-            .perform(patch(TRANSACTIONS_ENDPOINT + "/cancel/" + transactionId))
+            .perform(patch(CANCEL_TRANSACTION_ENDPOINT + "/" + transactionId))
             .andDo(print())
             .andExpect(status().isOk())
             .andReturn()
@@ -276,10 +277,10 @@ public class RequestBuilder {
   }
 
   @SneakyThrows
-  public static ErrorResponse cancelRequestAndExpectError(Long transactionId, MockMvc mockMvc) {
+  public static ErrorResponse cancelTransactionAndExpectError(Long transactionId, MockMvc mockMvc) {
     var response =
         mockMvc
-            .perform(patch(TRANSACTIONS_ENDPOINT + "/cancel/" + transactionId))
+            .perform(patch(CANCEL_TRANSACTION_ENDPOINT + "/" + transactionId))
             .andDo(print())
             .andExpect(status().isOk())
             .andReturn()
