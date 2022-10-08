@@ -29,6 +29,4 @@ public class CustomerRequest {
 
   @Email(message = "Customer should contain a valid email.")
   private String email;
-
-  private double fee = 0;
 }

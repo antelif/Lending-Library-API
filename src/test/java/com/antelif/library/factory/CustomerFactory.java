@@ -11,13 +11,6 @@ public class CustomerFactory {
     customer.setSurname("surname" + index);
     customer.setPhoneNo("123456789" + index);
     customer.setEmail("email@" + index + ".com");
-    customer.setFee(0);
-    return customer;
-  }
-
-  public static CustomerRequest createCustomerRequestWithFee(int index) {
-    var customer = createCustomerRequest(index);
-    customer.setFee(5);
     return customer;
   }
 
