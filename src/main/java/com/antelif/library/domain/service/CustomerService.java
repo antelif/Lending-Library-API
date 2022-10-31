@@ -4,18 +4,20 @@ import static com.antelif.library.application.error.GenericError.CUSTOMER_CREATI
 import static com.antelif.library.application.error.GenericError.CUSTOMER_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.DUPLICATE_CUSTOMER;
 
+import com.antelif.library.configuration.AppProperties;
 import com.antelif.library.domain.converter.CustomerConverter;
 import com.antelif.library.domain.dto.request.CustomerRequest;
 import com.antelif.library.domain.dto.response.CustomerResponse;
 import com.antelif.library.domain.exception.DuplicateEntityException;
 import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
+import com.antelif.library.domain.service.validation.CustomerValidationService;
 import com.antelif.library.infrastructure.entity.CustomerEntity;
 import com.antelif.library.infrastructure.repository.CustomerRepository;
 import java.util.Optional;
-import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** Customer Service. */
 @Service
@@ -25,6 +27,7 @@ public class CustomerService {
 
   private final CustomerRepository customerRepository;
   private final CustomerConverter converter;
+  private final AppProperties appProperties;
 
   /**
    * Adds a customer to database.
@@ -54,9 +57,43 @@ public class CustomerService {
    */
   public CustomerEntity getCustomerById(Long id) {
 
-    var persistedCustomer = customerRepository.getCustomerById(id);
+    var persistedCustomer =
+        customerRepository
+            .getCustomerById(id)
+            .orElseThrow(() -> new EntityDoesNotExistException(CUSTOMER_DOES_NOT_EXIST));
 
-    return persistedCustomer.orElseThrow(
-        () -> new EntityDoesNotExistException(CUSTOMER_DOES_NOT_EXIST));
+    persistedCustomer.updateFee(appProperties.getDailyFeeRate());
+
+    return persistedCustomer;
+  }
+
+  /**
+   * Updates the customer fee by subtracting the feeAmount provided from the customer fee.
+   *
+   * @param customerId the customer whose fee to update,
+   * @param feeAmount the amount to subtract from the customer fee,
+   * @return a customer response DTO.
+   */
+  public CustomerResponse updateCustomerFee(Long customerId, Double feeAmount) {
+
+    var persistedCustomer =
+        customerRepository
+            .getCustomerById(customerId)
+            .orElseThrow(() -> new EntityDoesNotExistException(CUSTOMER_DOES_NOT_EXIST));
+
+    persistedCustomer.updateFee(appProperties.getDailyFeeRate());
+
+    CustomerValidationService.validateUpdate(persistedCustomer, feeAmount);
+
+    persistedCustomer.payFee(feeAmount);
+
+    return converter.convertFromEntityToResponse(persistedCustomer);
+  }
+
+  /** Recalculates fee for all customers. */
+  public void recalculateCustomerFee() {
+    customerRepository
+        .findAll()
+        .forEach(customer -> customer.updateFee(appProperties.getDailyFeeRate()));
   }
 }

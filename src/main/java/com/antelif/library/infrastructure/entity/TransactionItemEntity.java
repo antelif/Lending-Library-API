@@ -1,7 +1,8 @@
 package com.antelif.library.infrastructure.entity;
 
-import com.antelif.library.infrastructure.ids.CopyTransactionId;
+import com.antelif.library.infrastructure.ids.TransactionItemId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
@@ -15,7 +16,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "transaction_item")
-@IdClass(value = CopyTransactionId.class)
+@IdClass(value = TransactionItemId.class)
 public class TransactionItemEntity {
 
   @Id
@@ -24,7 +25,7 @@ public class TransactionItemEntity {
   private BookCopyEntity bookCopy;
 
   @Id
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "transaction_id")
   private TransactionEntity transaction;
 }

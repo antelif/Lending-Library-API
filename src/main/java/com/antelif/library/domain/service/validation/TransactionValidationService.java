@@ -22,6 +22,7 @@ import com.antelif.library.infrastructure.entity.TransactionEntity;
 import com.antelif.library.infrastructure.entity.TransactionItemEntity;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
@@ -38,7 +39,8 @@ public final class TransactionValidationService {
   public static void validateCreation(TransactionEntity transaction) {
 
     var bookCopies =
-        transaction.getTransactionItems().stream()
+        Optional.of(transaction).map(TransactionEntity::getTransactionItems).stream()
+            .flatMap(Collection::stream)
             .map(TransactionItemEntity::getBookCopy)
             .collect(Collectors.toList());
     var customer = transaction.getCustomer();

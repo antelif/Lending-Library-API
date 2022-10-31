@@ -1,3 +1,7 @@
+app:
+  properties:
+    daily-fee-rate: ${DAILY_FEE_RATE:0.5}
+    fee-calculation-rate: ${FEE_RATE:0 30 7 * * *} # every day at 7.30
 spring:
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/library
@@ -7,8 +11,8 @@ spring:
   jpa:
     database: POSTGRESQL
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-#    open-in-view: false
-#    generate-ddl: false
+    #    open-in-view: false
+    #    generate-ddl: false
     show-sql: true
     hibernate:
       ddl-auto: update

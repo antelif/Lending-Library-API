@@ -1,5 +1,6 @@
 package com.antelif.library.infrastructure.entity;
 
+import static com.antelif.library.domain.common.InstantConversions.nowInstantToDays;
 import static com.antelif.library.domain.type.BookCopyStatus.AVAILABLE;
 import static com.antelif.library.domain.type.TransactionStatus.ACTIVE;
 import static com.antelif.library.domain.type.TransactionStatus.CANCELLED;
@@ -7,6 +8,7 @@ import static com.antelif.library.domain.type.TransactionStatus.FINALIZED;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.EnumType.STRING;
+import static javax.persistence.FetchType.EAGER;
 
 import com.antelif.library.domain.type.TransactionStatus;
 import java.time.Instant;
@@ -50,7 +52,7 @@ public class TransactionEntity {
   @JoinColumn(referencedColumnName = "id")
   private PersonnelEntity personnel;
 
-  @OneToMany(mappedBy = "transaction", cascade = ALL)
+  @OneToMany(mappedBy = "transaction", cascade = ALL, fetch = EAGER)
   private Set<TransactionItemEntity> transactionItems;
 
   /**
@@ -69,7 +71,7 @@ public class TransactionEntity {
    * @param daysUntilReturn the days to return the book as provided during a transaction.
    */
   public void setDates(int daysUntilReturn) {
-    this.creationDate = Instant.now();
+    this.creationDate = nowInstantToDays();
     this.returnDate = calculateReturnDate(daysUntilReturn);
   }
 
@@ -93,7 +95,7 @@ public class TransactionEntity {
   }
 
   private Instant calculateReturnDate(int daysUntilReturn) {
-    return Instant.now().plus(daysUntilReturn, DAYS).truncatedTo(DAYS);
+    return nowInstantToDays().plus(daysUntilReturn, DAYS);
   }
 
   /**

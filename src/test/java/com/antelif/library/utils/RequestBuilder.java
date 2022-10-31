@@ -76,7 +76,6 @@ public class RequestBuilder {
         mockMvc
             .perform(get(endpoint).contentType(APPLICATION_JSON))
             .andDo(print())
-            .andExpect(status().isOk())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -109,6 +108,12 @@ public class RequestBuilder {
         getRequest(PUBLISHERS_ENDPOINT + "/" + id, mockMvc), PublisherResponse.class);
   }
 
+  @SneakyThrows
+  public static CustomerResponse getCustomerById(Long id, MockMvc mockMvc) {
+    return objectMapper.readValue(
+        getRequest(CUSTOMERS_ENDPOINT + "/" + id, mockMvc), CustomerResponse.class);
+  }
+
   // POST
   @SneakyThrows
   private static String postRequest(String endpoint, String content, MockMvc mockMvc) {
@@ -116,7 +121,6 @@ public class RequestBuilder {
         mockMvc
             .perform(post(endpoint).contentType(APPLICATION_JSON).content(content))
             .andDo(print())
-            .andExpect(status().isOk())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -239,13 +243,31 @@ public class RequestBuilder {
   }
 
   @SneakyThrows
+  public static CustomerResponse patchCustomerFee(Long customerId, Double fee, MockMvc mockMvc) {
+
+    var response =
+        mockMvc
+            .perform(
+                patch(CUSTOMERS_ENDPOINT + "/" + customerId).param("feeAmount", fee.toString()))
+            .andDo(print())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    var customerMap =
+        objectMapper.readValue(response, new TypeReference<Map<String, CustomerResponse>>() {});
+
+    return objectMapper.readValue(
+        objectMapper.writeValueAsString(customerMap.get(UPDATED)), CustomerResponse.class);
+  }
+
+  @SneakyThrows
   public static TransactionResponse cancelTransaction(Long transactionId, MockMvc mockMvc) {
 
     var response =
         mockMvc
             .perform(patch(CANCEL_TRANSACTION_ENDPOINT + "/" + transactionId))
             .andDo(print())
-            .andExpect(status().isOk())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -267,7 +289,6 @@ public class RequestBuilder {
                     .contentType(APPLICATION_JSON)
                     .content(content))
             .andDo(print())
-            .andExpect(status().isOk())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -294,7 +315,21 @@ public class RequestBuilder {
         mockMvc
             .perform(patch(CANCEL_TRANSACTION_ENDPOINT + "/" + transactionId))
             .andDo(print())
-            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    return objectMapper.readValue(response, ErrorResponse.class);
+  }
+
+  @SneakyThrows
+  public static ErrorResponse patchCustomerFeeAndExpectError(
+      Long customerId, Double fee, MockMvc mockMvc) {
+    var response =
+        mockMvc
+            .perform(
+                patch(CUSTOMERS_ENDPOINT + "/" + customerId).param("feeAmount", fee.toString()))
+            .andDo(print())
             .andReturn()
             .getResponse()
             .getContentAsString();

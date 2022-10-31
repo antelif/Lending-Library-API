@@ -160,6 +160,9 @@
       <column name="fee" type="double" startWith="0">
         <constraints nullable="false"/>
       </column>
+      <column name="last_update" type="timestamp with time zone">
+        <constraints nullable="false"/>
+      </column>
     </createTable>
   </changeSet>
 

@@ -31,9 +31,6 @@ public class BookCopyConverter
 
   @Override
   public BookCopyResponse convertFromEntityToResponse(BookCopyEntity bookCopyEntity) {
-    var bookCopy = modelMapper.map(bookCopyEntity, BookCopyResponse.class);
-    bookCopy.setBook(bookConverter.convertFromEntityToResponse(bookCopyEntity.getBook()));
-
-    return bookCopy;
+    return modelMapper.map(bookCopyEntity, BookCopyResponse.class);
   }
 }
