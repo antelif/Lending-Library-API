@@ -41,8 +41,10 @@ public enum GenericError {
 
   CUSTOMER_HAS_FEE(28, "Customer has pending fee."),
   CUSTOMER_HAS_THE_BOOK(29, "Customer has already this book."),
+  INVALID_CUSTOMER_UPDATE_VALUE(37, "Customer's fee is less than input or less than 0."),
 
-  INPUT_VALIDATIONS_ERROR(30, "Wrong input.");
+  INPUT_VALIDATIONS_ERROR(30, "Wrong input."),
+  GENERIC_ERROR(36, "Generic internal error.");
 
   private final int code;
   private final String description;

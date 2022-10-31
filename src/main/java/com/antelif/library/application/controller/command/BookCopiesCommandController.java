@@ -35,7 +35,7 @@ public class BookCopiesCommandController {
    * @return a book copy response DTO.
    */
   @PostMapping
-  public ResponseEntity<Map<String, BookCopyResponse>> addPersonnel(
+  public ResponseEntity<Map<String, BookCopyResponse>> addBookCopy(
       @RequestBody @Valid BookCopyRequest bookCopyRequest) {
     log.info("Received request to add book copy {}", bookCopyRequest);
     return ResponseEntity.ok(Map.of(CREATED, bookCopyService.addBookCopy(bookCopyRequest)));

@@ -39,6 +39,8 @@ directly, rather a list of book copies.
 <b>Customer:</b> The customer that will borrow books.
 
 - Add new customer
+- Get a customer by their id
+- Update the customer fee - repay fee.
 
 <b>Personnel:</b> The personnel responsible for transactions.
 
@@ -92,7 +94,7 @@ data you need to:
     }
     ```
    The `middleName` field is optional.
-   <b>Expected response:</b>
+   <br/><b>Expected response:</b>
 
     ```
     {
@@ -114,7 +116,7 @@ data you need to:
      "name": "string"
    }
    ```
-   <b>Expected response:</b>
+   <br/><b>Expected response:</b>
    ```
    {
        "id": 0,
@@ -126,7 +128,7 @@ data you need to:
 2. <b>Get all publisher:</b>
    <br/><b>URL:</b> GET request at `/library/publishers`.
    <br/><b>Request body:</b> none
-   <b>Expected response:</b>
+   <br/><b>Expected response:</b>
    ```
    [
        {
@@ -138,7 +140,7 @@ data you need to:
 3. <b>Get a publisher by their id:</b>
    <br/><b>URL:</b> GET request at `/library/publishers/{publisherId}`.
    <br/><b>Request body:</b> none
-   <b>Expected response:</b>
+   <br/><b>Expected response:</b>
    ```
    {
      "id": 0,
@@ -162,7 +164,7 @@ following steps shown above to add an author and a publisher you can create a ne
    "title": "string"
    }
    ```
-   <b>Expected response:</b>
+   <br/><b>Expected response:</b>
    ```
    {
        "author": {
@@ -243,7 +245,7 @@ following steps shown above to add an author and a publisher you can create a ne
     - `status` is optional. if not provided it is set to `AVAILABLE`.
     - `state` should contain one of the following values [`NEW`, `GOOD`,`BAD`].
 
-   <b>Expected response:</b>
+   <br/><b>Expected response:</b>
    ```
    {
        "book": {
@@ -279,7 +281,7 @@ following steps shown above to add an author and a publisher you can create a ne
      "name": "string"
    }
    ```
-   <b>Expected response:</b>
+   <br/><b>Expected response:</b>
    ```
    {
        "id": 0,
@@ -303,7 +305,37 @@ following steps shown above to add an author and a publisher you can create a ne
      "surname": "string"
    }
    ```
-   <b>Expected response:</b>
+   <br/><b>Expected response:</b>
+   ```
+   {
+       "email": "string",
+       "fee": 0,
+       "id": 0,
+       "name": "string",
+       "phoneNo": "string",
+       "surname": "string"
+   }
+   ```
+   This `id` is referred as `customerId` in this document, and it will be needed to create and update
+   new transactions.
+2. <b>Get customer by id:</b>
+   <br/><b>URL:</b> GET request at `library/customers/{customerId}`.
+   <br/><b>Expected response:</b>
+   ```
+   {
+       "email": "string",
+       "fee": 0,
+       "id": 0,
+       "name": "string",
+       "phoneNo": "string",
+       "surname": "string"
+   }
+   ```
+3. <b>Update customer fee:</b>
+   <br/><b>URL:</b> PATCH request at `library/customers/{customerId}`.
+   <br/><b>Request body:</b>
+   ```0.0```
+   <br/><b>Expected response:</b>
    ```
    {
        "email": "string",
@@ -315,9 +347,6 @@ following steps shown above to add an author and a publisher you can create a ne
    }
    ```
 
-This `id` is referred as `customerId` in this document, and it will be needed to create and update
-new transactions.
-
 ### Transaction:
 
 In order to create new transactions you need to have previously added at least one book and a book
@@ -325,7 +354,7 @@ copy for this book, and have created a customer and a personnel.
 
 1. <b>Create new transaction:</b>
    <br/><b>URL:</b> POST request at `library/transactions`.
-   <b>Expected response:</b>
+   <br/><b>Expected response:</b>
 
    ```
    {
@@ -343,7 +372,7 @@ copy for this book, and have created a customer and a personnel.
       This `id` is referred as `transactionId` in this document, and it will be needed to update and
       finalize the transaction.
 
-   <b>Expected response:</b>
+   <br/><b>Expected response:</b>
    ```
    {
        "books": [
@@ -396,7 +425,7 @@ copy for this book, and have created a customer and a personnel.
      0
    ]
    ```
-   <b>Expected response:</b>
+   <br/><b>Expected response:</b>
    ```
    [
        {
@@ -513,8 +542,7 @@ ___
    copy persisted in database.
 2. When creating a new transaction:
     - All book copies provided should exist in database.
-    - Customer should not have a pending fee (at this point such functionality is not yet
-      implemented and all customers have 0 fee.)
+    - Customer should not have a pending fee.
     - Customer cannot borrow the same book when he haas previously borrowed this book and has not
       returned it yet - (See `Known Issues` 1).
     - Customer cannot borrow a book of state `BAD`.
@@ -535,6 +563,11 @@ When returning book by sending a patch transaction:
   Essentially this happens because a transaction is to be cancelled on the moment of creation. Else
   the customer should return the books and the transaction instead of cancelled should be '
   FINALIZED'.
+
+#### Customer Fee Update
+
+- The return fee cannot be negative.
+- The return fee cannot be greater than the fee owed.
 
 ### Validations for request bodies:
 
