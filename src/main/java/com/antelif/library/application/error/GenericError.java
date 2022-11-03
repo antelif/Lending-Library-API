@@ -43,6 +43,7 @@ public enum GenericError {
   CUSTOMER_HAS_THE_BOOK(29, "Customer has already this book."),
   INVALID_CUSTOMER_UPDATE_VALUE(37, "Customer's fee is less than input or less than 0."),
 
+  AUTHORIZATION_FAILED(38, "Personnel authorization failed. Wrong credentials."),
   INPUT_VALIDATIONS_ERROR(30, "Wrong input."),
   GENERIC_ERROR(36, "Generic internal error.");
 

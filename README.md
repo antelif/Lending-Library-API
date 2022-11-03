@@ -45,6 +45,7 @@ directly, rather a list of book copies.
 <b>Personnel:</b> The personnel responsible for transactions.
 
 - Add new personnel
+- Log in personnel
 
 <b>Publisher</b>
 
@@ -290,7 +291,22 @@ following steps shown above to add an author and a publisher you can create a ne
    ```
    This `id` is referred as `personnel` in this document, and it will be needed to create new
    transactions.
-
+2. <b>Log in personnel:</b>
+   <br/><b>URL:</b> POST request at `library/personnel/login`.
+   <br/><b>Request body:</b>
+   ```
+   {
+     "name": "string"
+     "password" "string"
+   }
+   ```
+   <br/><b>Expected response:</b>
+   ```
+   {
+       "id": 0,
+       "name": "string"
+   }
+   ```
 ### Customer
 
 1. <b>Add new personnel:</b>
@@ -631,10 +647,11 @@ ___
 ___
 
 1. Create endpoint to update book copy status.
-2. Personnel log in.
+2. ~~Personnel log in.~~
 3. Password encryption.
 4. Create script to initialize test data in database.
 5. Add ISBN validations.
+6. Authorize requests to be performed only by authorized personnel.
 
 
 
