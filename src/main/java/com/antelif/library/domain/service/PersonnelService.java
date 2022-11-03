@@ -7,6 +7,7 @@ import static com.antelif.library.application.error.GenericError.PERSONNEL_DOES_
 import com.antelif.library.domain.converter.PersonnelConverter;
 import com.antelif.library.domain.dto.request.PersonnelRequest;
 import com.antelif.library.domain.dto.response.PersonnelResponse;
+import com.antelif.library.domain.exception.AuthorizationException;
 import com.antelif.library.domain.exception.DuplicateEntityException;
 import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
@@ -45,6 +46,25 @@ public class PersonnelService {
         .map(personnelRepository::save)
         .map(converter::convertFromEntityToResponse)
         .orElseThrow(() -> new EntityCreationException(PERSONNEL_CREATION_FAILED));
+  }
+
+  /**
+   * Retrieve the logged in personnel.
+   *
+   * @param personnelRequest the object that contains personnel credentials.
+   * @return a personnel response DTO.
+   */
+  @Transactional
+  public PersonnelResponse logInPersonnel(PersonnelRequest personnelRequest) {
+    var persistedPersonnel =
+        personnelRepository.getPersonnelEntityByUsername(personnelRequest.getUsername());
+
+    if (persistedPersonnel.isEmpty()
+        || !persistedPersonnel.get().getPassword().equals(personnelRequest.getPassword())) {
+      throw new AuthorizationException();
+    }
+
+    return converter.convertFromEntityToResponse(persistedPersonnel.get());
   }
 
   /**
