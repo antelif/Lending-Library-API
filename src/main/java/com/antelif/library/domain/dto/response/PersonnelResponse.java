@@ -10,4 +10,5 @@ public class PersonnelResponse {
 
   private Long id;
   private String username;
+  private String role;
 }

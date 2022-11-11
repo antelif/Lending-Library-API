@@ -40,18 +40,4 @@ public class PersonnelCommandController {
     log.info("Received request to add personnel {}", personnelRequest);
     return ResponseEntity.ok(Map.of(CREATED, personnelService.addPersonnel(personnelRequest)));
   }
-
-  /**
-   * Retrieve the logged in personnel.
-   *
-   * @param personnelRequest the object that contains personnel credentials.
-   * @return a personnel response DTO.
-   */
-  @PostMapping("/login")
-  public ResponseEntity<PersonnelResponse> publisherLogIn(
-      @RequestBody PersonnelRequest personnelRequest) {
-
-    log.info("Received request to log in personnel {}", personnelRequest.getUsername());
-    return ResponseEntity.ok(personnelService.logInPersonnel(personnelRequest));
-  }
 }

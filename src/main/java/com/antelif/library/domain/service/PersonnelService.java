@@ -4,27 +4,33 @@ import static com.antelif.library.application.error.GenericError.DUPLICATE_PERSO
 import static com.antelif.library.application.error.GenericError.PERSONNEL_CREATION_FAILED;
 import static com.antelif.library.application.error.GenericError.PERSONNEL_DOES_NOT_EXIST;
 
+import com.antelif.library.configuration.AppProperties;
 import com.antelif.library.domain.converter.PersonnelConverter;
 import com.antelif.library.domain.dto.request.PersonnelRequest;
 import com.antelif.library.domain.dto.response.PersonnelResponse;
-import com.antelif.library.domain.exception.AuthorizationException;
 import com.antelif.library.domain.exception.DuplicateEntityException;
 import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
 import com.antelif.library.infrastructure.entity.PersonnelEntity;
 import com.antelif.library.infrastructure.repository.PersonnelRepository;
 import java.util.Optional;
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /** Personnel service. */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PersonnelService {
 
   private final PersonnelRepository personnelRepository;
+  private final AppProperties appProperties;
   private final PersonnelConverter converter;
+  private final PasswordEncoder passwordEncoder;
 
   /**
    * Adds personnel to database.
@@ -34,6 +40,8 @@ public class PersonnelService {
    */
   @Transactional
   public PersonnelResponse addPersonnel(PersonnelRequest personnelRequest) {
+
+    personnelRequest.setPassword(passwordEncoder.encode(personnelRequest.getPassword()));
 
     var persistedPersonnel =
         personnelRepository.getPersonnelEntityByUsername(personnelRequest.getUsername());
@@ -49,25 +57,6 @@ public class PersonnelService {
   }
 
   /**
-   * Retrieve the logged in personnel.
-   *
-   * @param personnelRequest the object that contains personnel credentials.
-   * @return a personnel response DTO.
-   */
-  @Transactional
-  public PersonnelResponse logInPersonnel(PersonnelRequest personnelRequest) {
-    var persistedPersonnel =
-        personnelRepository.getPersonnelEntityByUsername(personnelRequest.getUsername());
-
-    if (persistedPersonnel.isEmpty()
-        || !persistedPersonnel.get().getPassword().equals(personnelRequest.getPassword())) {
-      throw new AuthorizationException();
-    }
-
-    return converter.convertFromEntityToResponse(persistedPersonnel.get());
-  }
-
-  /**
    * Retrieve personnel from the database by provided id.
    *
    * @param id of the personnel to retrieve.
@@ -78,5 +67,18 @@ public class PersonnelService {
 
     return persistedPersonnel.orElseThrow(
         () -> new EntityDoesNotExistException(PERSONNEL_DOES_NOT_EXIST));
+  }
+
+  /** Initializes a root user to enable access to requests until new users are created. */
+  @PostConstruct
+  public void initializeRootUser() {
+    var rootPersonnel = new PersonnelRequest(appProperties.getRootUser());
+
+    try {
+      log.info("Creating root user.");
+      addPersonnel(rootPersonnel);
+    } catch (DuplicateEntityException exception) {
+      log.info("Root user has been already created.");
+    }
   }
 }

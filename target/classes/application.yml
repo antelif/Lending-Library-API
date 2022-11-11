@@ -2,6 +2,9 @@ app:
   properties:
     daily-fee-rate: ${DAILY_FEE_RATE:0.5}
     fee-calculation-rate: ${FEE_RATE:0 30 7 * * *} # every day at 7.30
+    root-user:
+      username: root
+      password: root
 spring:
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:5432/library
