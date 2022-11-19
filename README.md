@@ -4,7 +4,7 @@ ___
 
 #### Lending library application implemented in Java, using Spring framework. <br/>Contains common operations needed in a lending library such as manipulation of books and their copies, or creating and finalizing transaction with customers, etc.* <br/><br/>HTTP requests are used for each operation and data is saved in database.
 
-#####                  * a detailed list of available operations provided below in `Operations` section.
+#####                     * a detailed list of available operations provided below in `Operations` section.
 
 ## Technologies
 
@@ -19,45 +19,33 @@ ___
 ## Operations
 
 ___
-The user has a variety of operations they can perform. Below they are sectioned by the object of
-interest for each operation.
+The personnel user has a variety of operations they can perform. They are responsible for customer
+and transaction creation, handling fee repays and adding new books and their copies in the database.
+Below they are sectioned by the object of interest for each operation:
 
-<b>Author:</b>  The author of a book.
-
-- Add new authors
-
-<b>Book: </b> Contains information about the book, such as title, isbn, author, etc.
-
-- Add new book
-- Get all books from database
-- Get a book by their given id.
-
-<b>Book Copies:</b> Each book has some copies for lending. Customers cannot borrow the books
-directly, rather a list of book copies.
-
-- Add new book copies.
-
-<b>Customer:</b> The customer that will borrow books.
-
-- Add new customer
-- Get a customer by their id
-- Update the customer fee - repay fee.
-
-<b>Personnel:</b> The personnel responsible for transactions.
-
-- Add new personnel
-
-<b>Publisher</b>
-
-- Add new publisher
-- Get all publishers
-- Get a publisher by their id
-
-<b>Transactions: </b> The process of lending a list of books to a customer.
-
-- Create new transaction.
-- Update or/and finalize existing transaction
-- Cancel existing transaction.
+- <b>Author:</b>  Contains information about the author of a book.
+    - Add new authors
+- <b>Book: </b> Contains information about the book, such as title, isbn, author, etc.
+    - Add new book
+    - Get all books from database
+    - Get a book by their given id.
+- <b>Book Copies:</b> Each book has some copies for lending. Customers cannot borrow the books
+  directly, rather a list of book copies.
+    - Add new book copies.
+- <b>Customer:</b> The customer that will borrow books.
+    - Add new customer
+    - Get a customer by their id
+    - Update the customer fee - repay fee.
+- <b>Personnel:</b> The personnel responsible for transactions.
+    - Add new personnel
+- <b>Publisher</b>
+    - Add new publisher
+    - Get all publishers
+    - Get a publisher by their id
+- <b>Transactions: </b> The process of lending a list of books to a customer.
+    - Create new transaction.
+    - Update or/and finalize existing transaction
+    - Cancel existing transaction.
 
 ## How to run
 
@@ -80,17 +68,6 @@ password: root
 In order to be able to create new transactions: lending books, return books etc. you will need to
 initialize the database with some data.
 At this point there is no script to preload data, however it will be implemented in the future.
-
-You can manually persist entities in the database following next steps. To properly initialize your
-data you need to:
-
-1. Log in as root personnel user
-2. (Optinal) Create a new personnel user
-3. Create authors and publishers
-4. Create books
-5. Create book copies for the books
-6. Create customers
-7. You can now create transactions
 
 ---
 
@@ -359,7 +336,7 @@ following steps shown above to add an author and a publisher you can create a ne
 3. <b>Update customer fee:</b>
    <br/><b>URL:</b> PATCH request at `library/customers/{customerId}`.
    <br/><b>Request body:</b>
-   ```json 
+   ``` 
    0.0
    ```
    <br/><b>Expected response:</b>
