@@ -6,6 +6,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import com.antelif.library.application.error.ErrorResponse;
 import com.antelif.library.domain.exception.GenericException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /** Rest Controller Exception Handler. */
 @RestControllerAdvice
+@Slf4j
 public class RestControllerExceptionHandler {
 
   /***
@@ -22,7 +24,12 @@ public class RestControllerExceptionHandler {
   @ExceptionHandler(value = Exception.class)
   @ResponseStatus(INTERNAL_SERVER_ERROR)
   public ErrorResponse exceptionHandler(Exception exception) {
-    return new ErrorResponse(GENERIC_ERROR, exception.getMessage());
+    var error =
+        new ErrorResponse(GENERIC_ERROR, INTERNAL_SERVER_ERROR.value(), exception.getMessage());
+
+    log.error(error.toString());
+
+    return error;
   }
   /***
    * Handles all custom exceptions that extend GenericException.
@@ -32,7 +39,11 @@ public class RestControllerExceptionHandler {
   @ExceptionHandler(value = GenericException.class)
   @ResponseStatus(INTERNAL_SERVER_ERROR)
   public ErrorResponse genericExceptionHandler(GenericException exception) {
-    return new ErrorResponse(exception.getGenericError());
+    var error = new ErrorResponse(exception.getGenericError(), INTERNAL_SERVER_ERROR.value());
+
+    log.error(error.toString());
+
+    return error;
   }
 
   /**
@@ -42,9 +53,17 @@ public class RestControllerExceptionHandler {
    * @return an Error Response object with information about the error that occurred.
    */
   @ExceptionHandler(value = MethodArgumentNotValidException.class)
+  @ResponseStatus(INTERNAL_SERVER_ERROR)
   public ErrorResponse methodArgumentNotValidExceptionHandler(
       MethodArgumentNotValidException exception) {
-    return new ErrorResponse(
-        INPUT_VALIDATIONS_ERROR, exception.getFieldError().getDefaultMessage());
+    var error =
+        new ErrorResponse(
+            INPUT_VALIDATIONS_ERROR,
+            INTERNAL_SERVER_ERROR.value(),
+            exception.getFieldError().getDefaultMessage());
+
+    log.error(error.toString());
+
+    return error;
   }
 }

@@ -165,20 +165,6 @@ public class RequestBuilder {
   }
 
   @SneakyThrows
-  public static PersonnelResponse logInPersonnel(
-      PersonnelRequest personnelContent, MockMvc mockMvc) {
-    var personnelMap =
-        objectMapper.readValue(
-            postRequest(
-                PERSONNEL_ENDPOINT + "/login",
-                objectMapper.writeValueAsString(personnelContent),
-                mockMvc),
-            new TypeReference<Map<String, Object>>() {});
-    return objectMapper.readValue(
-        objectMapper.writeValueAsString(personnelMap), PersonnelResponse.class);
-  }
-
-  @SneakyThrows
   public static CustomerResponse postCustomer(CustomerRequest customerContent, MockMvc mockMvc) {
 
     var customerMap =

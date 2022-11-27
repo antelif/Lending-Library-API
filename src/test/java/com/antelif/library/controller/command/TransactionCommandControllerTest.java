@@ -10,6 +10,7 @@ import static com.antelif.library.application.error.GenericError.CUSTOMER_HAS_TH
 import static com.antelif.library.application.error.GenericError.DUPLICATE_BOOKS_IN_TRANSACTION;
 import static com.antelif.library.application.error.GenericError.PERSONNEL_DOES_NOT_EXIST;
 import static com.antelif.library.application.error.GenericError.TRANSACTION_DOES_NOT_EXIST;
+import static com.antelif.library.configuration.Roles.ADMIN;
 import static com.antelif.library.domain.common.Endpoints.TRANSACTIONS_ENDPOINT;
 import static com.antelif.library.domain.type.BookCopyStatus.AVAILABLE;
 import static com.antelif.library.domain.type.State.BAD;
@@ -36,6 +37,7 @@ import static com.antelif.library.utils.RequestBuilder.postRequestAndExpectError
 import static com.antelif.library.utils.RequestBuilder.postTransaction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 import com.antelif.library.domain.dto.request.TransactionRequest;
 import com.antelif.library.domain.dto.response.BookCopyResponse;
@@ -49,11 +51,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Transactions command controller")
+@WithMockUser(username = "root", password = "root", roles = ADMIN)
 class TransactionCommandControllerTest extends BaseIntegrationTest {
 
   @Autowired private WebApplicationContext webApplicationContext;
@@ -67,7 +71,10 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   @BeforeEach
   @SneakyThrows
   void setUp() {
-    this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+    this.mockMvc =
+        MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
+            .apply(springSecurity())
+            .build();
 
     authorCounter++;
     publisherCounter++;

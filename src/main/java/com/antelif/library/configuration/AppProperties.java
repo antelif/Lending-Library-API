@@ -12,4 +12,12 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class AppProperties {
   private Double dailyFeeRate;
+  private RootUser rootUser;
+
+  @Getter
+  @Setter
+  public static class RootUser {
+    private String username;
+    private String password;
+  }
 }

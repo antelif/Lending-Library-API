@@ -1,19 +1,20 @@
 package com.antelif.library.controller.command;
 
-import static com.antelif.library.application.error.GenericError.BOOK_DOES_NOT_EXIST;
-import static com.antelif.library.domain.common.Endpoints.BOOK_COPIES_ENDPOINT;
+import static com.antelif.library.configuration.Roles.ADMIN;
 import static com.antelif.library.factory.AuthorFactory.createAuthorRequest;
 import static com.antelif.library.factory.BookCopyFactory.createBookCopyRequest;
 import static com.antelif.library.factory.BookCopyFactory.createBookCopyResponse;
 import static com.antelif.library.factory.BookFactory.createBookRequest;
 import static com.antelif.library.factory.PublisherFactory.createPublisherRequest;
+import static com.antelif.library.utils.Constants.ROOT_PASSWORD;
+import static com.antelif.library.utils.Constants.ROOT_USER;
 import static com.antelif.library.utils.RequestBuilder.postAuthor;
 import static com.antelif.library.utils.RequestBuilder.postBook;
 import static com.antelif.library.utils.RequestBuilder.postBookCopy;
 import static com.antelif.library.utils.RequestBuilder.postPublisher;
-import static com.antelif.library.utils.RequestBuilder.postRequestAndExpectError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 import com.antelif.library.domain.dto.request.BookCopyRequest;
 import com.antelif.library.domain.dto.response.BookCopyResponse;
@@ -23,11 +24,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Book copies command controller")
+@WithMockUser(username = ROOT_USER, password = ROOT_PASSWORD, roles = ADMIN)
 class BookCopyCommandControllerTest extends BaseIntegrationTest {
 
   @Autowired private WebApplicationContext webApplicationContext;
@@ -40,7 +43,11 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
   @BeforeEach
   @SneakyThrows
   void setUp() {
-    this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+
+    this.mockMvc =
+        MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
+            .apply(springSecurity())
+            .build();
 
     authorCounter++;
     publisherCounter++;
