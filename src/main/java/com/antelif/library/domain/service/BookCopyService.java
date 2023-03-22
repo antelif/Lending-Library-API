@@ -51,10 +51,8 @@ public class BookCopyService {
    */
   public BookCopyResponse updateBookCopyState(Long bookCopyId, State state) {
 
-    var bookCopy =
-        repository.getByIdIn(List.of(bookCopyId)).stream()
-            .findFirst()
-            .orElseThrow(() -> new EntityDoesNotExistException(BOOK_COPY_DOES_NOT_EXIST));
+    var bookCopy = repository.findById(bookCopyId)
+        .orElseThrow(() -> new EntityDoesNotExistException(BOOK_COPY_DOES_NOT_EXIST));
 
     validateUpdate(bookCopy, state);
 
@@ -70,6 +68,6 @@ public class BookCopyService {
    * @return a list of book copy entity objects.
    */
   public List<BookCopyEntity> getBookCopiesByBookCopyIds(List<Long> bookCopyIds) {
-    return new ArrayList<>(repository.getByIdIn(bookCopyIds));
+    return new ArrayList<>(repository.findAllById(bookCopyIds));
   }
 }
