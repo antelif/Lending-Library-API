@@ -12,12 +12,15 @@ import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
 import com.antelif.library.infrastructure.entity.AuthorEntity;
 import com.antelif.library.infrastructure.repository.AuthorRepository;
+import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/** Author service. */
+/**
+ * Author service.
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -34,10 +37,10 @@ public class AuthorService {
    */
   public AuthorResponse addAuthor(AuthorRequest authorRequest) {
 
-    var persistedEntity =
+    List<AuthorEntity> persistedEntity =
         Optional.ofNullable(authorRequest.getMiddleName()).isPresent()
             ? authorRepository.getAuthorEntitiesByNameAndSurnameAndMiddleName(
-                authorRequest.getName(), authorRequest.getSurname(), authorRequest.getMiddleName())
+            authorRequest.getName(), authorRequest.getSurname(), authorRequest.getMiddleName())
             : authorRepository.getAuthorEntitiesByNameAndSurname(
                 authorRequest.getName(), authorRequest.getSurname());
 
@@ -57,7 +60,7 @@ public class AuthorService {
    * @return an author entity object.
    */
   public AuthorEntity getAuthorById(Long id) {
-    var persistedAuthor = authorRepository.getAuthorEntityById(id);
+    Optional<AuthorEntity> persistedAuthor = authorRepository.getAuthorEntityById(id);
 
     return persistedAuthor.orElseThrow(
         () -> new EntityDoesNotExistException(AUTHOR_DOES_NOT_EXIST));

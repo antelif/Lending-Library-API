@@ -8,7 +8,9 @@ import com.antelif.library.infrastructure.repository.PersonnelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/** Contains functionality to retrieve a personnel from the database for security purposes. */
+/**
+ * Contains functionality to retrieve a personnel from the database for security purposes.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserRetrievalService {

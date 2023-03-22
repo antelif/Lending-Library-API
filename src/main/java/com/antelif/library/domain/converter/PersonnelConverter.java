@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-/** Converter for personnel objects. */
+/**
+ * Converter for personnel objects.
+ */
 @Component
 @RequiredArgsConstructor
 public class PersonnelConverter

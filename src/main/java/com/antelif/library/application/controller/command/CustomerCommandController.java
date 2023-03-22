@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Customer command controller. */
+/**
+ * Customer command controller.
+ */
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -48,7 +50,7 @@ public class CustomerCommandController {
    * Updates the fee of the customer.
    *
    * @param customerId the customer id whose fee to update,
-   * @param feeAmount the fee amount to repay,
+   * @param feeAmount  the fee amount to repay,
    * @return a customer response DTO.
    */
   @PatchMapping("/{customerId}")

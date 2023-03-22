@@ -17,7 +17,14 @@ import static com.antelif.library.utils.RequestBuilder.postPersonnel;
 import static com.antelif.library.utils.RequestBuilder.postPublisher;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.domain.dto.response.AuthorResponse;
+import com.antelif.library.domain.dto.response.BookCopyResponse;
+import com.antelif.library.domain.dto.response.BookResponse;
+import com.antelif.library.domain.dto.response.CustomerResponse;
+import com.antelif.library.domain.dto.response.PersonnelResponse;
+import com.antelif.library.domain.dto.response.PublisherResponse;
+import com.antelif.library.config.BaseIT;
 import com.antelif.library.utils.RequestBuilder;
 import java.util.ArrayList;
 import lombok.SneakyThrows;
@@ -30,7 +37,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Validations Transaction")
-public class TransactionRequestValidationTest extends BaseIntegrationTest {
+public class TransactionRequestValidationIT extends BaseIT {
 
   @Autowired private MockMvc mockMvc;
   @Autowired private WebApplicationContext webApplicationContext;
@@ -47,26 +54,26 @@ public class TransactionRequestValidationTest extends BaseIntegrationTest {
     authorCounter++;
     publisherCounter++;
 
-    var authorRequest = createAuthorRequest(authorCounter);
-    var authorResponse = postAuthor(authorRequest, this.mockMvc);
+    AuthorRequest authorRequest = createAuthorRequest(authorCounter);
+    AuthorResponse authorResponse = postAuthor(authorRequest, this.mockMvc);
 
-    var publisherRequest = createPublisherRequest(publisherCounter);
-    var publisherResponse = postPublisher(publisherRequest, this.mockMvc);
+    PublisherRequest publisherRequest = createPublisherRequest(publisherCounter);
+    PublisherResponse publisherResponse = postPublisher(publisherRequest, this.mockMvc);
 
-    var bookRequest =
+    BookRequest bookRequest =
         createBookRequest(bookCounter, authorResponse.getId(), publisherResponse.getId());
 
-    var bookResponse = postBook(bookRequest, this.mockMvc);
-    var isbn = bookResponse.getIsbn();
+    BookResponse bookResponse = postBook(bookRequest, this.mockMvc);
+    String isbn = bookResponse.getIsbn();
 
-    var bookCopyRequest = createBookCopyRequest(isbn);
-    var bookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
+    BookCopyRequest bookCopyRequest = createBookCopyRequest(isbn);
+    BookCopyResponse bookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
 
-    var customerRequest = createCustomerRequest(customerCounter);
-    var customerResponse = postCustomer(customerRequest, this.mockMvc);
+    CustomerRequest customerRequest = createCustomerRequest(customerCounter);
+    CustomerResponse customerResponse = postCustomer(customerRequest, this.mockMvc);
 
-    var personnelRequest = createPersonnelRequest(personnelCounter);
-    var personnelResponse = postPersonnel(personnelRequest, this.mockMvc);
+    PersonnelRequest personnelRequest = createPersonnelRequest(personnelCounter);
+    PersonnelResponse personnelResponse = postPersonnel(personnelRequest, this.mockMvc);
 
     transactionRequest =
         createTransactionRequest(
@@ -79,7 +86,7 @@ public class TransactionRequestValidationTest extends BaseIntegrationTest {
   void testPublisherDaysUntilReturnCannotBeMoreThan7() {
     transactionRequest.setDaysUntilReturn(8);
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             TRANSACTIONS_ENDPOINT,
             objectMapper.writeValueAsString(transactionRequest),
@@ -94,7 +101,7 @@ public class TransactionRequestValidationTest extends BaseIntegrationTest {
   void testPublisherDaysUntilReturnCannotBeLessThan1() {
     transactionRequest.setDaysUntilReturn(0);
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             TRANSACTIONS_ENDPOINT,
             objectMapper.writeValueAsString(transactionRequest),
@@ -109,7 +116,7 @@ public class TransactionRequestValidationTest extends BaseIntegrationTest {
   void testPublisherCustomerCannotBeNull() {
     transactionRequest.setCustomerId(null);
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             TRANSACTIONS_ENDPOINT,
             objectMapper.writeValueAsString(transactionRequest),
@@ -124,7 +131,7 @@ public class TransactionRequestValidationTest extends BaseIntegrationTest {
   void testPublisherPersonnelCannotBeNull() {
     transactionRequest.setPersonnelId(null);
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             TRANSACTIONS_ENDPOINT,
             objectMapper.writeValueAsString(transactionRequest),
@@ -139,7 +146,7 @@ public class TransactionRequestValidationTest extends BaseIntegrationTest {
   void testPublisherCBookCopiesListCannotBeEmpty() {
     transactionRequest.setCopyIds(new ArrayList<>());
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             TRANSACTIONS_ENDPOINT,
             objectMapper.writeValueAsString(transactionRequest),

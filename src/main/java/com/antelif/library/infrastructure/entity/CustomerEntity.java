@@ -18,12 +18,15 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Customer entity object that gets persisted in database. */
+/**
+ * Customer entity object that gets persisted in database.
+ */
 @Getter
 @Setter
 @Entity
 @Table(name = "customer")
 public class CustomerEntity {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -73,7 +76,7 @@ public class CustomerEntity {
    */
   private void calculateFee(double dailyRate) {
 
-    var now = nowInstantToDays();
+    Instant now = nowInstantToDays();
     this.fee = 0;
 
     Optional.ofNullable(transactions).stream()
@@ -82,19 +85,23 @@ public class CustomerEntity {
         .forEach(
             transaction -> {
               if (now.isAfter(transaction.getReturnDate())) {
-                var daysInBetween = DAYS.between(transaction.getReturnDate(), now);
+                long daysInBetween = DAYS.between(transaction.getReturnDate(), now);
                 fee += dailyRate * daysInBetween;
                 lastUpdate = nowInstantToDays();
               }
             });
   }
 
-  /** Updates the lat update time. Truncates to days. */
+  /**
+   * Updates the lat update time. Truncates to days.
+   */
   private void updateLastUpdateTime() {
     this.lastUpdate = nowInstantToDays();
   }
 
-  /** Returns true if the fee was not updated the last day. */
+  /**
+   * Returns true if the fee was not updated the last day.
+   */
   private boolean feeIsUpdateable() {
     return nowInstantToDays().isAfter(lastUpdate);
   }

@@ -14,9 +14,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
+import com.antelif.library.application.error.ErrorResponse;
 import com.antelif.library.domain.dto.request.AuthorRequest;
 import com.antelif.library.domain.dto.response.AuthorResponse;
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.config.BaseIT;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,10 +30,12 @@ import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Authors command controller")
 @WithMockUser(username = ROOT_USER, password = ROOT_PASSWORD, roles = ADMIN)
-class AuthorCommandControllerTest extends BaseIntegrationTest {
+class AuthorCommandControllerIT extends BaseIT {
 
-  @Autowired private WebApplicationContext webApplicationContext;
-  @Autowired private MockMvc mockMvc;
+  @Autowired
+  private WebApplicationContext webApplicationContext;
+  @Autowired
+  private MockMvc mockMvc;
 
   private AuthorResponse expectedAuthorResponse;
   private AuthorRequest authorRequest;
@@ -40,10 +43,8 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
   @BeforeEach
   @SneakyThrows
   void setUp() {
-    this.mockMvc =
-        MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
-            .apply(springSecurity())
-            .build();
+    this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
+        .apply(springSecurity()).build();
 
     authorCounter++;
 
@@ -56,7 +57,7 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testNewAuthorIsCreatedWithAllArguments() {
 
-    var actualAuthorResponse = postAuthor(authorRequest, this.mockMvc);
+    AuthorResponse actualAuthorResponse = postAuthor(authorRequest, this.mockMvc);
 
     assertNotNull(actualAuthorResponse);
 
@@ -73,7 +74,7 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
 
     authorRequest.setMiddleName(null);
 
-    var actualAuthorResponse = postAuthor(authorRequest, this.mockMvc);
+    AuthorResponse actualAuthorResponse = postAuthor(authorRequest, this.mockMvc);
     assertNotNull(actualAuthorResponse);
 
     assertNotNull(actualAuthorResponse.getId());
@@ -83,8 +84,7 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
   }
 
   @Test
-  @DisplayName(
-      "Author: Unsuccessful creation when record exists for this name, surname and middle name.")
+  @DisplayName("Author: Unsuccessful creation when record exists for this name, surname and middle name.")
   @SneakyThrows
   void testDuplicateAuthorIsNotCreated() {
 
@@ -92,9 +92,8 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
     postAuthor(authorRequest, this.mockMvc);
 
     // Same author creation should fail
-    var response =
-        postRequestAndExpectError(
-            AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
+    ErrorResponse response = postRequestAndExpectError(AUTHORS_ENDPOINT,
+        objectMapper.writeValueAsString(authorRequest), this.mockMvc);
 
     assertEquals(DUPLICATE_AUTHOR.getCode(), response.getCode());
   }
@@ -110,9 +109,8 @@ class AuthorCommandControllerTest extends BaseIntegrationTest {
     postAuthor(authorRequest, this.mockMvc);
 
     // Same author without middle name should fail
-    var response =
-        postRequestAndExpectError(
-            AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
+    ErrorResponse response = postRequestAndExpectError(AUTHORS_ENDPOINT,
+        objectMapper.writeValueAsString(authorRequest), this.mockMvc);
 
     assertEquals(DUPLICATE_AUTHOR.getCode(), response.getCode());
   }

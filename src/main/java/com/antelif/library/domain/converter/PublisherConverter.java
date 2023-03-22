@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-/** Converter for publisher objects. */
+/**
+ * Converter for publisher objects.
+ */
 @Component
 @RequiredArgsConstructor
 public class PublisherConverter

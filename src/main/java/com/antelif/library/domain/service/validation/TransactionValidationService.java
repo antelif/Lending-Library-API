@@ -23,11 +23,14 @@ import com.antelif.library.infrastructure.entity.TransactionItemEntity;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
 
-/** Transaction validation service. */
+/**
+ * Transaction validation service.
+ */
 @Component
 public final class TransactionValidationService {
 
@@ -38,12 +41,12 @@ public final class TransactionValidationService {
    */
   public static void validateCreation(TransactionEntity transaction) {
 
-    var bookCopies =
+    List<BookCopyEntity> bookCopies =
         Optional.of(transaction).map(TransactionEntity::getTransactionItems).stream()
             .flatMap(Collection::stream)
             .map(TransactionItemEntity::getBookCopy)
             .collect(Collectors.toList());
-    var customer = transaction.getCustomer();
+    CustomerEntity customer = transaction.getCustomer();
 
     validateBookCopiesRetrieved(bookCopies);
     validateBooksToBorrowAreUnique(bookCopies);
@@ -55,8 +58,8 @@ public final class TransactionValidationService {
   /**
    * Contains all validations for transactions to be updated.
    *
-   * @param transactions a list of TransactionEntity items with information about transactions to be
-   *     updated,
+   * @param transactions        a list of TransactionEntity items with information about
+   *                            transactions to be updated,
    * @param bookCopyIdsReturned a list of book copy ids to be returned.
    */
   public static void validateUpdate(
@@ -76,14 +79,18 @@ public final class TransactionValidationService {
     validateTransactionIsPartiallyUpdated(transaction);
   }
 
-  /** Throws an exception if the transaction to cancel is finalized. */
+  /**
+   * Throws an exception if the transaction to cancel is finalized.
+   */
   private static void validateTransactionIsFinalized(TransactionEntity transaction) {
     if (transaction.getStatus().equals(FINALIZED)) {
       throw new UnsuccessfulTransactionException(CANNOT_CANCEL_FINALIZED_TRANSACTION);
     }
   }
 
-  /** Throws an exception if the transaction to cancel has some books returned already. */
+  /**
+   * Throws an exception if the transaction to cancel has some books returned already.
+   */
   private static void validateTransactionIsPartiallyUpdated(TransactionEntity transaction) {
     if (transaction.getTransactionItems().stream()
         .map(TransactionItemEntity::getBookCopy)
@@ -99,7 +106,7 @@ public final class TransactionValidationService {
    */
   private static void validateBookCopiesToReturnExistInTransaction(
       List<TransactionEntity> transactions, List<Long> bookCopyIdsReturned) {
-    var bookCopyIdsInTransactions =
+    List<Long> bookCopyIdsInTransactions =
         transactions.stream()
             .map(TransactionEntity::getTransactionItems)
             .flatMap(Collection::stream)
@@ -111,11 +118,14 @@ public final class TransactionValidationService {
       throw new UnsuccessfulTransactionException(BOOK_COPIES_NOT_IN_TRANSACTION);
     }
   }
-  /** Throws an exception if book copy id to return is not of status 'LENT' in transaction. */
+
+  /**
+   * Throws an exception if book copy id to return is not of status 'LENT' in transaction.
+   */
   private static void validateBookCopiesToReturnAreLent(
       List<TransactionEntity> transactions, List<Long> bookCopyIdsReturned) {
 
-    var availableBookCopies =
+    Set<BookCopyEntity> availableBookCopies =
         transactions.stream()
             .map(TransactionEntity::getTransactionItems)
             .flatMap(Collection::stream)
@@ -136,13 +146,15 @@ public final class TransactionValidationService {
     }
   }
 
-  /** Throws an exception if transaction contains books with the same ISBN twice. */
+  /**
+   * Throws an exception if transaction contains books with the same ISBN twice.
+   */
   private static void validateBooksToBorrowAreUnique(List<BookCopyEntity> bookCopies) {
     if (bookCopies.stream()
-            .map(BookCopyEntity::getBook)
-            .map(BookEntity::getIsbn)
-            .collect(Collectors.toSet())
-            .size()
+        .map(BookCopyEntity::getBook)
+        .map(BookEntity::getIsbn)
+        .collect(Collectors.toSet())
+        .size()
         < bookCopies.size()) {
       throw new UnsuccessfulTransactionException(DUPLICATE_BOOKS_IN_TRANSACTION);
     }
@@ -157,12 +169,12 @@ public final class TransactionValidationService {
 
   private static void validateCustomerHasThisBook(
       CustomerEntity customer, List<BookCopyEntity> bookCopies) {
-    var bookCopyIds =
+    Set<Long> bookCopyIds =
         Stream.of(bookCopies)
             .flatMap(Collection::stream)
             .map(BookCopyEntity::getId)
             .collect(Collectors.toSet());
-    var customerBookCopyIds =
+    Set<Long> customerBookCopyIds =
         Stream.of(customer)
             .map(CustomerEntity::getTransactions)
             .flatMap(Collection::stream)
@@ -184,5 +196,6 @@ public final class TransactionValidationService {
     }
   }
 
-  private TransactionValidationService() {}
+  private TransactionValidationService() {
+  }
 }

@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-/** Contains all information to display when an error occurs. */
+/**
+ * Contains all information to display when an error occurs.
+ */
 @Getter
 @Setter
 @ToString
@@ -23,7 +25,7 @@ public class ErrorResponse {
    * Constructor for custom exceptions.
    *
    * @param genericError the error that occurred,
-   * @param status the http request status of the error that occurred.
+   * @param status       the http request status of the error that occurred.
    */
   public ErrorResponse(GenericError genericError, int status) {
     this.name = genericError.getName();
@@ -37,8 +39,8 @@ public class ErrorResponse {
    * Constructor for validation exceptions.
    *
    * @param genericError the error that occurred,
-   * @param status the http request status of the error that occurred,
-   * @param description the description provided by the runtime exception that occurred.
+   * @param status       the http request status of the error that occurred,
+   * @param description  the description provided by the runtime exception that occurred.
    */
   public ErrorResponse(GenericError genericError, int status, String description) {
     this.name = genericError.getName();

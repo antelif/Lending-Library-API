@@ -9,7 +9,6 @@ import com.antelif.library.domain.dto.request.BookCopyRequest;
 import com.antelif.library.domain.dto.response.BookCopyResponse;
 import com.antelif.library.domain.exception.EntityCreationException;
 import com.antelif.library.domain.exception.EntityDoesNotExistException;
-import com.antelif.library.domain.service.validation.BookCopyValidationService;
 import com.antelif.library.domain.type.State;
 import com.antelif.library.infrastructure.entity.BookCopyEntity;
 import com.antelif.library.infrastructure.repository.BookCopyRepository;
@@ -20,7 +19,9 @@ import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/** Book copy service. */
+/**
+ * Book copy service.
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -45,13 +46,14 @@ public class BookCopyService {
 
   /**
    * Updates the state of a book copy.
+   *
    * @param bookCopyId the book copy id of which to change the state.
-   * @param state the new book copy state.
+   * @param state      the new book copy state.
    * @return a book copy response DTO.
    */
   public BookCopyResponse updateBookCopyState(Long bookCopyId, State state) {
 
-    var bookCopy = repository.findById(bookCopyId)
+    BookCopyEntity bookCopy = repository.findById(bookCopyId)
         .orElseThrow(() -> new EntityDoesNotExistException(BOOK_COPY_DOES_NOT_EXIST));
 
     validateUpdate(bookCopy, state);

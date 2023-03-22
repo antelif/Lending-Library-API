@@ -1,9 +1,12 @@
 package com.antelif.library.domain.common;
 
-/** Controller tags used to separate requests in Swagger. */
+/**
+ * Controller tags used to separate requests in Swagger.
+ */
 public final class ControllerTags {
 
-  private ControllerTags() {}
+  private ControllerTags() {
+  }
 
   // Separate controller by logic.
   public static final String BOOK_CONTROLLER = "Book";

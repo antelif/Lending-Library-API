@@ -19,7 +19,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** Customer Service. */
+/**
+ * Customer Service.
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -37,7 +39,8 @@ public class CustomerService {
    */
   public CustomerResponse addCustomer(CustomerRequest customerRequest) {
 
-    var persistedCustomer = customerRepository.getCustomerByPhoneNo(customerRequest.getPhoneNo());
+    Optional<CustomerEntity> persistedCustomer = customerRepository.getCustomerByPhoneNo(
+        customerRequest.getPhoneNo());
 
     if (persistedCustomer.isPresent()) {
       throw new DuplicateEntityException(DUPLICATE_CUSTOMER);
@@ -57,7 +60,7 @@ public class CustomerService {
    */
   public CustomerEntity getCustomerById(Long id) {
 
-    var persistedCustomer =
+    CustomerEntity persistedCustomer =
         customerRepository
             .getCustomerById(id)
             .orElseThrow(() -> new EntityDoesNotExistException(CUSTOMER_DOES_NOT_EXIST));
@@ -71,12 +74,12 @@ public class CustomerService {
    * Updates the customer fee by subtracting the feeAmount provided from the customer fee.
    *
    * @param customerId the customer whose fee to update,
-   * @param feeAmount the amount to subtract from the customer fee,
+   * @param feeAmount  the amount to subtract from the customer fee,
    * @return a customer response DTO.
    */
   public CustomerResponse updateCustomerFee(Long customerId, Double feeAmount) {
 
-    var persistedCustomer =
+    CustomerEntity persistedCustomer =
         customerRepository
             .getCustomerById(customerId)
             .orElseThrow(() -> new EntityDoesNotExistException(CUSTOMER_DOES_NOT_EXIST));
@@ -90,7 +93,9 @@ public class CustomerService {
     return converter.convertFromEntityToResponse(persistedCustomer);
   }
 
-  /** Recalculates fee for all customers. */
+  /**
+   * Recalculates fee for all customers.
+   */
   public void recalculateCustomerFee() {
     customerRepository
         .findAll()

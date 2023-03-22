@@ -2,15 +2,21 @@ package com.antelif.library.domain.exception;
 
 import com.antelif.library.application.error.GenericError;
 
-/** Validation exception that occurs during validations. */
+/**
+ * Validation exception that occurs during validations.
+ */
 public class ValidationException extends GenericException {
 
-  /** Constructor. */
+  /**
+   * Constructor.
+   */
   public ValidationException(GenericError genericError, String args) {
     super(genericError, args);
   }
 
-  /** Constructor. */
+  /**
+   * Constructor.
+   */
   public ValidationException(GenericError genericError) {
     super(genericError);
   }

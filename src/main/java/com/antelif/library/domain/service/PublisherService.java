@@ -19,7 +19,9 @@ import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/** Publisher service. */
+/**
+ * Publisher service.
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -36,7 +38,7 @@ public class PublisherService {
    */
   public PublisherResponse addPublisher(PublisherRequest publisherRequest) {
 
-    var persistedEntity =
+    Optional<List<PublisherEntity>> persistedEntity =
         Optional.ofNullable(publisherRepository.getPublishersByName(publisherRequest.getName()));
 
     if (persistedEntity.isPresent() && !persistedEntity.get().isEmpty()) {
@@ -67,7 +69,7 @@ public class PublisherService {
    * @return a publisher entity object.
    */
   public PublisherEntity getPublisherById(Long id) {
-    var persistedPublisher = publisherRepository.getPublisherById(id);
+    Optional<PublisherEntity> persistedPublisher = publisherRepository.getPublisherById(id);
 
     return persistedPublisher.orElseThrow(
         () -> new EntityDoesNotExistException(PUBLISHER_DOES_NOT_EXIST));

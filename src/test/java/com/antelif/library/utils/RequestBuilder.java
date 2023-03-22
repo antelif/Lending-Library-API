@@ -75,7 +75,7 @@ public class RequestBuilder {
   // GET
   @SneakyThrows
   public static String getRequest(String endpoint, MockMvc mockMvc) {
-    var response =
+    String response =
         mockMvc
             .perform(get(endpoint).contentType(APPLICATION_JSON))
             .andDo(print())
@@ -83,7 +83,7 @@ public class RequestBuilder {
             .getResponse()
             .getContentAsString();
 
-    var mapResponse = objectMapper.readValue(response, new TypeReference<>() {});
+    Object mapResponse = objectMapper.readValue(response, new TypeReference<>() {});
     return objectMapper.writeValueAsString(mapResponse);
   }
 
@@ -120,7 +120,7 @@ public class RequestBuilder {
   // POST
   @SneakyThrows
   private static String postRequest(String endpoint, String content, MockMvc mockMvc) {
-    var response =
+    String response =
         mockMvc
             .perform(post(endpoint).contentType(APPLICATION_JSON).content(content))
             .andDo(print())
@@ -128,13 +128,13 @@ public class RequestBuilder {
             .getResponse()
             .getContentAsString();
 
-    var mapResponse = objectMapper.readValue(response, new TypeReference<>() {});
+    Object mapResponse = objectMapper.readValue(response, new TypeReference<>() {});
     return objectMapper.writeValueAsString(mapResponse);
   }
 
   @SneakyThrows
   public static AuthorResponse postAuthor(AuthorRequest authorContent, MockMvc mockMvc) {
-    var authorMap =
+    Map<String, Object> authorMap =
         objectMapper.readValue(
             postRequest(AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorContent), mockMvc),
             new TypeReference<Map<String, Object>>() {});
@@ -146,7 +146,7 @@ public class RequestBuilder {
   public static PublisherResponse postPublisher(
       PublisherRequest publisherContent, MockMvc mockMvc) {
 
-    var publisherMap =
+    Map<String, Object> publisherMap =
         objectMapper.readValue(
             postRequest(
                 PUBLISHERS_ENDPOINT, objectMapper.writeValueAsString(publisherContent), mockMvc),
@@ -158,7 +158,7 @@ public class RequestBuilder {
   @SneakyThrows
   public static PersonnelResponse postPersonnel(
       PersonnelRequest personnelContent, MockMvc mockMvc) {
-    var personnelMap =
+    Map<String, Object> personnelMap =
         objectMapper.readValue(
             postRequest(
                 PERSONNEL_ENDPOINT, objectMapper.writeValueAsString(personnelContent), mockMvc),
@@ -170,7 +170,7 @@ public class RequestBuilder {
   @SneakyThrows
   public static CustomerResponse postCustomer(CustomerRequest customerContent, MockMvc mockMvc) {
 
-    var customerMap =
+    Map<String, Object> customerMap =
         objectMapper.readValue(
             postRequest(
                 CUSTOMERS_ENDPOINT, objectMapper.writeValueAsString(customerContent), mockMvc),
@@ -181,7 +181,7 @@ public class RequestBuilder {
 
   @SneakyThrows
   public static BookCopyResponse postBookCopy(BookCopyRequest bookCopyContent, MockMvc mockMvc) {
-    var bookCopyMap =
+    Map<String, Object> bookCopyMap =
         objectMapper.readValue(
             postRequest(
                 BOOK_COPIES_ENDPOINT, objectMapper.writeValueAsString(bookCopyContent), mockMvc),
@@ -193,7 +193,7 @@ public class RequestBuilder {
   @SneakyThrows
   public static BookResponse postBook(BookRequest bookContent, MockMvc mockMvc) {
 
-    var bookMap =
+    Map<String, Object> bookMap =
         objectMapper.readValue(
             postRequest(BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookContent), mockMvc),
             new TypeReference<Map<String, Object>>() {});
@@ -204,13 +204,13 @@ public class RequestBuilder {
   @SneakyThrows
   public static BookResponse postBook(
       int bookIndex, int authorIndex, int publisherIndex, MockMvc mockMvc) {
-    var authorRequest = AuthorFactory.createAuthorRequest(authorIndex);
-    var authorResponse = postAuthor(authorRequest, mockMvc);
+    AuthorRequest authorRequest = AuthorFactory.createAuthorRequest(authorIndex);
+    AuthorResponse authorResponse = postAuthor(authorRequest, mockMvc);
 
-    var publisherRequest = PublisherFactory.createPublisherRequest(publisherIndex);
-    var publisherResponse = postPublisher(publisherRequest, mockMvc);
+    PublisherRequest publisherRequest = PublisherFactory.createPublisherRequest(publisherIndex);
+    PublisherResponse publisherResponse = postPublisher(publisherRequest, mockMvc);
 
-    var bookRequest =
+    BookRequest bookRequest =
         BookFactory.createBookRequest(bookIndex, authorResponse.getId(), publisherResponse.getId());
 
     return postBook(bookRequest, mockMvc);
@@ -219,7 +219,7 @@ public class RequestBuilder {
   @SneakyThrows
   public static TransactionResponse postTransaction(
       TransactionRequest transactionContent, MockMvc mockMvc) {
-    var transactionMap =
+    Map<String, Object> transactionMap =
         objectMapper.readValue(
             postRequest(
                 TRANSACTIONS_ENDPOINT,
@@ -235,7 +235,7 @@ public class RequestBuilder {
   @SneakyThrows
   public static List<TransactionResponse> patchTransactions(
       Long customerId, List<Long> bookCopyIds, MockMvc mockMvc) {
-    var transactionMap =
+    Map<String, Object> transactionMap =
         objectMapper.readValue(
             patchRequest(
                 TRANSACTIONS_ENDPOINT + "/customer/" + customerId, bookCopyIds.toString(), mockMvc),
@@ -248,7 +248,7 @@ public class RequestBuilder {
   @SneakyThrows
   public static CustomerResponse patchCustomerFee(Long customerId, Double fee, MockMvc mockMvc) {
 
-    var response =
+    String response =
         mockMvc
             .perform(
                 patch(CUSTOMERS_ENDPOINT + "/" + customerId).param("feeAmount", fee.toString()))
@@ -257,7 +257,7 @@ public class RequestBuilder {
             .getResponse()
             .getContentAsString();
 
-    var customerMap =
+    Map<String, CustomerResponse> customerMap =
         objectMapper.readValue(response, new TypeReference<Map<String, CustomerResponse>>() {});
 
     return objectMapper.readValue(
@@ -270,7 +270,7 @@ public class RequestBuilder {
     BookCopyUpdateStateRequest bookCopyUpdateStateRequest = new BookCopyUpdateStateRequest();
     bookCopyUpdateStateRequest.setState(state);
 
-    var response =
+    String response =
         mockMvc
             .perform(
                 patch(BOOK_COPIES_ENDPOINT + "/" + bookCopyId)
@@ -281,7 +281,7 @@ public class RequestBuilder {
             .getResponse()
             .getContentAsString();
 
-    var customerMap =
+    Map<String, BookCopyResponse> customerMap =
         objectMapper.readValue(response, new TypeReference<Map<String, BookCopyResponse>>() {});
 
     return objectMapper.readValue(
@@ -291,7 +291,7 @@ public class RequestBuilder {
   @SneakyThrows
   public static TransactionResponse cancelTransaction(Long transactionId, MockMvc mockMvc) {
 
-    var response =
+    String response =
         mockMvc
             .perform(patch(CANCEL_TRANSACTION_ENDPOINT + "/" + transactionId))
             .andDo(print())
@@ -299,7 +299,7 @@ public class RequestBuilder {
             .getResponse()
             .getContentAsString();
 
-    var transactionMap =
+    Map<String, Object> transactionMap =
         objectMapper.readValue(response, new TypeReference<Map<String, Object>>() {});
 
     return objectMapper.readValue(
@@ -308,7 +308,7 @@ public class RequestBuilder {
 
   @SneakyThrows
   private static String patchRequest(String endpoint, String content, MockMvc mockMvc) {
-    var response =
+    String response =
         mockMvc
             .perform(
                 patch(endpoint)
@@ -320,7 +320,7 @@ public class RequestBuilder {
             .getResponse()
             .getContentAsString();
 
-    var mapResponse = objectMapper.readValue(response, new TypeReference<>() {});
+    Object mapResponse = objectMapper.readValue(response, new TypeReference<>() {});
     return objectMapper.writeValueAsString(mapResponse);
   }
 
@@ -338,7 +338,7 @@ public class RequestBuilder {
 
   @SneakyThrows
   public static ErrorResponse cancelTransactionAndExpectError(Long transactionId, MockMvc mockMvc) {
-    var response =
+    String response =
         mockMvc
             .perform(patch(CANCEL_TRANSACTION_ENDPOINT + "/" + transactionId))
             .andDo(print())
@@ -352,7 +352,7 @@ public class RequestBuilder {
   @SneakyThrows
   public static ErrorResponse patchCustomerFeeAndExpectError(
       Long customerId, Double fee, MockMvc mockMvc) {
-    var response =
+    String response =
         mockMvc
             .perform(
                 patch(CUSTOMERS_ENDPOINT + "/" + customerId).param("feeAmount", fee.toString()))
@@ -371,7 +371,7 @@ public class RequestBuilder {
     BookCopyUpdateStateRequest bookCopyUpdateStateRequest = new BookCopyUpdateStateRequest();
     bookCopyUpdateStateRequest.setState(state);
 
-    var response =
+    String response =
         mockMvc
             .perform(
                 patch(BOOK_COPIES_ENDPOINT + "/" + bookCopyId)

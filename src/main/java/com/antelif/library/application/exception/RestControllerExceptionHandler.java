@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/** Rest Controller Exception Handler. */
+/**
+ * Rest Controller Exception Handler.
+ */
 @RestControllerAdvice
 @Slf4j
 public class RestControllerExceptionHandler {
@@ -24,13 +26,14 @@ public class RestControllerExceptionHandler {
   @ExceptionHandler(value = Exception.class)
   @ResponseStatus(INTERNAL_SERVER_ERROR)
   public ErrorResponse exceptionHandler(Exception exception) {
-    var error =
+    ErrorResponse error =
         new ErrorResponse(GENERIC_ERROR, INTERNAL_SERVER_ERROR.value(), exception.getMessage());
 
     log.error(error.toString());
 
     return error;
   }
+
   /***
    * Handles all custom exceptions that extend GenericException.
    * @param exception the exception that was thrown.
@@ -39,7 +42,7 @@ public class RestControllerExceptionHandler {
   @ExceptionHandler(value = GenericException.class)
   @ResponseStatus(INTERNAL_SERVER_ERROR)
   public ErrorResponse genericExceptionHandler(GenericException exception) {
-    var error =
+    ErrorResponse error =
         new ErrorResponse(
             exception.getGenericError(), INTERNAL_SERVER_ERROR.value(), exception.getMessage());
 
@@ -58,7 +61,7 @@ public class RestControllerExceptionHandler {
   @ResponseStatus(INTERNAL_SERVER_ERROR)
   public ErrorResponse methodArgumentNotValidExceptionHandler(
       MethodArgumentNotValidException exception) {
-    var error =
+    ErrorResponse error =
         new ErrorResponse(
             INPUT_VALIDATIONS_ERROR,
             INTERNAL_SERVER_ERROR.value(),

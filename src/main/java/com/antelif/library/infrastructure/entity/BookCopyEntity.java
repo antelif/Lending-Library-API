@@ -18,7 +18,9 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/** BookCopyEntity entity object that gets persisted in database. */
+/**
+ * BookCopyEntity entity object that gets persisted in database.
+ */
 @Getter
 @Setter
 @Entity
@@ -43,7 +45,9 @@ public class BookCopyEntity {
     return status.equals(AVAILABLE) && !state.equals(BAD);
   }
 
-  /** Changes the lending status of the book. */
+  /**
+   * Changes the lending status of the book.
+   */
   protected void toggleStatus() {
     this.status = this.status.equals(AVAILABLE) ? LENT : AVAILABLE;
   }

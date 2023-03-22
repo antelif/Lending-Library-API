@@ -4,12 +4,16 @@ import com.antelif.library.domain.dto.request.BookRequest;
 import com.antelif.library.domain.dto.response.BookResponse;
 import com.antelif.library.domain.service.AuthorService;
 import com.antelif.library.domain.service.PublisherService;
+import com.antelif.library.infrastructure.entity.AuthorEntity;
 import com.antelif.library.infrastructure.entity.BookEntity;
+import com.antelif.library.infrastructure.entity.PublisherEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-/** Converter for Book objects. */
+/**
+ * Converter for Book objects.
+ */
 @Component
 @RequiredArgsConstructor
 public class BookConverter implements Converter<BookRequest, BookEntity, BookResponse> {
@@ -23,13 +27,13 @@ public class BookConverter implements Converter<BookRequest, BookEntity, BookRes
 
   @Override
   public BookEntity convertFromRequestToEntity(BookRequest bookRequest) {
-    var bookEntity = modelMapper.map(bookRequest, BookEntity.class);
+    BookEntity bookEntity = modelMapper.map(bookRequest, BookEntity.class);
 
     // Decorate
-    var author = authorService.getAuthorById(bookRequest.getAuthorId());
+    AuthorEntity author = authorService.getAuthorById(bookRequest.getAuthorId());
     bookEntity.setAuthor(author);
 
-    var publisher = publisherService.getPublisherById(bookRequest.getPublisherId());
+    PublisherEntity publisher = publisherService.getPublisherById(bookRequest.getPublisherId());
     bookEntity.setPublisher(publisher);
 
     return bookEntity;
@@ -37,7 +41,7 @@ public class BookConverter implements Converter<BookRequest, BookEntity, BookRes
 
   @Override
   public BookResponse convertFromEntityToResponse(BookEntity bookEntity) {
-    var bookResponse = modelMapper.map(bookEntity, BookResponse.class);
+    BookResponse bookResponse = modelMapper.map(bookEntity, BookResponse.class);
 
     // Decorate
     bookResponse.setAuthor(authorConverter.convertFromEntityToResponse(bookEntity.getAuthor()));

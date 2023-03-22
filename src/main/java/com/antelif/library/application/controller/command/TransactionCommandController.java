@@ -23,7 +23,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** TransactionEntity Command Controller. */
+/**
+ * TransactionEntity Command Controller.
+ */
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -48,7 +50,7 @@ public class TransactionCommandController {
   /**
    * Updates a customer transaction by returning book copies.
    *
-   * @param customerId the customer that returns the books,
+   * @param customerId  the customer that returns the books,
    * @param bookCopyIds the ids of the book copies that are returned,
    * @return a list of updated transaction response DTOs.
    */

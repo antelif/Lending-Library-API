@@ -5,7 +5,8 @@ import static com.antelif.library.domain.common.Endpoints.AUTHORS_ENDPOINT;
 import static com.antelif.library.factory.PublisherFactory.createPublisherRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.config.BaseIT;
 import com.antelif.library.utils.RequestBuilder;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Validations Publisher")
-public class PublisherRequestValidationTest extends BaseIntegrationTest {
+public class PublisherRequestValidationIT extends BaseIT {
 
   @Autowired private MockMvc mockMvc;
   @Autowired private WebApplicationContext webApplicationContext;
@@ -38,7 +39,7 @@ public class PublisherRequestValidationTest extends BaseIntegrationTest {
   void testPublisherNameCannotBeEmpty() {
     publisherRequest.setName(" ");
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             AUTHORS_ENDPOINT, objectMapper.writeValueAsString(publisherRequest), this.mockMvc);
 

@@ -6,6 +6,7 @@ import static com.antelif.library.domain.common.Endpoints.CUSTOMERS_ENDPOINT;
 import com.antelif.library.domain.converter.CustomerConverter;
 import com.antelif.library.domain.dto.response.CustomerResponse;
 import com.antelif.library.domain.service.CustomerService;
+import com.antelif.library.infrastructure.entity.CustomerEntity;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Customer query controller. */
+/**
+ * Customer query controller.
+ */
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -36,7 +39,7 @@ public class CustomerQueryController {
   public ResponseEntity<CustomerResponse> getCustomerById(@PathVariable("id") Long id) {
 
     log.info("Received request to get customer {}", id);
-    var customerEntity = customerService.getCustomerById(id);
+    CustomerEntity customerEntity = customerService.getCustomerById(id);
     return ResponseEntity.ok(customerConverter.convertFromEntityToResponse(customerEntity));
   }
 }

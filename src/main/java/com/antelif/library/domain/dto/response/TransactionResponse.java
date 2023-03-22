@@ -9,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TransactionResponse {
+
   private Long id;
   private Instant creationDate;
   private Instant returnDate;

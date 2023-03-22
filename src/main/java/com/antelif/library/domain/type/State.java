@@ -2,7 +2,9 @@ package com.antelif.library.domain.type;
 
 import lombok.Getter;
 
-/** State of the book copy. */
+/**
+ * State of the book copy.
+ */
 @Getter
 public enum State {
   NEW(1),

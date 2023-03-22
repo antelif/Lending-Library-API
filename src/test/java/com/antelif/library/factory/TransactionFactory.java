@@ -14,7 +14,7 @@ public class TransactionFactory {
 
   public static TransactionRequest createTransactionRequest(
       long customerIndex, long personnelIndex, long bookCopyIndex) {
-    var transaction = new TransactionRequest();
+    TransactionRequest transaction = new TransactionRequest();
     transaction.setDaysUntilReturn(5);
     transaction.setCustomerId(customerIndex);
     transaction.setPersonnelId(personnelIndex);
@@ -25,7 +25,7 @@ public class TransactionFactory {
 
   public static TransactionResponse createTransactionResponse(
       int customerIndex, int personnelIndex, int authorIndex, int publisherIndex, int bookIndex) {
-    var transaction = new TransactionResponse();
+    TransactionResponse transaction = new TransactionResponse();
 
     transaction.setCustomer(createCustomerResponse(customerIndex));
     transaction.setPersonnel(createPersonnelResponse(personnelIndex));

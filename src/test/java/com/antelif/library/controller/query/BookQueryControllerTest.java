@@ -13,10 +13,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
+import com.antelif.library.application.error.ErrorResponse;
 import com.antelif.library.domain.dto.response.BookResponse;
 import com.antelif.library.factory.BookFactory;
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.config.BaseIT;
 import com.antelif.library.utils.RequestBuilder;
+import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +31,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Books query controller")
 @WithMockUser(username = ROOT_USER, password = ROOT_PASSWORD, roles = ADMIN)
-public class BookQueryControllerTest extends BaseIntegrationTest {
+public class BookQueryControllerTest extends BaseIT {
 
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
@@ -58,7 +60,7 @@ public class BookQueryControllerTest extends BaseIntegrationTest {
   void testRetrieveAllBooksSuccessfully() {
     postBook(bookCounter, authorCounter, publisherCounter, this.mockMvc);
 
-    var actualResponse = getBooks(this.mockMvc);
+    List<BookResponse> actualResponse = getBooks(this.mockMvc);
 
     assertTrue(0 < actualResponse.size());
   }
@@ -67,9 +69,9 @@ public class BookQueryControllerTest extends BaseIntegrationTest {
   @DisplayName("Book: Retrieve book by id successfully.")
   @SneakyThrows
   void testRetrieveBookById() {
-    var bookId = postBook(bookCounter, authorCounter, publisherCounter, this.mockMvc).getId();
+    Long bookId = postBook(bookCounter, authorCounter, publisherCounter, this.mockMvc).getId();
 
-    var actualResponse = RequestBuilder.getBookById(bookId, this.mockMvc);
+    BookResponse actualResponse = RequestBuilder.getBookById(bookId, this.mockMvc);
 
     assertNotNull(actualResponse.getId());
     assertEquals(expectedBookResponse.getTitle(), actualResponse.getTitle());
@@ -93,9 +95,9 @@ public class BookQueryControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testExceptionIsThrownWhenBookDoesNotExist() {
 
-    var inexistentBookId = 9999L;
+    long inexistentBookId = 9999L;
 
-    var response = getRequestAndExpectError(BOOKS_ENDPOINT + "/" + inexistentBookId, this.mockMvc);
+    ErrorResponse response = getRequestAndExpectError(BOOKS_ENDPOINT + "/" + inexistentBookId, this.mockMvc);
 
     assertEquals(BOOK_DOES_NOT_EXIST.getCode(), response.getCode());
   }

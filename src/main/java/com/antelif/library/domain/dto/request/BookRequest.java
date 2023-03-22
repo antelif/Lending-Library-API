@@ -6,10 +6,10 @@ import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.validator.constraints.ISBN;
-import org.hibernate.validator.constraints.ISBN.Type;
 
-/** Book request DTO used as request body in HTTP requests. */
+/**
+ * Book request DTO used as request body in HTTP requests.
+ */
 @Getter
 @Setter
 @ToString

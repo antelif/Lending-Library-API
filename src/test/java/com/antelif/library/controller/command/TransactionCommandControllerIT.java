@@ -39,10 +39,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
+import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.domain.dto.request.AuthorRequest;
+import com.antelif.library.domain.dto.request.BookCopyRequest;
+import com.antelif.library.domain.dto.request.BookRequest;
+import com.antelif.library.domain.dto.request.CustomerRequest;
+import com.antelif.library.domain.dto.request.PersonnelRequest;
+import com.antelif.library.domain.dto.request.PublisherRequest;
 import com.antelif.library.domain.dto.request.TransactionRequest;
+import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.domain.dto.response.BookCopyResponse;
+import com.antelif.library.domain.dto.response.BookResponse;
+import com.antelif.library.domain.dto.response.CustomerResponse;
+import com.antelif.library.domain.dto.response.PersonnelResponse;
+import com.antelif.library.domain.dto.response.PublisherResponse;
 import com.antelif.library.domain.dto.response.TransactionResponse;
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.config.BaseIT;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,7 +70,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Transactions command controller")
 @WithMockUser(username = "root", password = "root", roles = ADMIN)
-class TransactionCommandControllerTest extends BaseIntegrationTest {
+class TransactionCommandControllerIT extends BaseIT {
 
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
@@ -86,26 +98,26 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
         createTransactionResponse(
             customerCounter, personnelCounter, authorCounter, publisherCounter, bookCounter);
 
-    var authorRequest = createAuthorRequest(authorCounter);
-    var authorResponse = postAuthor(authorRequest, this.mockMvc);
+    AuthorRequest authorRequest = createAuthorRequest(authorCounter);
+    AuthorResponse authorResponse = postAuthor(authorRequest, this.mockMvc);
 
-    var publisherRequest = createPublisherRequest(publisherCounter);
-    var publisherResponse = postPublisher(publisherRequest, this.mockMvc);
+    PublisherRequest publisherRequest = createPublisherRequest(publisherCounter);
+    PublisherResponse publisherResponse = postPublisher(publisherRequest, this.mockMvc);
 
-    var bookRequest =
+    BookRequest bookRequest =
         createBookRequest(bookCounter, authorResponse.getId(), publisherResponse.getId());
 
-    var bookResponse = postBook(bookRequest, this.mockMvc);
+    BookResponse bookResponse = postBook(bookRequest, this.mockMvc);
     isbn = bookResponse.getIsbn();
 
-    var bookCopyRequest = createBookCopyRequest(isbn);
-    var bookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
+    BookCopyRequest bookCopyRequest = createBookCopyRequest(isbn);
+    BookCopyResponse bookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
 
-    var customerRequest = createCustomerRequest(customerCounter);
-    var customerResponse = postCustomer(customerRequest, this.mockMvc);
+    CustomerRequest customerRequest = createCustomerRequest(customerCounter);
+    CustomerResponse customerResponse = postCustomer(customerRequest, this.mockMvc);
 
-    var personnelRequest = createPersonnelRequest(personnelCounter);
-    var personnelResponse = postPersonnel(personnelRequest, this.mockMvc);
+    PersonnelRequest personnelRequest = createPersonnelRequest(personnelCounter);
+    PersonnelResponse personnelResponse = postPersonnel(personnelRequest, this.mockMvc);
 
     transactionRequest =
         createTransactionRequest(
@@ -117,7 +129,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testTransactionIsCreatedSuccessfully() {
 
-    var actualTransactionResponse = postTransaction(transactionRequest, this.mockMvc);
+    TransactionResponse actualTransactionResponse = postTransaction(transactionRequest, this.mockMvc);
 
     assertNotNull(actualTransactionResponse);
 
@@ -148,8 +160,8 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
         expectedTransactionResponse.getPersonnel().getUsername(),
         actualTransactionResponse.getPersonnel().getUsername());
 
-    var expectedCopy = expectedTransactionResponse.getBooks().stream().findFirst().get();
-    var actualCopy = actualTransactionResponse.getBooks().stream().findFirst().get();
+    BookCopyResponse expectedCopy = expectedTransactionResponse.getBooks().stream().findFirst().get();
+    BookCopyResponse actualCopy = actualTransactionResponse.getBooks().stream().findFirst().get();
 
     assertNotNull(actualCopy.getId());
     assertEquals(expectedCopy.getState(), actualCopy.getState());
@@ -181,15 +193,15 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   void testTransactionFailsWhenCustomerBorrowsSameBookInOneTransaction() {
 
     // Create another book copy for the book of the transaction.
-    var secondBookCopyRequest = createBookCopyRequest(isbn);
-    var secondBookCopyResponse = postBookCopy(secondBookCopyRequest, this.mockMvc);
+    BookCopyRequest secondBookCopyRequest = createBookCopyRequest(isbn);
+    BookCopyResponse secondBookCopyResponse = postBookCopy(secondBookCopyRequest, this.mockMvc);
 
     // Add the second book copy to transaction request.
-    var bookCopyIds =
+    List<Long> bookCopyIds =
         List.of(transactionRequest.getCopyIds().get(0), secondBookCopyResponse.getId());
     transactionRequest.setCopyIds(bookCopyIds);
 
-    var transactionMapResponse =
+    ErrorResponse transactionMapResponse =
         postRequestAndExpectError(
             TRANSACTIONS_ENDPOINT, objectMapper.writeValueAsString(transactionRequest), mockMvc);
     assertEquals(DUPLICATE_BOOKS_IN_TRANSACTION.getCode(), transactionMapResponse.getCode());
@@ -203,7 +215,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
     // First transaction
     postTransaction(transactionRequest, mockMvc);
 
-    var transactionResponse =
+    ErrorResponse transactionResponse =
         postRequestAndExpectError(
             TRANSACTIONS_ENDPOINT,
             objectMapper.writeValueAsString(transactionRequest),
@@ -216,14 +228,14 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   @DisplayName("Transaction: Unsuccessful creation when copy state is bad.")
   void testTransactionFailsWhenBookStateIsBad() {
 
-    var bookCopyRequest = createBookCopyRequest(isbn);
+    BookCopyRequest bookCopyRequest = createBookCopyRequest(isbn);
     bookCopyRequest.setState(BAD);
 
-    var bookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
+    BookCopyResponse bookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
 
     transactionRequest.setCopyIds(List.of(bookCopyResponse.getId()));
 
-    var transactionResponse =
+    ErrorResponse transactionResponse =
         postRequestAndExpectError(
             TRANSACTIONS_ENDPOINT,
             objectMapper.writeValueAsString(transactionRequest),
@@ -242,12 +254,12 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
 
     // When another user tries to lend same book they fail.
     customerCounter++;
-    var newCustomer = createCustomerRequest(customerCounter);
-    var newCustomerId = postCustomer(newCustomer, this.mockMvc).getId();
+    CustomerRequest newCustomer = createCustomerRequest(customerCounter);
+    Long newCustomerId = postCustomer(newCustomer, this.mockMvc).getId();
 
     transactionRequest.setCustomerId(newCustomerId);
 
-    var transactionResponse =
+    ErrorResponse transactionResponse =
         postRequestAndExpectError(
             TRANSACTIONS_ENDPOINT,
             objectMapper.writeValueAsString(transactionRequest),
@@ -263,7 +275,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
 
     transactionRequest.setCopyIds(List.of(9999L));
 
-    var transactionResponse =
+    ErrorResponse transactionResponse =
         postRequestAndExpectError(
             TRANSACTIONS_ENDPOINT,
             objectMapper.writeValueAsString(transactionRequest),
@@ -278,7 +290,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   void testTransactionFailsWhenCustomerDoesNotExist() {
     transactionRequest.setCustomerId((9999L));
 
-    var transactionResponse =
+    ErrorResponse transactionResponse =
         postRequestAndExpectError(
             TRANSACTIONS_ENDPOINT,
             objectMapper.writeValueAsString(transactionRequest),
@@ -293,7 +305,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   void testTransactionFailsWhenPersonnelDoesNotExist() {
     transactionRequest.setPersonnelId(9999L);
 
-    var transactionResponse =
+    ErrorResponse transactionResponse =
         postRequestAndExpectError(
             TRANSACTIONS_ENDPOINT,
             objectMapper.writeValueAsString(transactionRequest),
@@ -306,20 +318,20 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   @DisplayName("Transaction: Successful update of transaction")
   void testSuccessfulUpdateOfTransaction() {
-    var transactionResponse = postTransaction(transactionRequest, this.mockMvc);
+    TransactionResponse transactionResponse = postTransaction(transactionRequest, this.mockMvc);
 
-    var customerId = transactionResponse.getCustomer().getId();
-    var bookCopyIds = transactionResponse.getBooks().stream().map(BookCopyResponse::getId).toList();
+    Long customerId = transactionResponse.getCustomer().getId();
+    List<Long> bookCopyIds = transactionResponse.getBooks().stream().map(BookCopyResponse::getId).toList();
 
-    var updatedTransactions = patchTransactions(customerId, bookCopyIds, this.mockMvc);
+    List<TransactionResponse> updatedTransactions = patchTransactions(customerId, bookCopyIds, this.mockMvc);
 
     assertEquals(1, updatedTransactions.size());
 
-    var updatedTransaction = updatedTransactions.get(0);
+    TransactionResponse updatedTransaction = updatedTransactions.get(0);
     assertEquals(FINALIZED, updatedTransaction.getStatus());
 
     assertEquals(1, updatedTransaction.getBooks().size());
-    var bookCopy = updatedTransaction.getBooks().stream().findAny().get();
+    BookCopyResponse bookCopy = updatedTransaction.getBooks().stream().findAny().get();
     assertEquals(AVAILABLE, bookCopy.getStatus());
   }
 
@@ -328,12 +340,12 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   @DisplayName(
       "Transaction: Unsuccessful update when book copies do not exist in active transaction")
   void testUnsuccessfulUpdateWhenBookCopyIdsDoNotExistInTransaction() {
-    var transactionResponse = postTransaction(transactionRequest, this.mockMvc);
+    TransactionResponse transactionResponse = postTransaction(transactionRequest, this.mockMvc);
 
-    var customerId = transactionResponse.getCustomer().getId();
-    var bookCopyIds = List.of(9999L);
+    Long customerId = transactionResponse.getCustomer().getId();
+    List<Long> bookCopyIds = List.of(9999L);
 
-    var errorResponse =
+    ErrorResponse errorResponse =
         patchRequestAndExpectError(
             TRANSACTIONS_ENDPOINT + "/customer/" + customerId,
             objectMapper.writeValueAsString(bookCopyIds),
@@ -345,9 +357,9 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   @Test
   @DisplayName("Transaction: Successful cancellation.")
   void testSuccessfulCancellationWhenAllBookCopiesAreLent() {
-    var transactionResponse = postTransaction(transactionRequest, this.mockMvc);
+    TransactionResponse transactionResponse = postTransaction(transactionRequest, this.mockMvc);
 
-    var result = cancelTransaction(transactionResponse.getId(), this.mockMvc);
+    TransactionResponse result = cancelTransaction(transactionResponse.getId(), this.mockMvc);
 
     assertNotNull(result);
   }
@@ -356,9 +368,9 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   @DisplayName("Transaction: Unsuccessful cancellation when transaction does not exist.")
   void testUnsuccessfulTransactionWhenTransactionDoesNotExist() {
 
-    var transactionId = 9999L;
+    long transactionId = 9999L;
 
-    var response = cancelTransactionAndExpectError(transactionId, this.mockMvc);
+    ErrorResponse response = cancelTransactionAndExpectError(transactionId, this.mockMvc);
 
     assertEquals(TRANSACTION_DOES_NOT_EXIST.getCode(), response.getCode());
   }
@@ -367,7 +379,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
   @DisplayName("Transaction: Unsuccessful cancellation when transaction is finalized.")
   void testUnsuccessfulTransactionCancellationWhenFinalized() {
 
-    var transactionResponse = postTransaction(transactionRequest, this.mockMvc);
+    TransactionResponse transactionResponse = postTransaction(transactionRequest, this.mockMvc);
 
     // Return books and finalize transaction.
     patchTransactions(
@@ -377,7 +389,7 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
             .collect(Collectors.toList()),
         this.mockMvc);
 
-    var result = cancelTransactionAndExpectError(transactionResponse.getId(), this.mockMvc);
+    ErrorResponse result = cancelTransactionAndExpectError(transactionResponse.getId(), this.mockMvc);
 
     assertEquals(CANNOT_CANCEL_FINALIZED_TRANSACTION.getCode(), result.getCode());
   }
@@ -392,37 +404,37 @@ class TransactionCommandControllerTest extends BaseIntegrationTest {
     authorCounter++;
 
     // Create new book.
-    var secondAuthorRequest = createAuthorRequest(authorCounter);
-    var secondAuthorResponse = postAuthor(secondAuthorRequest, this.mockMvc);
+    AuthorRequest secondAuthorRequest = createAuthorRequest(authorCounter);
+    AuthorResponse secondAuthorResponse = postAuthor(secondAuthorRequest, this.mockMvc);
 
-    var secondPublisherRequest = createPublisherRequest(publisherCounter);
-    var secondPublisherResponse = postPublisher(secondPublisherRequest, this.mockMvc);
+    PublisherRequest secondPublisherRequest = createPublisherRequest(publisherCounter);
+    PublisherResponse secondPublisherResponse = postPublisher(secondPublisherRequest, this.mockMvc);
 
-    var secondBookRequest =
+    BookRequest secondBookRequest =
         createBookRequest(
             bookCounter, secondAuthorResponse.getId(), secondPublisherResponse.getId());
 
-    var secondBookResponse = postBook(secondBookRequest, this.mockMvc);
+    BookResponse secondBookResponse = postBook(secondBookRequest, this.mockMvc);
     isbn = secondBookResponse.getIsbn();
 
     // Create book copy for the new book.
-    var secondBookCopyRequest = createBookCopyRequest(isbn);
-    var secondBookCopyResponse = postBookCopy(secondBookCopyRequest, this.mockMvc);
+    BookCopyRequest secondBookCopyRequest = createBookCopyRequest(isbn);
+    BookCopyResponse secondBookCopyResponse = postBookCopy(secondBookCopyRequest, this.mockMvc);
 
-    var copyIds = List.of(transactionRequest.getCopyIds().get(0), secondBookCopyResponse.getId());
+    List<Long> copyIds = List.of(transactionRequest.getCopyIds().get(0), secondBookCopyResponse.getId());
 
     // Add the new book copy to new transaction.
     transactionRequest.setCopyIds(new ArrayList<>(copyIds));
     transactionRequest.getCopyIds().add(secondBookCopyResponse.getId());
 
-    var transactionResponse = postTransaction(transactionRequest, this.mockMvc);
+    TransactionResponse transactionResponse = postTransaction(transactionRequest, this.mockMvc);
 
     // Return the new book copy.
     patchTransactions(
         transactionRequest.getCustomerId(), List.of(secondBookCopyResponse.getId()), this.mockMvc);
 
     // Try to cancel transaction when the new book is already returned.
-    var result = cancelTransactionAndExpectError(transactionResponse.getId(), this.mockMvc);
+    ErrorResponse result = cancelTransactionAndExpectError(transactionResponse.getId(), this.mockMvc);
 
     assertEquals(CANNOT_CANCEL_PARTIALLY_UPDATED_TRANSACTION.getCode(), result.getCode());
   }

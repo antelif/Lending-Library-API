@@ -5,7 +5,8 @@ import static com.antelif.library.domain.common.Endpoints.BOOKS_ENDPOINT;
 import static com.antelif.library.factory.BookFactory.createBookRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.config.BaseIT;
 import com.antelif.library.utils.RequestBuilder;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Validations Book")
-public class BookRequestValidationTest extends BaseIntegrationTest {
+public class BookRequestValidationIT extends BaseIT {
 
   @Autowired private MockMvc mockMvc;
   @Autowired private WebApplicationContext webApplicationContext;
@@ -41,7 +42,7 @@ public class BookRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookIsbnCannotBeBlank() {
     bookRequest.setIsbn(" ");
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
 
@@ -53,7 +54,7 @@ public class BookRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookIsbnCannotBeNull() {
     bookRequest.setIsbn(null);
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
 
@@ -66,7 +67,7 @@ public class BookRequestValidationTest extends BaseIntegrationTest {
   @Disabled("Disabled until ISBN validations are concluded.")
   void testBookIsbnFormat() {
     bookRequest.setIsbn("1111");
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
 
@@ -78,7 +79,7 @@ public class BookRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookTitleCannotBeBlank() {
     bookRequest.setTitle(" ");
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
 
@@ -90,7 +91,7 @@ public class BookRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookTitleCannotBeNull() {
     bookRequest.setTitle(null);
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
 
@@ -102,7 +103,7 @@ public class BookRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookTitleCannotBeLongerThan50Characters() {
     bookRequest.setTitle("aaaaaaaaaaAAAAAAAAAAaaaaaaaaaaAAAAAAAAAAaaaaaaaaaaAAAAAAAAAA");
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
 
@@ -114,7 +115,7 @@ public class BookRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookAuthorCannotBeNull() {
     bookRequest.setAuthorId(null);
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
 
@@ -126,7 +127,7 @@ public class BookRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookPublisherCannotBeNull() {
     bookRequest.setPublisherId(null);
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             BOOKS_ENDPOINT, objectMapper.writeValueAsString(bookRequest), this.mockMvc);
 

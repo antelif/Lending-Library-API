@@ -21,7 +21,9 @@ import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/** Transaction service. */
+/**
+ * Transaction service.
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -37,7 +39,8 @@ public class TransactionService {
    * @return a transaction response DTO.
    */
   public TransactionResponse createTransaction(TransactionRequest transactionRequest) {
-    var transactionEntity = transactionConverter.convertFromRequestToEntity(transactionRequest);
+    TransactionEntity transactionEntity = transactionConverter.convertFromRequestToEntity(
+        transactionRequest);
 
     validateCreation(transactionEntity);
 
@@ -55,12 +58,12 @@ public class TransactionService {
    * can be finalized the status is set to 'FINALIZED' and all book copies are 'AVAILABLE'.
    *
    * @param bookCopyIds the ids of the book copies to return and update their statuses back to
-   *     AVAILABLE.
-   * @param customerId the customer that returns the books.
+   *                    AVAILABLE.
+   * @param customerId  the customer that returns the books.
    * @return a list with the updated transaction after books are returned.
    */
   public List<TransactionResponse> updateTransactions(List<Long> bookCopyIds, String customerId) {
-    var transactionsToUpdate =
+    List<TransactionEntity> transactionsToUpdate =
         transactionRepository.findAllByCustomerIdAndStatus(Long.valueOf(customerId), ACTIVE);
 
     validateUpdate(transactionsToUpdate, bookCopyIds);
@@ -79,7 +82,8 @@ public class TransactionService {
   }
 
   public TransactionResponse cancelTransaction(Long transactionId) {
-    var persistedTransaction = transactionRepository.findById(transactionId);
+    Optional<TransactionEntity> persistedTransaction = transactionRepository.findById(
+        transactionId);
 
     if (persistedTransaction.isEmpty()) {
       throw new EntityDoesNotExistException(TRANSACTION_DOES_NOT_EXIST);

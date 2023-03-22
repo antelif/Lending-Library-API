@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-/** Converter for author objects. */
+/**
+ * Converter for author objects.
+ */
 @Component
 @RequiredArgsConstructor
 public class AuthorConverter implements Converter<AuthorRequest, AuthorEntity, AuthorResponse> {

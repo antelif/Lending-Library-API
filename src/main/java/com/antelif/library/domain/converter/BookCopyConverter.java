@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-/** Converter for book copy objects. */
+/**
+ * Converter for book copy objects.
+ */
 @Component
 @RequiredArgsConstructor
 public class BookCopyConverter
@@ -23,7 +25,7 @@ public class BookCopyConverter
   @Override
   public BookCopyEntity convertFromRequestToEntity(BookCopyRequest bookCopyRequest) {
 
-    var bookCopy = modelMapper.map(bookCopyRequest, BookCopyEntity.class);
+    BookCopyEntity bookCopy = modelMapper.map(bookCopyRequest, BookCopyEntity.class);
     bookCopy.setBook(bookService.getBookByIsbn(bookCopyRequest.getIsbn()));
 
     return bookCopy;

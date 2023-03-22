@@ -10,20 +10,23 @@ import com.antelif.library.infrastructure.entity.BookCopyEntity;
 
 public final class BookCopyValidationService {
 
-  private BookCopyValidationService() {}
+  private BookCopyValidationService() {
+  }
 
   /**
    * Contains all validations when updating a book copy.
    *
    * @param bookCopy the book copy to update,
-   * @param state the new book copy state
+   * @param state    the new book copy state
    */
   public static void validateUpdate(BookCopyEntity bookCopy, State state) {
     validateStateIsEligible(bookCopy, state);
     validateStatusIsEligible(bookCopy);
   }
 
-  /** Throws an exception if the new state is of better condition than the existing one. */
+  /**
+   * Throws an exception if the new state is of better condition than the existing one.
+   */
   private static void validateStateIsEligible(BookCopyEntity bookCopy, State state) {
     if (bookCopy.getState().getStateOrder() > state.getStateOrder()) {
       throw new ValidationException(
@@ -32,7 +35,9 @@ public final class BookCopyValidationService {
     }
   }
 
-  /** Throws an exception if the book copy is not available. */
+  /**
+   * Throws an exception if the book copy is not available.
+   */
   private static void validateStatusIsEligible(BookCopyEntity bookCopy) {
     if (!bookCopy.getStatus().equals(AVAILABLE)) {
       throw new ValidationException(INVALID_BOOK_COPY_STATUS);

@@ -21,14 +21,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
+import com.antelif.library.application.error.ErrorResponse;
 import com.antelif.library.application.error.GenericError;
+import com.antelif.library.domain.dto.request.AuthorRequest;
 import com.antelif.library.domain.dto.request.BookCopyRequest;
-import com.antelif.library.domain.dto.request.update.BookCopyUpdateStateRequest;
+import com.antelif.library.domain.dto.request.BookRequest;
+import com.antelif.library.domain.dto.request.PublisherRequest;
+import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.domain.dto.response.BookCopyResponse;
+import com.antelif.library.domain.dto.response.BookResponse;
+import com.antelif.library.domain.dto.response.PublisherResponse;
 import com.antelif.library.domain.type.BookCopyStatus;
 import com.antelif.library.domain.type.State;
+import com.antelif.library.infrastructure.entity.BookCopyEntity;
 import com.antelif.library.infrastructure.repository.BookCopyRepository;
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.config.BaseIT;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +48,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Book copies command controller")
 @WithMockUser(username = ROOT_USER, password = ROOT_PASSWORD, roles = ADMIN)
-class BookCopyCommandControllerTest extends BaseIntegrationTest {
+class BookCopyCommandControllerIT extends BaseIT {
 
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
@@ -66,17 +73,17 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
 
     expectedBookCopyResponse = createBookCopyResponse(authorCounter, publisherCounter, bookCounter);
 
-    var authorRequest = createAuthorRequest(authorCounter);
-    var authorResponse = postAuthor(authorRequest, this.mockMvc);
+    AuthorRequest authorRequest = createAuthorRequest(authorCounter);
+    AuthorResponse authorResponse = postAuthor(authorRequest, this.mockMvc);
 
-    var publisherRequest = createPublisherRequest(publisherCounter);
-    var publisherResponse = postPublisher(publisherRequest, this.mockMvc);
+    PublisherRequest publisherRequest = createPublisherRequest(publisherCounter);
+    PublisherResponse publisherResponse = postPublisher(publisherRequest, this.mockMvc);
 
-    var bookRequest =
+    BookRequest bookRequest =
         createBookRequest(bookCounter, authorResponse.getId(), publisherResponse.getId());
 
     // Set book isbn
-    var bookResponse = postBook(bookRequest, this.mockMvc);
+    BookResponse bookResponse = postBook(bookRequest, this.mockMvc);
 
     bookCopyRequest = createBookCopyRequest(bookResponse.getIsbn());
   }
@@ -86,7 +93,7 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
   @DisplayName("BookCopy: Successful creation.")
   void testNewBookCopyIsCreated() {
 
-    var actualBookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
+    BookCopyResponse actualBookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
 
     assertNotNull(actualBookCopyResponse);
 
@@ -123,12 +130,12 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
   void testNewBookCopyStateIsUpdatedSuccessfully() {
 
     // Create book copy with NEW state and AVAILABLE status
-    var actualBookCopy = postBookCopy(bookCopyRequest, this.mockMvc);
+    BookCopyResponse actualBookCopy = postBookCopy(bookCopyRequest, this.mockMvc);
     assertEquals(NEW, actualBookCopy.getState());
     assertEquals(AVAILABLE, actualBookCopy.getStatus());
 
     // Update book copy to BAS state
-    var updatedBookCopy = patchBookCopyState(actualBookCopy.getId(), BAD, this.mockMvc);
+    BookCopyResponse updatedBookCopy = patchBookCopyState(actualBookCopy.getId(), BAD, this.mockMvc);
     assertEquals(BAD, updatedBookCopy.getState());
     assertEquals(AVAILABLE, actualBookCopy.getStatus());
   }
@@ -138,17 +145,17 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
   @DisplayName("BookCopy: Unsuccessful book copy update when the copy is not available.")
   void testNewBookCopyIsStateIsNotUpdatedWhenBookIsBorrowed() {
     // Create book copy with NEW state and AVAILABLE status
-    var actualBookCopy = postBookCopy(bookCopyRequest, this.mockMvc);
+    BookCopyResponse actualBookCopy = postBookCopy(bookCopyRequest, this.mockMvc);
     assertEquals(NEW, actualBookCopy.getState());
     assertEquals(AVAILABLE, actualBookCopy.getStatus());
 
     // Update book status to LENT
-    var persistedBookCopy = bookCopyRepository.findById(actualBookCopy.getId()).get();
+    BookCopyEntity persistedBookCopy = bookCopyRepository.findById(actualBookCopy.getId()).get();
     persistedBookCopy.setStatus(BookCopyStatus.LENT);
     bookCopyRepository.save(persistedBookCopy);
 
     // Update of state should fail
-    var errorResponse = patchBookCopyStateAndExpectError(actualBookCopy.getId(), BAD, this.mockMvc);
+    ErrorResponse errorResponse = patchBookCopyStateAndExpectError(actualBookCopy.getId(), BAD, this.mockMvc);
 
     assertEquals(GenericError.INVALID_BOOK_COPY_STATUS.getCode(), errorResponse.getCode());
   }
@@ -160,17 +167,17 @@ class BookCopyCommandControllerTest extends BaseIntegrationTest {
   void testNewBookCopyIsStateIsNotUpdatedWhenNewStateIsSuperior() {
     // Create book copy with BAD state and AVAILABLE status
     bookCopyRequest.setState(BAD);
-    var actualBookCopy = postBookCopy(bookCopyRequest, this.mockMvc);
+    BookCopyResponse actualBookCopy = postBookCopy(bookCopyRequest, this.mockMvc);
     assertEquals(BAD, actualBookCopy.getState());
     assertEquals(AVAILABLE, actualBookCopy.getStatus());
 
     // Update book status to LENT
-    var persistedBookCopy = bookCopyRepository.findById(actualBookCopy.getId()).get();
+    BookCopyEntity persistedBookCopy = bookCopyRepository.findById(actualBookCopy.getId()).get();
     persistedBookCopy.setStatus(BookCopyStatus.LENT);
     bookCopyRepository.save(persistedBookCopy);
 
     // Update of state should fail
-    var errorResponse =
+    ErrorResponse errorResponse =
         patchBookCopyStateAndExpectError(actualBookCopy.getId(), State.NEW, this.mockMvc);
 
     assertEquals(GenericError.INVALID_BOOK_COPY_STATE.getCode(), errorResponse.getCode());

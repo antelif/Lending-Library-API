@@ -8,7 +8,9 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Author entity object that gets persisted in database. */
+/**
+ * Author entity object that gets persisted in database.
+ */
 @Getter
 @Setter
 @Entity

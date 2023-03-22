@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** Author Request DTO used as request body in HTTP requests. */
+/**
+ * Author Request DTO used as request body in HTTP requests.
+ */
 @Getter
 @Setter
 @ToString

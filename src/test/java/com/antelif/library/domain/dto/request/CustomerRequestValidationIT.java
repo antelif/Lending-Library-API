@@ -5,7 +5,8 @@ import static com.antelif.library.domain.common.Endpoints.CUSTOMERS_ENDPOINT;
 import static com.antelif.library.factory.CustomerFactory.createCustomerRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.config.BaseIT;
 import com.antelif.library.utils.RequestBuilder;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Validations Customer")
-public class CustomerRequestValidationTest extends BaseIntegrationTest {
+public class CustomerRequestValidationIT extends BaseIT {
 
   @Autowired private MockMvc mockMvc;
   @Autowired private WebApplicationContext webApplicationContext;
@@ -40,7 +41,7 @@ public class CustomerRequestValidationTest extends BaseIntegrationTest {
   void testCustomerNameCannotBeBlank() {
     customerRequest.setName(" ");
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             CUSTOMERS_ENDPOINT, objectMapper.writeValueAsString(customerRequest), this.mockMvc);
 
@@ -53,7 +54,7 @@ public class CustomerRequestValidationTest extends BaseIntegrationTest {
   void testCustomerNameCannotBeLongerThan50Characters() {
     customerRequest.setName("aaaaaaaaaabbbbbbbbbbaaaaaaaaaabbbbbbbbbbaaaaaaaaaabbbbbbbbbb");
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             CUSTOMERS_ENDPOINT, objectMapper.writeValueAsString(customerRequest), this.mockMvc);
 
@@ -66,7 +67,7 @@ public class CustomerRequestValidationTest extends BaseIntegrationTest {
   void testCustomerSurnameCannotBeBlank() {
     customerRequest.setSurname(" ");
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             CUSTOMERS_ENDPOINT, objectMapper.writeValueAsString(customerRequest), this.mockMvc);
 
@@ -79,7 +80,7 @@ public class CustomerRequestValidationTest extends BaseIntegrationTest {
   void testCustomerSurnameCannotBeLongerThan50Characters() {
     customerRequest.setSurname("aaaaaaaaaabbbbbbbbbbaaaaaaaaaabbbbbbbbbbaaaaaaaaaabbbbbbbbbb");
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             CUSTOMERS_ENDPOINT, objectMapper.writeValueAsString(customerRequest), this.mockMvc);
 
@@ -92,7 +93,7 @@ public class CustomerRequestValidationTest extends BaseIntegrationTest {
   void testCustomerPhoneNoCannotContainCharacterOtherThanDigits() {
     customerRequest.setPhoneNo("aaaaaaaaaaa");
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             CUSTOMERS_ENDPOINT, objectMapper.writeValueAsString(customerRequest), this.mockMvc);
 
@@ -105,7 +106,7 @@ public class CustomerRequestValidationTest extends BaseIntegrationTest {
   void testCustomerPhoneNoContainMoreThan10Digits() {
     customerRequest.setPhoneNo("123456");
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             CUSTOMERS_ENDPOINT, objectMapper.writeValueAsString(customerRequest), this.mockMvc);
 
@@ -118,7 +119,7 @@ public class CustomerRequestValidationTest extends BaseIntegrationTest {
   void testCustomerPhoneNoContainLessThan15Digits() {
     customerRequest.setPhoneNo("1234567891011121314");
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             CUSTOMERS_ENDPOINT, objectMapper.writeValueAsString(customerRequest), this.mockMvc);
 
@@ -131,7 +132,7 @@ public class CustomerRequestValidationTest extends BaseIntegrationTest {
   void testCustomerEmailFormat() {
     customerRequest.setEmail("aa");
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             CUSTOMERS_ENDPOINT, objectMapper.writeValueAsString(customerRequest), this.mockMvc);
 

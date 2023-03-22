@@ -10,7 +10,9 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/** BookEntity entity object that gets persisted in database. */
+/**
+ * BookEntity entity object that gets persisted in database.
+ */
 @Setter
 @Getter
 @Entity

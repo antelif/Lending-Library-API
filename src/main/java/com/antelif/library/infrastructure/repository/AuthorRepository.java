@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
-/** AuthorEntity repository. */
+/**
+ * AuthorEntity repository.
+ */
 @Component
 @Repository
 public interface AuthorRepository extends JpaRepository<AuthorEntity, Long> {
@@ -23,7 +25,7 @@ public interface AuthorRepository extends JpaRepository<AuthorEntity, Long> {
   /**
    * Retrieves all authors by their name and surname.
    *
-   * @param name the name of the author,
+   * @param name    the name of the author,
    * @param surname the surname of the author,
    * @return a list with all authors retrieved
    */
@@ -40,8 +42,8 @@ public interface AuthorRepository extends JpaRepository<AuthorEntity, Long> {
   /**
    * Retrieves all authos by their name, surname and middle name.
    *
-   * @param name the name of the author,
-   * @param surname the surname of the author,
+   * @param name       the name of the author,
+   * @param surname    the surname of the author,
    * @param middleName the middle name of the author
    * @return a list with all author retrieved.
    */

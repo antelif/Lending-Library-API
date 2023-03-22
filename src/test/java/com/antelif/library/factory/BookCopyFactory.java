@@ -11,7 +11,7 @@ import com.antelif.library.domain.dto.response.BookCopyResponse;
 public class BookCopyFactory {
 
   public static BookCopyRequest createBookCopyRequest(String isbn) {
-    var bookCopy = new BookCopyRequest();
+    BookCopyRequest bookCopy = new BookCopyRequest();
     bookCopy.setIsbn(isbn);
     bookCopy.setState(NEW);
     return bookCopy;
@@ -19,7 +19,7 @@ public class BookCopyFactory {
 
   public static BookCopyResponse createBookCopyResponse(
       int authorIndex, int publisherIndex, int bookIndex) {
-    var bookCopy = new BookCopyResponse();
+    BookCopyResponse bookCopy = new BookCopyResponse();
 
     bookCopy.setState(NEW);
     bookCopy.setStatus(AVAILABLE);
@@ -31,7 +31,7 @@ public class BookCopyFactory {
 
   public static BookCopyResponse createBookCopyResponseAfterTransaction(
       int authorIndex, int publisherIndex, int bookIndex) {
-    var bookCopy = createBookCopyResponse(authorIndex, publisherIndex, bookIndex);
+    BookCopyResponse bookCopy = createBookCopyResponse(authorIndex, publisherIndex, bookIndex);
     bookCopy.setStatus(LENT);
 
     return bookCopy;

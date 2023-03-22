@@ -8,7 +8,9 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.validator.constraints.Range;
 
-/** Transaction request DTO used as request body in HTTP requests. */
+/**
+ * Transaction request DTO used as request body in HTTP requests.
+ */
 @Getter
 @Setter
 @ToString

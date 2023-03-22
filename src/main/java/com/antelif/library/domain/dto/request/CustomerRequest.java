@@ -9,7 +9,9 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
 
-/** Customer Request DTO used as request body in HTTP requests. */
+/**
+ * Customer Request DTO used as request body in HTTP requests.
+ */
 @Getter
 @Setter
 @ToString

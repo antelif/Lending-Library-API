@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Author command controller. */
+/**
+ * Author command controller.
+ */
 @RestController
 @RequiredArgsConstructor
 @Slf4j

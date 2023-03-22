@@ -1,6 +1,5 @@
-package com.antelif.library.integration;
+package com.antelif.library.config;
 
-import com.antelif.library.config.ConfiguredPostgresqlContainer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -10,7 +9,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
-public class BaseIntegrationTest {
+public class BaseIT {
 
   @Autowired public ObjectMapper objectMapper;
 
