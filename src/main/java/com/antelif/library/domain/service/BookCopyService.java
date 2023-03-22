@@ -1,11 +1,16 @@
 package com.antelif.library.domain.service;
 
 import static com.antelif.library.application.error.GenericError.BOOK_COPY_CREATION_FAILED;
+import static com.antelif.library.application.error.GenericError.BOOK_COPY_DOES_NOT_EXIST;
+import static com.antelif.library.domain.service.validation.BookCopyValidationService.validateUpdate;
 
 import com.antelif.library.domain.converter.BookCopyConverter;
 import com.antelif.library.domain.dto.request.BookCopyRequest;
 import com.antelif.library.domain.dto.response.BookCopyResponse;
 import com.antelif.library.domain.exception.EntityCreationException;
+import com.antelif.library.domain.exception.EntityDoesNotExistException;
+import com.antelif.library.domain.service.validation.BookCopyValidationService;
+import com.antelif.library.domain.type.State;
 import com.antelif.library.infrastructure.entity.BookCopyEntity;
 import com.antelif.library.infrastructure.repository.BookCopyRepository;
 import java.util.ArrayList;
@@ -36,6 +41,26 @@ public class BookCopyService {
         .map(repository::save)
         .map(converter::convertFromEntityToResponse)
         .orElseThrow(() -> new EntityCreationException(BOOK_COPY_CREATION_FAILED));
+  }
+
+  /**
+   * Updates the state of a book copy.
+   * @param bookCopyId the book copy id of which to change the state.
+   * @param state the new book copy state.
+   * @return a book copy response DTO.
+   */
+  public BookCopyResponse updateBookCopyState(Long bookCopyId, State state) {
+
+    var bookCopy =
+        repository.getByIdIn(List.of(bookCopyId)).stream()
+            .findFirst()
+            .orElseThrow(() -> new EntityDoesNotExistException(BOOK_COPY_DOES_NOT_EXIST));
+
+    validateUpdate(bookCopy, state);
+
+    bookCopy.setState(state);
+
+    return converter.convertFromEntityToResponse(bookCopy);
   }
 
   /**

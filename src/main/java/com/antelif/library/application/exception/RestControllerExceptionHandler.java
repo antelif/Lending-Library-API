@@ -39,7 +39,9 @@ public class RestControllerExceptionHandler {
   @ExceptionHandler(value = GenericException.class)
   @ResponseStatus(INTERNAL_SERVER_ERROR)
   public ErrorResponse genericExceptionHandler(GenericException exception) {
-    var error = new ErrorResponse(exception.getGenericError(), INTERNAL_SERVER_ERROR.value());
+    var error =
+        new ErrorResponse(
+            exception.getGenericError(), INTERNAL_SERVER_ERROR.value(), exception.getMessage());
 
     log.error(error.toString());
 

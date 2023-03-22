@@ -13,4 +13,9 @@ public class GenericException extends RuntimeException {
     super(genericError.getDescription());
     this.genericError = genericError;
   }
+
+  public GenericException(GenericError genericError, String args) {
+    super(genericError.getDescription() + " - " + args);
+    this.genericError = genericError;
+  }
 }
