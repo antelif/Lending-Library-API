@@ -32,6 +32,7 @@ Below they are sectioned by the object of interest for each operation:
 - <b>Book Copies:</b> Each book has some copies for lending. Customers cannot borrow the books
   directly, rather a list of book copies.
     - Add new book copies.
+    - Update the state of existing book copies.
 - <b>Customer:</b> The customer that will borrow books.
     - Add new customer
     - Get a customer by their id
@@ -264,6 +265,42 @@ following steps shown above to add an author and a publisher you can create a ne
    ```
    This `id` is referred as `bookCopyId` or `copyId` in this document, and it will be needed to
    create new transactions.
+2. <b>Update the state of an existing book copy:</b>
+   <br/><b>URL:</b> PATCH request at `library/copies/{id}`.
+   <br/><b>Request body:</b>
+   ```json
+   {
+   "state": "NEW"
+   }
+   ```
+   - `id` is optional. if not provided it is set to `AVAILABLE`.
+   - `state` should contain one of the following values [`NEW`, `GOOD`,`BAD`].
+
+   <br/><b>Expected response:</b>
+   ```json
+   {
+    "book": {
+      "author": {
+        "id": 0,
+        "middleName": "string",
+        "name": "string",
+        "surname": "string"
+      },
+      "id": 0,
+      "isbn": "string",
+      "publisher": {
+        "id": 0,
+        "name": "string"
+      },
+      "title": "string"
+    },
+    "id": 0,
+    "state": "BAD",
+    "status": "AVAILABLE"
+
+   }
+   ```
+   This `id` is referred as `bookCopyId` or `copyId` in this document.
 
 ### Personnel
 
@@ -540,6 +577,11 @@ In order to do anything you need to log in using basic authentication.
 
 1. In order to create a new book you need to have a publisher and an author persisted in database.
 2. The book ISBN should be unique for each book.
+
+#### Book Copy
+1. When updating the state of a book copy, the copy must not:
+   - be borrowed already
+   - is of worse state than the one provided for update: NEW -> GOOD -> BAD
 
 #### Transaction Creation - Borrow books
 
