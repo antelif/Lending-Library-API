@@ -28,7 +28,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
       org.springframework.security.core.AuthenticationException e)
       throws IOException, ServletException, InternalAuthenticationServiceException {
 
-    var errorResponse = new ErrorResponse(AUTHENTICATION_FAILED, UNAUTHORIZED.value());
+    ErrorResponse errorResponse = new ErrorResponse(AUTHENTICATION_FAILED, UNAUTHORIZED.value());
 
     httpServletResponse.getOutputStream().println(objectMapper.writeValueAsString(errorResponse));
   }

@@ -27,7 +27,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
       AccessDeniedException exception)
       throws IOException {
 
-    var errorResponse = new ErrorResponse(AUTHORIZATION_FAILED, FORBIDDEN.value());
+    ErrorResponse errorResponse = new ErrorResponse(AUTHORIZATION_FAILED, FORBIDDEN.value());
 
     httpServletResponse.getOutputStream().println(objectMapper.writeValueAsString(errorResponse));
   }

@@ -15,8 +15,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
+import com.antelif.library.application.error.ErrorResponse;
 import com.antelif.library.domain.dto.request.PublisherRequest;
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.domain.dto.response.PublisherResponse;
+import com.antelif.library.config.BaseIT;
+import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +32,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Publishers query controller")
 @WithMockUser(username = ROOT_USER, password = ROOT_PASSWORD, roles = ADMIN)
-public class PublisherQueryControllerTest extends BaseIntegrationTest {
+public class PublisherQueryControllerTest extends BaseIT {
 
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
@@ -54,7 +57,7 @@ public class PublisherQueryControllerTest extends BaseIntegrationTest {
   void testRetrieveAllPublishers() {
     postPublisher(publisherRequest, this.mockMvc);
 
-    var actualResponse = getPublishers(this.mockMvc);
+    List<PublisherResponse> actualResponse = getPublishers(this.mockMvc);
 
     assertTrue(0 < actualResponse.size());
   }
@@ -63,9 +66,9 @@ public class PublisherQueryControllerTest extends BaseIntegrationTest {
   @DisplayName("Publisher: Retrieve publisher by id successfully.")
   @SneakyThrows
   void testRetrievePublisherById() {
-    var publisherId = postPublisher(publisherRequest, this.mockMvc).getId();
+    Long publisherId = postPublisher(publisherRequest, this.mockMvc).getId();
 
-    var actualResponse = getPublisherById(publisherId, this.mockMvc);
+    PublisherResponse actualResponse = getPublisherById(publisherId, this.mockMvc);
 
     assertNotNull(actualResponse.getId());
     assertEquals(publisherRequest.getName(), actualResponse.getName());
@@ -76,9 +79,9 @@ public class PublisherQueryControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testExceptionIsThrownWhenPublisherDoesNotExist() {
 
-    var inexistentPublisherId = 9999L;
+    long inexistentPublisherId = 9999L;
 
-    var response =
+    ErrorResponse response =
         getRequestAndExpectError(PUBLISHERS_ENDPOINT + "/" + inexistentPublisherId, this.mockMvc);
 
     assertEquals(PUBLISHER_DOES_NOT_EXIST.getCode(), response.getCode());

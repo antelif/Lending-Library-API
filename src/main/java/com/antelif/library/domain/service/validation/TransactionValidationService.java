@@ -23,6 +23,7 @@ import com.antelif.library.infrastructure.entity.TransactionItemEntity;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
@@ -38,12 +39,12 @@ public final class TransactionValidationService {
    */
   public static void validateCreation(TransactionEntity transaction) {
 
-    var bookCopies =
+    List<BookCopyEntity> bookCopies =
         Optional.of(transaction).map(TransactionEntity::getTransactionItems).stream()
             .flatMap(Collection::stream)
             .map(TransactionItemEntity::getBookCopy)
             .collect(Collectors.toList());
-    var customer = transaction.getCustomer();
+    CustomerEntity customer = transaction.getCustomer();
 
     validateBookCopiesRetrieved(bookCopies);
     validateBooksToBorrowAreUnique(bookCopies);
@@ -99,7 +100,7 @@ public final class TransactionValidationService {
    */
   private static void validateBookCopiesToReturnExistInTransaction(
       List<TransactionEntity> transactions, List<Long> bookCopyIdsReturned) {
-    var bookCopyIdsInTransactions =
+    List<Long> bookCopyIdsInTransactions =
         transactions.stream()
             .map(TransactionEntity::getTransactionItems)
             .flatMap(Collection::stream)
@@ -115,7 +116,7 @@ public final class TransactionValidationService {
   private static void validateBookCopiesToReturnAreLent(
       List<TransactionEntity> transactions, List<Long> bookCopyIdsReturned) {
 
-    var availableBookCopies =
+    Set<BookCopyEntity> availableBookCopies =
         transactions.stream()
             .map(TransactionEntity::getTransactionItems)
             .flatMap(Collection::stream)
@@ -157,12 +158,12 @@ public final class TransactionValidationService {
 
   private static void validateCustomerHasThisBook(
       CustomerEntity customer, List<BookCopyEntity> bookCopies) {
-    var bookCopyIds =
+    Set<Long> bookCopyIds =
         Stream.of(bookCopies)
             .flatMap(Collection::stream)
             .map(BookCopyEntity::getId)
             .collect(Collectors.toSet());
-    var customerBookCopyIds =
+    Set<Long> customerBookCopyIds =
         Stream.of(customer)
             .map(CustomerEntity::getTransactions)
             .flatMap(Collection::stream)

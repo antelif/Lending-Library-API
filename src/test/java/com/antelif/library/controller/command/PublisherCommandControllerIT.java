@@ -13,9 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
+import com.antelif.library.application.error.ErrorResponse;
 import com.antelif.library.domain.dto.request.PublisherRequest;
 import com.antelif.library.domain.dto.response.PublisherResponse;
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.config.BaseIT;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +29,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Publishers command controller")
 @WithMockUser(username = ROOT_USER, password = ROOT_PASSWORD, roles = ADMIN)
-class PublisherCommandControllerTest extends BaseIntegrationTest {
+class PublisherCommandControllerIT extends BaseIT {
 
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
@@ -55,7 +56,7 @@ class PublisherCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testNewPublisherIsCreatedSuccessfully() {
 
-    var actualPublisherResponse = postPublisher(publisherRequest, this.mockMvc);
+    PublisherResponse actualPublisherResponse = postPublisher(publisherRequest, this.mockMvc);
 
     assertNotNull(actualPublisherResponse);
     assertNotNull(actualPublisherResponse.getId());
@@ -71,7 +72,7 @@ class PublisherCommandControllerTest extends BaseIntegrationTest {
     postPublisher(publisherRequest, this.mockMvc);
 
     // Same publisher creation should fail
-    var errorResponse =
+    ErrorResponse errorResponse =
         postRequestAndExpectError(
             PUBLISHERS_ENDPOINT, objectMapper.writeValueAsString(publisherRequest), this.mockMvc);
 

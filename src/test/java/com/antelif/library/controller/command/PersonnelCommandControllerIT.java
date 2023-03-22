@@ -13,9 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
+import com.antelif.library.application.error.ErrorResponse;
 import com.antelif.library.domain.dto.request.PersonnelRequest;
 import com.antelif.library.domain.dto.response.PersonnelResponse;
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.config.BaseIT;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +29,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Personnel command controller")
 @WithMockUser(username = ROOT_USER, password = ROOT_PASSWORD, roles = ADMIN)
-class PersonnelCommandControllerTest extends BaseIntegrationTest {
+class PersonnelCommandControllerIT extends BaseIT {
 
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
@@ -54,7 +55,7 @@ class PersonnelCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testNewPersonnelIsCreated() {
 
-    var actualPersonnelResponse = postPersonnel(personnelRequest, this.mockMvc);
+    PersonnelResponse actualPersonnelResponse = postPersonnel(personnelRequest, this.mockMvc);
 
     assertNotNull(actualPersonnelResponse);
 
@@ -71,7 +72,7 @@ class PersonnelCommandControllerTest extends BaseIntegrationTest {
     postPersonnel(personnelRequest, this.mockMvc);
 
     // Same personnel creation should fail
-    var errorResponse =
+    ErrorResponse errorResponse =
         postRequestAndExpectError(
             PERSONNEL_ENDPOINT, objectMapper.writeValueAsString(personnelRequest), this.mockMvc);
 

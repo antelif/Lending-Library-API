@@ -24,7 +24,7 @@ public class RestControllerExceptionHandler {
   @ExceptionHandler(value = Exception.class)
   @ResponseStatus(INTERNAL_SERVER_ERROR)
   public ErrorResponse exceptionHandler(Exception exception) {
-    var error =
+    ErrorResponse error =
         new ErrorResponse(GENERIC_ERROR, INTERNAL_SERVER_ERROR.value(), exception.getMessage());
 
     log.error(error.toString());
@@ -39,7 +39,7 @@ public class RestControllerExceptionHandler {
   @ExceptionHandler(value = GenericException.class)
   @ResponseStatus(INTERNAL_SERVER_ERROR)
   public ErrorResponse genericExceptionHandler(GenericException exception) {
-    var error =
+    ErrorResponse error =
         new ErrorResponse(
             exception.getGenericError(), INTERNAL_SERVER_ERROR.value(), exception.getMessage());
 
@@ -58,7 +58,7 @@ public class RestControllerExceptionHandler {
   @ResponseStatus(INTERNAL_SERVER_ERROR)
   public ErrorResponse methodArgumentNotValidExceptionHandler(
       MethodArgumentNotValidException exception) {
-    var error =
+    ErrorResponse error =
         new ErrorResponse(
             INPUT_VALIDATIONS_ERROR,
             INTERNAL_SERVER_ERROR.value(),

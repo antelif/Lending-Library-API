@@ -51,7 +51,7 @@ public class BookCopyService {
    */
   public BookCopyResponse updateBookCopyState(Long bookCopyId, State state) {
 
-    var bookCopy = repository.findById(bookCopyId)
+    BookCopyEntity bookCopy = repository.findById(bookCopyId)
         .orElseThrow(() -> new EntityDoesNotExistException(BOOK_COPY_DOES_NOT_EXIST));
 
     validateUpdate(bookCopy, state);

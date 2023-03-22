@@ -36,7 +36,7 @@ class AuthorConverterTest {
   @Test
   @DisplayName("Convert Author: Request to Entity")
   void convertFromDtoToDomain_isSuccessful() {
-    var actualEntity = authorConverter.convertFromRequestToEntity(expectedRequest);
+    AuthorEntity actualEntity = authorConverter.convertFromRequestToEntity(expectedRequest);
 
     assertEquals(expectedEntity.getName(), actualEntity.getName());
     assertEquals(expectedEntity.getMiddleName(), actualEntity.getMiddleName());
@@ -46,7 +46,7 @@ class AuthorConverterTest {
   @Test
   @DisplayName("Convert Author: Entity to Response")
   void convertFromDomainToEntity_isSuccessful() {
-    var actualOutput = authorConverter.convertFromEntityToResponse(expectedEntity);
+    AuthorResponse actualOutput = authorConverter.convertFromEntityToResponse(expectedEntity);
 
     assertEquals(authorResponse.getName(), actualOutput.getName());
     assertEquals(authorResponse.getMiddleName(), actualOutput.getMiddleName());

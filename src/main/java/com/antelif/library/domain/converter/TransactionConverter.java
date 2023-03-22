@@ -5,8 +5,13 @@ import com.antelif.library.domain.dto.response.TransactionResponse;
 import com.antelif.library.domain.service.BookCopyService;
 import com.antelif.library.domain.service.CustomerService;
 import com.antelif.library.domain.service.PersonnelService;
+import com.antelif.library.infrastructure.entity.BookCopyEntity;
+import com.antelif.library.infrastructure.entity.CustomerEntity;
+import com.antelif.library.infrastructure.entity.PersonnelEntity;
 import com.antelif.library.infrastructure.entity.TransactionEntity;
 import com.antelif.library.infrastructure.entity.TransactionItemEntity;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -28,11 +33,11 @@ public class TransactionConverter
 
   @Override
   public TransactionEntity convertFromRequestToEntity(TransactionRequest transactionRequest) {
-    var transaction = modelMapper.map(transactionRequest, TransactionEntity.class);
+    TransactionEntity transaction = modelMapper.map(transactionRequest, TransactionEntity.class);
 
-    var customer = customerService.getCustomerById(transactionRequest.getCustomerId());
-    var personnel = personnelService.getPersonnelById(transactionRequest.getPersonnelId());
-    var bookCopies = bookCopyService.getBookCopiesByBookCopyIds(transactionRequest.getCopyIds());
+    CustomerEntity customer = customerService.getCustomerById(transactionRequest.getCustomerId());
+    PersonnelEntity personnel = personnelService.getPersonnelById(transactionRequest.getPersonnelId());
+    List<BookCopyEntity> bookCopies = bookCopyService.getBookCopiesByBookCopyIds(transactionRequest.getCopyIds());
 
     transaction.setCustomer(customer);
     transaction.setPersonnel(personnel);
@@ -44,9 +49,9 @@ public class TransactionConverter
 
   @Override
   public TransactionResponse convertFromEntityToResponse(TransactionEntity transactionEntity) {
-    var transaction = modelMapper.map(transactionEntity, TransactionResponse.class);
+    TransactionResponse transaction = modelMapper.map(transactionEntity, TransactionResponse.class);
 
-    var bookCopies =
+    Set<BookCopyEntity> bookCopies =
         transactionEntity.getTransactionItems().stream()
             .map(TransactionItemEntity::getBookCopy)
             .collect(Collectors.toSet());

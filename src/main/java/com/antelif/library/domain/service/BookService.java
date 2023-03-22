@@ -35,7 +35,7 @@ public class BookService {
    * @return a book response DTO.
    */
   public BookResponse addBook(BookRequest bookRequest) {
-    var persistedEntity = bookRepository.getBookByIsbn(bookRequest.getIsbn());
+    Optional<BookEntity> persistedEntity = bookRepository.getBookByIsbn(bookRequest.getIsbn());
 
     if (persistedEntity.isPresent()) {
       throw new DuplicateEntityException(DUPLICATE_BOOK);
@@ -53,7 +53,7 @@ public class BookService {
    * @return a book entity if book was retrieved.
    */
   public BookEntity getBookByIsbn(String isbn) {
-    var persistedBook = bookRepository.getBookByIsbn(isbn);
+    Optional<BookEntity> persistedBook = bookRepository.getBookByIsbn(isbn);
 
     return persistedBook.orElseThrow(() -> new EntityDoesNotExistException(BOOK_DOES_NOT_EXIST));
   }

@@ -5,7 +5,8 @@ import static com.antelif.library.domain.common.Endpoints.PERSONNEL_ENDPOINT;
 import static com.antelif.library.factory.PersonnelFactory.createPersonnelRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.config.BaseIT;
 import com.antelif.library.utils.RequestBuilder;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Validations Personnel")
-public class PersonnelRequestValidationTest extends BaseIntegrationTest {
+public class PersonnelRequestValidationIT extends BaseIT {
 
   @Autowired private MockMvc mockMvc;
   @Autowired private WebApplicationContext webApplicationContext;
@@ -38,7 +39,7 @@ public class PersonnelRequestValidationTest extends BaseIntegrationTest {
   void testPersonnelNameCannotBeEmpty() {
     personnelRequest.setUsername(" ");
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             PERSONNEL_ENDPOINT, objectMapper.writeValueAsString(personnelRequest), this.mockMvc);
 
@@ -51,7 +52,7 @@ public class PersonnelRequestValidationTest extends BaseIntegrationTest {
   void testPersonnelNameCannotBeLongerThan20Characters() {
     personnelRequest.setUsername("111111111111111111111");
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             PERSONNEL_ENDPOINT, objectMapper.writeValueAsString(personnelRequest), this.mockMvc);
 
@@ -64,7 +65,7 @@ public class PersonnelRequestValidationTest extends BaseIntegrationTest {
   void testPersonnelPasswordCannotBeEmpty() {
     personnelRequest.setPassword(" ");
 
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             PERSONNEL_ENDPOINT, objectMapper.writeValueAsString(personnelRequest), this.mockMvc);
 

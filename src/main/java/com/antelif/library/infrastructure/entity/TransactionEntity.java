@@ -87,7 +87,7 @@ public class TransactionEntity {
     return bookCopies.stream()
         .map(
             bookCopy -> {
-              var transactionItem = new TransactionItemEntity();
+              TransactionItemEntity transactionItem = new TransactionItemEntity();
               transactionItem.setBookCopy(bookCopy);
               return transactionItem;
             })

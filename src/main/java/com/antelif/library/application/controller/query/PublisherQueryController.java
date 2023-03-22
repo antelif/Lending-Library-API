@@ -6,6 +6,7 @@ import static com.antelif.library.domain.common.Endpoints.PUBLISHERS_ENDPOINT;
 import com.antelif.library.domain.converter.PublisherConverter;
 import com.antelif.library.domain.dto.response.PublisherResponse;
 import com.antelif.library.domain.service.PublisherService;
+import com.antelif.library.infrastructure.entity.PublisherEntity;
 import io.swagger.annotations.Api;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,7 @@ public class PublisherQueryController {
   @GetMapping("/{id}")
   public ResponseEntity<PublisherResponse> getPublisherById(@PathVariable("id") Long id) {
 
-    var publisherEntity = publisherService.getPublisherById(id);
+    PublisherEntity publisherEntity = publisherService.getPublisherById(id);
     return ResponseEntity.ok(publisherConverter.convertFromEntityToResponse(publisherEntity));
   }
 }

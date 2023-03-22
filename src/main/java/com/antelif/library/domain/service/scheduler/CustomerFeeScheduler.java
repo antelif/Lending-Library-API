@@ -20,7 +20,7 @@ public class CustomerFeeScheduler {
   @Scheduled(cron = "${app.properties.fee-calculation-rate}")
   @Async
   public void customerFeeCalculationScheduler() {
-    var watch = new StopWatch();
+    StopWatch watch = new StopWatch();
     watch.start();
 
     log.info("Calculating fees of customers.");

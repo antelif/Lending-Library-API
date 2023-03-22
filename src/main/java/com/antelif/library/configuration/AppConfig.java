@@ -27,8 +27,8 @@ public class AppConfig {
 
   @Bean
   public ObjectMapper objectMapper() {
-    var javaTimeModule = new JavaTimeModule();
-    var objectMapper = new ObjectMapper();
+    JavaTimeModule javaTimeModule = new JavaTimeModule();
+    ObjectMapper objectMapper = new ObjectMapper();
     objectMapper
         .registerModule(javaTimeModule)
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

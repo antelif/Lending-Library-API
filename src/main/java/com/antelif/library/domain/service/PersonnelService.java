@@ -43,7 +43,7 @@ public class PersonnelService {
 
     personnelRequest.setPassword(passwordEncoder.encode(personnelRequest.getPassword()));
 
-    var persistedPersonnel =
+    Optional<PersonnelEntity> persistedPersonnel =
         personnelRepository.getPersonnelEntityByUsername(personnelRequest.getUsername());
 
     if (persistedPersonnel.isPresent()) {
@@ -63,7 +63,7 @@ public class PersonnelService {
    * @return a personnel entity object.
    */
   public PersonnelEntity getPersonnelById(Long id) {
-    var persistedPersonnel = personnelRepository.getPersonnelById(id);
+    Optional<PersonnelEntity> persistedPersonnel = personnelRepository.getPersonnelById(id);
 
     return persistedPersonnel.orElseThrow(
         () -> new EntityDoesNotExistException(PERSONNEL_DOES_NOT_EXIST));
@@ -72,7 +72,7 @@ public class PersonnelService {
   /** Initializes a root user to enable access to requests until new users are created. */
   @PostConstruct
   public void initializeRootUser() {
-    var rootPersonnel = new PersonnelRequest(appProperties.getRootUser());
+    PersonnelRequest rootPersonnel = new PersonnelRequest(appProperties.getRootUser());
 
     try {
       log.info("Creating root user.");

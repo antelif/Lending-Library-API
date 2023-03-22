@@ -37,7 +37,7 @@ public class TransactionService {
    * @return a transaction response DTO.
    */
   public TransactionResponse createTransaction(TransactionRequest transactionRequest) {
-    var transactionEntity = transactionConverter.convertFromRequestToEntity(transactionRequest);
+    TransactionEntity transactionEntity = transactionConverter.convertFromRequestToEntity(transactionRequest);
 
     validateCreation(transactionEntity);
 
@@ -60,7 +60,7 @@ public class TransactionService {
    * @return a list with the updated transaction after books are returned.
    */
   public List<TransactionResponse> updateTransactions(List<Long> bookCopyIds, String customerId) {
-    var transactionsToUpdate =
+    List<TransactionEntity> transactionsToUpdate =
         transactionRepository.findAllByCustomerIdAndStatus(Long.valueOf(customerId), ACTIVE);
 
     validateUpdate(transactionsToUpdate, bookCopyIds);
@@ -79,7 +79,7 @@ public class TransactionService {
   }
 
   public TransactionResponse cancelTransaction(Long transactionId) {
-    var persistedTransaction = transactionRepository.findById(transactionId);
+    Optional<TransactionEntity> persistedTransaction = transactionRepository.findById(transactionId);
 
     if (persistedTransaction.isEmpty()) {
       throw new EntityDoesNotExistException(TRANSACTION_DOES_NOT_EXIST);

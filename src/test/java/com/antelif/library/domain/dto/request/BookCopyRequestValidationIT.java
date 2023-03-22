@@ -5,7 +5,8 @@ import static com.antelif.library.domain.common.Endpoints.BOOK_COPIES_ENDPOINT;
 import static com.antelif.library.factory.BookCopyFactory.createBookCopyRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.config.BaseIT;
 import com.antelif.library.utils.RequestBuilder;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Validations Book Copy")
-public class BookCopyRequestValidationTest extends BaseIntegrationTest {
+public class BookCopyRequestValidationIT extends BaseIT {
 
   @Autowired private MockMvc mockMvc;
   @Autowired private WebApplicationContext webApplicationContext;
@@ -39,7 +40,7 @@ public class BookCopyRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookCopyIsbnCannotBeBlank() {
     bookCopyRequest.setIsbn(" ");
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             BOOK_COPIES_ENDPOINT, objectMapper.writeValueAsString(bookCopyRequest), this.mockMvc);
 
@@ -51,7 +52,7 @@ public class BookCopyRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookCopyIsbnCannotBeNull() {
     bookCopyRequest.setIsbn(null);
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             BOOK_COPIES_ENDPOINT, objectMapper.writeValueAsString(bookCopyRequest), this.mockMvc);
 
@@ -64,7 +65,7 @@ public class BookCopyRequestValidationTest extends BaseIntegrationTest {
   @Disabled("Disabled until ISBN validations are concluded.")
   void testBookCopyIsbnFormat() {
     bookCopyRequest.setIsbn("1111");
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             BOOK_COPIES_ENDPOINT, objectMapper.writeValueAsString(bookCopyRequest), this.mockMvc);
 
@@ -76,7 +77,7 @@ public class BookCopyRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testBookCopyStateCannotBeBlank() {
     bookCopyRequest.setState(null);
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             BOOK_COPIES_ENDPOINT, objectMapper.writeValueAsString(bookCopyRequest), this.mockMvc);
 

@@ -29,11 +29,26 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
+import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.domain.dto.request.AuthorRequest;
+import com.antelif.library.domain.dto.request.BookCopyRequest;
+import com.antelif.library.domain.dto.request.BookRequest;
 import com.antelif.library.domain.dto.request.CustomerRequest;
+import com.antelif.library.domain.dto.request.PersonnelRequest;
+import com.antelif.library.domain.dto.request.PublisherRequest;
+import com.antelif.library.domain.dto.request.TransactionRequest;
+import com.antelif.library.domain.dto.response.AuthorResponse;
+import com.antelif.library.domain.dto.response.BookCopyResponse;
+import com.antelif.library.domain.dto.response.BookResponse;
 import com.antelif.library.domain.dto.response.CustomerResponse;
+import com.antelif.library.domain.dto.response.PersonnelResponse;
+import com.antelif.library.domain.dto.response.PublisherResponse;
+import com.antelif.library.domain.dto.response.TransactionResponse;
+import com.antelif.library.infrastructure.entity.CustomerEntity;
+import com.antelif.library.infrastructure.entity.TransactionEntity;
 import com.antelif.library.infrastructure.repository.CustomerRepository;
 import com.antelif.library.infrastructure.repository.TransactionRepository;
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.config.BaseIT;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,7 +61,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Customer command controller")
 @WithMockUser(username = "root", password = "root", roles = ADMIN)
-class CustomerCommandControllerTest extends BaseIntegrationTest {
+class CustomerCommandControllerIT extends BaseIT {
 
   @Autowired private WebApplicationContext webApplicationContext;
   @Autowired private MockMvc mockMvc;
@@ -76,7 +91,7 @@ class CustomerCommandControllerTest extends BaseIntegrationTest {
   @SneakyThrows
   void testNewCustomerIsCreated() {
 
-    var actualCustomer = postCustomer(customerRequest, this.mockMvc);
+    CustomerResponse actualCustomer = postCustomer(customerRequest, this.mockMvc);
 
     assertNotNull(actualCustomer);
 
@@ -97,7 +112,7 @@ class CustomerCommandControllerTest extends BaseIntegrationTest {
     postCustomer(customerRequest, this.mockMvc);
 
     // Same customer creation should fail
-    var errorResponse =
+    ErrorResponse errorResponse =
         postRequestAndExpectError(
             CUSTOMERS_ENDPOINT, objectMapper.writeValueAsString(customerRequest), this.mockMvc);
 
@@ -108,7 +123,7 @@ class CustomerCommandControllerTest extends BaseIntegrationTest {
   @DisplayName("Customer: Successful update of customer fee.")
   @SneakyThrows
   void testCustomerFeeIsUpdated() {
-    var actualCustomer = postCustomer(customerRequest, this.mockMvc);
+    CustomerResponse actualCustomer = postCustomer(customerRequest, this.mockMvc);
 
     // Add transaction
     authorCounter++;
@@ -117,45 +132,45 @@ class CustomerCommandControllerTest extends BaseIntegrationTest {
     customerCounter++;
     personnelCounter++;
 
-    var authorRequest = createAuthorRequest(authorCounter);
-    var authorResponse = postAuthor(authorRequest, this.mockMvc);
+    AuthorRequest authorRequest = createAuthorRequest(authorCounter);
+    AuthorResponse authorResponse = postAuthor(authorRequest, this.mockMvc);
 
-    var publisherRequest = createPublisherRequest(publisherCounter);
-    var publisherResponse = postPublisher(publisherRequest, this.mockMvc);
+    PublisherRequest publisherRequest = createPublisherRequest(publisherCounter);
+    PublisherResponse publisherResponse = postPublisher(publisherRequest, this.mockMvc);
 
-    var bookRequest =
+    BookRequest bookRequest =
         createBookRequest(bookCounter, authorResponse.getId(), publisherResponse.getId());
 
-    var bookResponse = postBook(bookRequest, this.mockMvc);
-    var isbn = bookResponse.getIsbn();
+    BookResponse bookResponse = postBook(bookRequest, this.mockMvc);
+    String isbn = bookResponse.getIsbn();
 
-    var bookCopyRequest = createBookCopyRequest(isbn);
-    var bookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
+    BookCopyRequest bookCopyRequest = createBookCopyRequest(isbn);
+    BookCopyResponse bookCopyResponse = postBookCopy(bookCopyRequest, this.mockMvc);
 
-    var personnelRequest = createPersonnelRequest(personnelCounter);
-    var personnelResponse = postPersonnel(personnelRequest, this.mockMvc);
+    PersonnelRequest personnelRequest = createPersonnelRequest(personnelCounter);
+    PersonnelResponse personnelResponse = postPersonnel(personnelRequest, this.mockMvc);
 
-    var transactionRequest =
+    TransactionRequest transactionRequest =
         createTransactionRequest(
             actualCustomer.getId(), personnelResponse.getId(), bookCopyResponse.getId());
-    var transactionResponse = postTransaction(transactionRequest, this.mockMvc);
+    TransactionResponse transactionResponse = postTransaction(transactionRequest, this.mockMvc);
 
     // Update customer last update to be one day before so that we need to update them again
-    var persistedCustomer = customerRepository.getCustomerById(actualCustomer.getId()).get();
+    CustomerEntity persistedCustomer = customerRepository.getCustomerById(actualCustomer.getId()).get();
     persistedCustomer.setLastUpdate(nowInstantToDays().minus(1, DAYS));
     customerRepository.save(persistedCustomer);
 
     // Update transaction return time to be 10 days late so that fee should be 5.
-    var persistedTransaction = transactionRepository.findById(transactionResponse.getId()).get();
+    TransactionEntity persistedTransaction = transactionRepository.findById(transactionResponse.getId()).get();
     persistedTransaction.setCreationDate(nowInstantToDays().minus(11, DAYS));
     persistedTransaction.setReturnDate(nowInstantToDays().minus(10, DAYS));
     transactionRepository.save(persistedTransaction);
 
     // Repay some of the fee
-    var customerResponse = patchCustomerFee(actualCustomer.getId(), 3.0, this.mockMvc);
+    CustomerResponse customerResponse = patchCustomerFee(actualCustomer.getId(), 3.0, this.mockMvc);
 
     // Retrieve customer again
-    var updatedCustomer = getCustomerById(customerResponse.getId(), this.mockMvc);
+    CustomerResponse updatedCustomer = getCustomerById(customerResponse.getId(), this.mockMvc);
 
     assertEquals(2, updatedCustomer.getFee());
   }
@@ -164,10 +179,10 @@ class CustomerCommandControllerTest extends BaseIntegrationTest {
   @DisplayName("Customer: Update of customer fee fails when return amount in negative.")
   @SneakyThrows
   void testCustomerUpdateFailsWhenReturnAmountIsNegative() {
-    var actualCustomer = postCustomer(customerRequest, this.mockMvc);
+    CustomerResponse actualCustomer = postCustomer(customerRequest, this.mockMvc);
 
     // Update customer with negative fee should fail.
-    var errorResponse = patchCustomerFeeAndExpectError(actualCustomer.getId(), -10.0, this.mockMvc);
+    ErrorResponse errorResponse = patchCustomerFeeAndExpectError(actualCustomer.getId(), -10.0, this.mockMvc);
 
     assertEquals(INVALID_CUSTOMER_UPDATE_VALUE.getCode(), errorResponse.getCode());
   }
@@ -177,10 +192,10 @@ class CustomerCommandControllerTest extends BaseIntegrationTest {
       "Customer: Update of customer fee fails when return amount in greater than customer fee.")
   @SneakyThrows
   void testCustomerUpdateFailsWhenReturnAmountIsGreaterThanCustomerFee() {
-    var actualCustomer = postCustomer(customerRequest, this.mockMvc);
+    CustomerResponse actualCustomer = postCustomer(customerRequest, this.mockMvc);
 
     // Update customer with negative fee should fail.
-    var errorResponse = patchCustomerFeeAndExpectError(actualCustomer.getId(), 100.0, this.mockMvc);
+    ErrorResponse errorResponse = patchCustomerFeeAndExpectError(actualCustomer.getId(), 100.0, this.mockMvc);
 
     assertEquals(INVALID_CUSTOMER_UPDATE_VALUE.getCode(), errorResponse.getCode());
   }

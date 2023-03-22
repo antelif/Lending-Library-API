@@ -5,7 +5,8 @@ import static com.antelif.library.domain.common.Endpoints.AUTHORS_ENDPOINT;
 import static com.antelif.library.factory.AuthorFactory.createAuthorRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.antelif.library.integration.BaseIntegrationTest;
+import com.antelif.library.application.error.ErrorResponse;
+import com.antelif.library.config.BaseIT;
 import com.antelif.library.utils.RequestBuilder;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 @DisplayName("Validations Author")
-public class AuthorRequestValidationTest extends BaseIntegrationTest {
+public class AuthorRequestValidationIT extends BaseIT {
 
   @Autowired private MockMvc mockMvc;
   @Autowired private WebApplicationContext webApplicationContext;
@@ -39,7 +40,7 @@ public class AuthorRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testAuthorNameCannotBeBlank() {
     authorRequest.setName(" ");
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
 
@@ -51,7 +52,7 @@ public class AuthorRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testAuthorNameCannotBeNull() {
     authorRequest.setName(null);
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
 
@@ -63,7 +64,7 @@ public class AuthorRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testAuthorSurnameCannotBeBlank() {
     authorRequest.setSurname(" ");
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
 
@@ -75,7 +76,7 @@ public class AuthorRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testAuthorSurnameCannotBeNull() {
     authorRequest.setSurname(null);
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
 
@@ -87,7 +88,7 @@ public class AuthorRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testAuthorNameCannotBeMoreThan50Characters() {
     authorRequest.setName("111111111111111111111111111111111111111111111111111");
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
 
@@ -99,7 +100,7 @@ public class AuthorRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testAuthorSurnameCannotBeMoreThan50Characters() {
     authorRequest.setSurname("111111111111111111111111111111111111111111111111111");
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
 
@@ -111,7 +112,7 @@ public class AuthorRequestValidationTest extends BaseIntegrationTest {
   @SneakyThrows
   void testAuthorMiddleNameCannotBeMoreThan50Characters() {
     authorRequest.setMiddleName("111111111111111111111111111111111111111111111111111");
-    var response =
+    ErrorResponse response =
         RequestBuilder.postRequestAndExpectError(
             AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
 

@@ -23,7 +23,7 @@ public class BookCopyConverter
   @Override
   public BookCopyEntity convertFromRequestToEntity(BookCopyRequest bookCopyRequest) {
 
-    var bookCopy = modelMapper.map(bookCopyRequest, BookCopyEntity.class);
+    BookCopyEntity bookCopy = modelMapper.map(bookCopyRequest, BookCopyEntity.class);
     bookCopy.setBook(bookService.getBookByIsbn(bookCopyRequest.getIsbn()));
 
     return bookCopy;

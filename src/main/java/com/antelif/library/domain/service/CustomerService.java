@@ -37,7 +37,7 @@ public class CustomerService {
    */
   public CustomerResponse addCustomer(CustomerRequest customerRequest) {
 
-    var persistedCustomer = customerRepository.getCustomerByPhoneNo(customerRequest.getPhoneNo());
+    Optional<CustomerEntity> persistedCustomer = customerRepository.getCustomerByPhoneNo(customerRequest.getPhoneNo());
 
     if (persistedCustomer.isPresent()) {
       throw new DuplicateEntityException(DUPLICATE_CUSTOMER);
@@ -57,7 +57,7 @@ public class CustomerService {
    */
   public CustomerEntity getCustomerById(Long id) {
 
-    var persistedCustomer =
+    CustomerEntity persistedCustomer =
         customerRepository
             .getCustomerById(id)
             .orElseThrow(() -> new EntityDoesNotExistException(CUSTOMER_DOES_NOT_EXIST));
@@ -76,7 +76,7 @@ public class CustomerService {
    */
   public CustomerResponse updateCustomerFee(Long customerId, Double feeAmount) {
 
-    var persistedCustomer =
+    CustomerEntity persistedCustomer =
         customerRepository
             .getCustomerById(customerId)
             .orElseThrow(() -> new EntityDoesNotExistException(CUSTOMER_DOES_NOT_EXIST));

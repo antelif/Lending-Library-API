@@ -9,7 +9,7 @@ import lombok.SneakyThrows;
 public class BookFactory {
 
   public static BookRequest createBookRequest(int bookIndex, long authorId, long publisherId) {
-    var book = new BookRequest();
+    BookRequest book = new BookRequest();
     book.setIsbn("isbn" + bookIndex);
     book.setTitle("title" + bookIndex);
     book.setAuthorId(authorId);
@@ -19,7 +19,7 @@ public class BookFactory {
 
   @SneakyThrows
   public static BookResponse createBookResponse(int authorId, int publisherId, int bookIndex) {
-    var book = new BookResponse();
+    BookResponse book = new BookResponse();
     book.setIsbn("isbn" + bookIndex);
     book.setTitle("title" + bookIndex);
     book.setAuthor(createAuthorResponse(authorId));

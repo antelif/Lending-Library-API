@@ -73,7 +73,7 @@ public class CustomerEntity {
    */
   private void calculateFee(double dailyRate) {
 
-    var now = nowInstantToDays();
+    Instant now = nowInstantToDays();
     this.fee = 0;
 
     Optional.ofNullable(transactions).stream()
@@ -82,7 +82,7 @@ public class CustomerEntity {
         .forEach(
             transaction -> {
               if (now.isAfter(transaction.getReturnDate())) {
-                var daysInBetween = DAYS.between(transaction.getReturnDate(), now);
+                long daysInBetween = DAYS.between(transaction.getReturnDate(), now);
                 fee += dailyRate * daysInBetween;
                 lastUpdate = nowInstantToDays();
               }
