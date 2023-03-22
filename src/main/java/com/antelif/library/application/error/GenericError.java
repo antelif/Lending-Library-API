@@ -25,6 +25,8 @@ public enum GenericError {
   CUSTOMER_DOES_NOT_EXIST(18, "Customer does not exist."),
   CUSTOMER_CREATION_FAILED(20, "Could not create new customer."),
 
+  INVALID_BOOK_COPY_STATE(3, "Cannot provide better book copy state."),
+  INVALID_BOOK_COPY_STATUS(7, "Cannot update state of unavailable book"),
   BOOK_COPY_DOES_NOT_EXIST(22, "Book copy does not exist."),
   BOOK_COPY_CREATION_FAILED(24, "Could not create new book copy."),
   BOOK_COPY_UNAVAILABLE(28, "Copy is not eligible for lending due to bad state or unavailability"),

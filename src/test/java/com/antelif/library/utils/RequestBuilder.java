@@ -16,6 +16,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,6 +28,7 @@ import com.antelif.library.domain.dto.request.CustomerRequest;
 import com.antelif.library.domain.dto.request.PersonnelRequest;
 import com.antelif.library.domain.dto.request.PublisherRequest;
 import com.antelif.library.domain.dto.request.TransactionRequest;
+import com.antelif.library.domain.dto.request.update.BookCopyUpdateStateRequest;
 import com.antelif.library.domain.dto.response.AuthorResponse;
 import com.antelif.library.domain.dto.response.BookCopyResponse;
 import com.antelif.library.domain.dto.response.BookResponse;
@@ -34,6 +36,7 @@ import com.antelif.library.domain.dto.response.CustomerResponse;
 import com.antelif.library.domain.dto.response.PersonnelResponse;
 import com.antelif.library.domain.dto.response.PublisherResponse;
 import com.antelif.library.domain.dto.response.TransactionResponse;
+import com.antelif.library.domain.type.State;
 import com.antelif.library.factory.AuthorFactory;
 import com.antelif.library.factory.BookFactory;
 import com.antelif.library.factory.PublisherFactory;
@@ -262,6 +265,30 @@ public class RequestBuilder {
   }
 
   @SneakyThrows
+  public static BookCopyResponse patchBookCopyState(Long bookCopyId, State state, MockMvc mockMvc) {
+
+    BookCopyUpdateStateRequest bookCopyUpdateStateRequest = new BookCopyUpdateStateRequest();
+    bookCopyUpdateStateRequest.setState(state);
+
+    var response =
+        mockMvc
+            .perform(
+                patch(BOOK_COPIES_ENDPOINT + "/" + bookCopyId)
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(bookCopyUpdateStateRequest)))
+            .andDo(print())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    var customerMap =
+        objectMapper.readValue(response, new TypeReference<Map<String, BookCopyResponse>>() {});
+
+    return objectMapper.readValue(
+        objectMapper.writeValueAsString(customerMap.get(UPDATED)), BookCopyResponse.class);
+  }
+
+  @SneakyThrows
   public static TransactionResponse cancelTransaction(Long transactionId, MockMvc mockMvc) {
 
     var response =
@@ -329,6 +356,27 @@ public class RequestBuilder {
         mockMvc
             .perform(
                 patch(CUSTOMERS_ENDPOINT + "/" + customerId).param("feeAmount", fee.toString()))
+            .andDo(print())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    return objectMapper.readValue(response, ErrorResponse.class);
+  }
+
+  @SneakyThrows
+  public static ErrorResponse patchBookCopyStateAndExpectError(
+      Long bookCopyId, State state, MockMvc mockMvc) {
+
+    BookCopyUpdateStateRequest bookCopyUpdateStateRequest = new BookCopyUpdateStateRequest();
+    bookCopyUpdateStateRequest.setState(state);
+
+    var response =
+        mockMvc
+            .perform(
+                patch(BOOK_COPIES_ENDPOINT + "/" + bookCopyId)
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(bookCopyUpdateStateRequest)))
             .andDo(print())
             .andReturn()
             .getResponse()
