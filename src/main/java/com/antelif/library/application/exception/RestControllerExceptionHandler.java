@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/** Rest Controller Exception Handler. */
+/**
+ * Rest Controller Exception Handler.
+ */
 @RestControllerAdvice
 @Slf4j
 public class RestControllerExceptionHandler {
@@ -31,6 +33,7 @@ public class RestControllerExceptionHandler {
 
     return error;
   }
+
   /***
    * Handles all custom exceptions that extend GenericException.
    * @param exception the exception that was thrown.

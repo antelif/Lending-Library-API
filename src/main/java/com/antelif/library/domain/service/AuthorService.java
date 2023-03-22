@@ -18,7 +18,9 @@ import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/** Author service. */
+/**
+ * Author service.
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -38,7 +40,7 @@ public class AuthorService {
     List<AuthorEntity> persistedEntity =
         Optional.ofNullable(authorRequest.getMiddleName()).isPresent()
             ? authorRepository.getAuthorEntitiesByNameAndSurnameAndMiddleName(
-                authorRequest.getName(), authorRequest.getSurname(), authorRequest.getMiddleName())
+            authorRequest.getName(), authorRequest.getSurname(), authorRequest.getMiddleName())
             : authorRepository.getAuthorEntitiesByNameAndSurname(
                 authorRequest.getName(), authorRequest.getSurname());
 

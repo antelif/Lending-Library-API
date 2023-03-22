@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-/** Converter for book copy objects. */
+/**
+ * Converter for book copy objects.
+ */
 @Component
 @RequiredArgsConstructor
 public class BookCopyConverter

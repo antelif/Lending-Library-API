@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-/** Converter for Book objects. */
+/**
+ * Converter for Book objects.
+ */
 @Component
 @RequiredArgsConstructor
 public class BookConverter implements Converter<BookRequest, BookEntity, BookResponse> {

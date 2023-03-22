@@ -1,6 +1,8 @@
 package com.antelif.library.domain.common;
 
-/** Endpoints. */
+/**
+ * Endpoints.
+ */
 public final class Endpoints {
 
   public static final String AUTHORS_ENDPOINT = "/library/authors";
@@ -12,5 +14,6 @@ public final class Endpoints {
   public static final String TRANSACTIONS_ENDPOINT = "/library/transactions";
   public static final String CANCEL_TRANSACTION_ENDPOINT = "/library/cancel/transaction";
 
-  private Endpoints() {}
+  private Endpoints() {
+  }
 }

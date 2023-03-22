@@ -11,7 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
-/** Handles 403 requests. */
+/**
+ * Handles 403 requests.
+ */
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
   private final ObjectMapper objectMapper;

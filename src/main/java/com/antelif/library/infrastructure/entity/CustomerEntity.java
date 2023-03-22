@@ -18,12 +18,15 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Customer entity object that gets persisted in database. */
+/**
+ * Customer entity object that gets persisted in database.
+ */
 @Getter
 @Setter
 @Entity
 @Table(name = "customer")
 public class CustomerEntity {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -89,12 +92,16 @@ public class CustomerEntity {
             });
   }
 
-  /** Updates the lat update time. Truncates to days. */
+  /**
+   * Updates the lat update time. Truncates to days.
+   */
   private void updateLastUpdateTime() {
     this.lastUpdate = nowInstantToDays();
   }
 
-  /** Returns true if the fee was not updated the last day. */
+  /**
+   * Returns true if the fee was not updated the last day.
+   */
   private boolean feeIsUpdateable() {
     return nowInstantToDays().isAfter(lastUpdate);
   }

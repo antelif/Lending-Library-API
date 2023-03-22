@@ -11,7 +11,9 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/** CopyTransactionEntity entity object that gets persisted in database. */
+/**
+ * CopyTransactionEntity entity object that gets persisted in database.
+ */
 @Getter
 @Setter
 @Entity

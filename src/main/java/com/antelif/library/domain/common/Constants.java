@@ -1,9 +1,12 @@
 package com.antelif.library.domain.common;
 
-/** Class with constants. */
+/**
+ * Class with constants.
+ */
 public final class Constants {
 
-  private Constants() {}
+  private Constants() {
+  }
 
   public static final String CREATED = "created";
   public static final String UPDATED = "updated";

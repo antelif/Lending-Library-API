@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-/** Personnel Request DTO used as request body in HTTP requests. */
+/**
+ * Personnel Request DTO used as request body in HTTP requests.
+ */
 @Getter
 @Setter
 @ToString
@@ -27,7 +29,9 @@ public class PersonnelRequest {
 
   private Role role = ADMIN;
 
-  /** Constructor to build the root user using application properties configuration. */
+  /**
+   * Constructor to build the root user using application properties configuration.
+   */
   public PersonnelRequest(RootUser rootUser) {
     this.username = rootUser.getUsername();
     this.password = rootUser.getPassword();

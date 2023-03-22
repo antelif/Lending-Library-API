@@ -27,12 +27,15 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/** TransactionEntity entity that gets persisted in database. */
+/**
+ * TransactionEntity entity that gets persisted in database.
+ */
 @Getter
 @Setter
 @Entity
 @Table(name = "transaction")
 public class TransactionEntity {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -79,7 +82,7 @@ public class TransactionEntity {
    * Creates a list of TransactionItemEntity for each one of the book copies provided.
    *
    * @param bookCopies the list with the BookCopyEntity objects of the transaction to create
-   *     TransactionEntityItems for.
+   *                   TransactionEntityItems for.
    * @return a set of TransactionItemEntity objects, one for each book copy.
    */
   public Set<TransactionItemEntity> createTransactionItemsOfCopies(
@@ -123,7 +126,9 @@ public class TransactionEntity {
         .allMatch(status -> status.equals(AVAILABLE));
   }
 
-  /** Sets the transaction status to 'FINALIZED' */
+  /**
+   * Sets the transaction status to 'FINALIZED'
+   */
   public void finalizeTransaction() {
     this.status = FINALIZED;
   }

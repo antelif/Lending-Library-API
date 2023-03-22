@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Customer query controller. */
+/**
+ * Customer query controller.
+ */
 @RestController
 @RequiredArgsConstructor
 @Slf4j

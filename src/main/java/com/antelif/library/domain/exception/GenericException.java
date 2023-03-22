@@ -3,7 +3,9 @@ package com.antelif.library.domain.exception;
 import com.antelif.library.application.error.GenericError;
 import lombok.Getter;
 
-/** Generic Exception. */
+/**
+ * Generic Exception.
+ */
 @Getter
 public class GenericException extends RuntimeException {
 

@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** Book copy request DTO used as request body in HTTP requests. */
+/**
+ * Book copy request DTO used as request body in HTTP requests.
+ */
 @Getter
 @Setter
 @ToString

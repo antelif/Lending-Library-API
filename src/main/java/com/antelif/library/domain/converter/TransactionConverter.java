@@ -17,7 +17,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-/** Converter for transaction objects. */
+/**
+ * Converter for transaction objects.
+ */
 @RequiredArgsConstructor
 @Component
 public class TransactionConverter
@@ -36,8 +38,10 @@ public class TransactionConverter
     TransactionEntity transaction = modelMapper.map(transactionRequest, TransactionEntity.class);
 
     CustomerEntity customer = customerService.getCustomerById(transactionRequest.getCustomerId());
-    PersonnelEntity personnel = personnelService.getPersonnelById(transactionRequest.getPersonnelId());
-    List<BookCopyEntity> bookCopies = bookCopyService.getBookCopiesByBookCopyIds(transactionRequest.getCopyIds());
+    PersonnelEntity personnel = personnelService.getPersonnelById(
+        transactionRequest.getPersonnelId());
+    List<BookCopyEntity> bookCopies = bookCopyService.getBookCopiesByBookCopyIds(
+        transactionRequest.getCopyIds());
 
     transaction.setCustomer(customer);
     transaction.setPersonnel(personnel);

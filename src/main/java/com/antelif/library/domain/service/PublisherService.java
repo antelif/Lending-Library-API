@@ -19,7 +19,9 @@ import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/** Publisher service. */
+/**
+ * Publisher service.
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor

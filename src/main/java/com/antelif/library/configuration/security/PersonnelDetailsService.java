@@ -7,7 +7,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-/** Contains functionality to authenticate a database personnel. */
+/**
+ * Contains functionality to authenticate a database personnel.
+ */
 @Service
 @RequiredArgsConstructor
 public class PersonnelDetailsService implements UserDetailsService {

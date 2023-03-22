@@ -12,7 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
-/** Handles 401 requests. */
+/**
+ * Handles 401 requests.
+ */
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
   private final ObjectMapper objectMapper;

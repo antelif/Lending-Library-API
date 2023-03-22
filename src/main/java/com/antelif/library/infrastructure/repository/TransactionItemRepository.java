@@ -6,14 +6,16 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-/** TransactionItemEntity repository. */
+/**
+ * TransactionItemEntity repository.
+ */
 @Repository
 public interface TransactionItemRepository extends JpaRepository<TransactionItemEntity, Long> {
 
   /**
    * Gets an TransactionItemEntity object by the book copy id and the transaction id.
    *
-   * @param bookCopyId the id of the book copy,
+   * @param bookCopyId    the id of the book copy,
    * @param transactionId the id of the transaction.
    * @return a TransactionItemEntityor an empty optional if there is no record for given ids.
    */
@@ -25,7 +27,7 @@ public interface TransactionItemRepository extends JpaRepository<TransactionItem
    *
    * @param bookCopyId the id of the book copy of the TransactionItemEntity objects.
    * @return a list of TransactionItemEntity or an empty list if there is no record with this book
-   *     copy id.
+   * copy id.
    */
   List<TransactionItemEntity> getByBookCopy_Id(Long bookCopyId);
 
@@ -34,7 +36,7 @@ public interface TransactionItemRepository extends JpaRepository<TransactionItem
    *
    * @param transactionId the id of the transaction of the TransactionItemEntity objects.
    * @return a list of TransactionItemEntity or an empty list if there is no record with this
-   *     transaction id.
+   * transaction id.
    */
   List<TransactionItemEntity> getByTransaction_Id(Long transactionId);
 }

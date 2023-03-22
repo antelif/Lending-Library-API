@@ -2,7 +2,9 @@ package com.antelif.library.application.error;
 
 import lombok.Getter;
 
-/** Errors. */
+/**
+ * Errors.
+ */
 @Getter
 public enum GenericError {
   DUPLICATE_AUTHOR(1, "Author already exists."),
@@ -56,7 +58,7 @@ public enum GenericError {
   /**
    * Constructor.
    *
-   * @param code the error code,
+   * @param code        the error code,
    * @param description the error description
    */
   GenericError(int code, String description) {
@@ -64,7 +66,9 @@ public enum GenericError {
     this.description = description;
   }
 
-  /** Get the name of the GenericError. */
+  /**
+   * Get the name of the GenericError.
+   */
   public String getName() {
     return this.name();
   }

@@ -8,7 +8,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
-/** Scheduler to calculate customer fee. */
+/**
+ * Scheduler to calculate customer fee.
+ */
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -16,7 +18,9 @@ public class CustomerFeeScheduler {
 
   private final CustomerService customerService;
 
-  /** Recalculates customer fee every day at 07:30. */
+  /**
+   * Recalculates customer fee every day at 07:30.
+   */
   @Scheduled(cron = "${app.properties.fee-calculation-rate}")
   @Async
   public void customerFeeCalculationScheduler() {

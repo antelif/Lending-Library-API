@@ -21,7 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/** Personnel service. */
+/**
+ * Personnel service.
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -69,7 +71,9 @@ public class PersonnelService {
         () -> new EntityDoesNotExistException(PERSONNEL_DOES_NOT_EXIST));
   }
 
-  /** Initializes a root user to enable access to requests until new users are created. */
+  /**
+   * Initializes a root user to enable access to requests until new users are created.
+   */
   @PostConstruct
   public void initializeRootUser() {
     PersonnelRequest rootPersonnel = new PersonnelRequest(appProperties.getRootUser());

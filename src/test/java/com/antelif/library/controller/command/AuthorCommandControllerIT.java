@@ -32,8 +32,10 @@ import org.springframework.web.context.WebApplicationContext;
 @WithMockUser(username = ROOT_USER, password = ROOT_PASSWORD, roles = ADMIN)
 class AuthorCommandControllerIT extends BaseIT {
 
-  @Autowired private WebApplicationContext webApplicationContext;
-  @Autowired private MockMvc mockMvc;
+  @Autowired
+  private WebApplicationContext webApplicationContext;
+  @Autowired
+  private MockMvc mockMvc;
 
   private AuthorResponse expectedAuthorResponse;
   private AuthorRequest authorRequest;
@@ -41,10 +43,8 @@ class AuthorCommandControllerIT extends BaseIT {
   @BeforeEach
   @SneakyThrows
   void setUp() {
-    this.mockMvc =
-        MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
-            .apply(springSecurity())
-            .build();
+    this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext)
+        .apply(springSecurity()).build();
 
     authorCounter++;
 
@@ -84,8 +84,7 @@ class AuthorCommandControllerIT extends BaseIT {
   }
 
   @Test
-  @DisplayName(
-      "Author: Unsuccessful creation when record exists for this name, surname and middle name.")
+  @DisplayName("Author: Unsuccessful creation when record exists for this name, surname and middle name.")
   @SneakyThrows
   void testDuplicateAuthorIsNotCreated() {
 
@@ -93,9 +92,8 @@ class AuthorCommandControllerIT extends BaseIT {
     postAuthor(authorRequest, this.mockMvc);
 
     // Same author creation should fail
-    ErrorResponse response =
-        postRequestAndExpectError(
-            AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
+    ErrorResponse response = postRequestAndExpectError(AUTHORS_ENDPOINT,
+        objectMapper.writeValueAsString(authorRequest), this.mockMvc);
 
     assertEquals(DUPLICATE_AUTHOR.getCode(), response.getCode());
   }
@@ -111,9 +109,8 @@ class AuthorCommandControllerIT extends BaseIT {
     postAuthor(authorRequest, this.mockMvc);
 
     // Same author without middle name should fail
-    ErrorResponse response =
-        postRequestAndExpectError(
-            AUTHORS_ENDPOINT, objectMapper.writeValueAsString(authorRequest), this.mockMvc);
+    ErrorResponse response = postRequestAndExpectError(AUTHORS_ENDPOINT,
+        objectMapper.writeValueAsString(authorRequest), this.mockMvc);
 
     assertEquals(DUPLICATE_AUTHOR.getCode(), response.getCode());
   }

@@ -3,10 +3,13 @@ package com.antelif.library.domain.dto.response;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Customer response DTO used as response body in HTTP requests. */
+/**
+ * Customer response DTO used as response body in HTTP requests.
+ */
 @Getter
 @Setter
 public class CustomerResponse {
+
   private Long id;
   private String name;
   private String surname;
